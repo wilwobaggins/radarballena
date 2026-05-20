@@ -1,0 +1,14 @@
+# Core
+openai
+pydantic
+python-dotenv
+requests
+
+# Testing
+pytest
+
+# Code quality
+ruff
+
+# Próxima fase: Supabase
+supabase
