@@ -365,3 +365,30 @@ grant all on all sequences in schema public to prisma;
 alter default privileges for role postgres in schema public grant all on tables to prisma;
 alter default privileges for role postgres in schema public grant all on routines to prisma;
 alter default privileges for role postgres in schema public grant all on sequences to prisma;
+
+create table if not exists public.market_snapshots (
+  id uuid primary key default gen_random_uuid(),
+  "marketId" uuid not null,
+
+  "currentProbability" double precision,
+  volume double precision,
+  liquidity double precision,
+  "priceYes" double precision,
+  "priceNo" double precision,
+
+  "rawData" jsonb,
+  "capturedAt" timestamptz not null default now(),
+
+  constraint market_snapshots_marketId_fkey
+    foreign key ("marketId") references public.markets(id)
+    on delete cascade
+);
+
+create index if not exists market_snapshots_marketId_idx
+on public.market_snapshots ("marketId");
+
+create index if not exists market_snapshots_capturedAt_idx
+on public.market_snapshots ("capturedAt");
+
+create index if not exists market_snapshots_market_captured_idx
+on public.market_snapshots ("marketId", "capturedAt");
