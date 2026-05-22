@@ -67,6 +67,7 @@ def insert_market(market: dict[str, Any]) -> dict[str, Any]:
         "liquidity": market.get("liquidity"),
         "outcomes": market.get("outcomes", []),
         "last_updated": market.get("last_updated"),
+        "raw_payload": market.get("raw_payload"),
     }
 
     if existing.data:

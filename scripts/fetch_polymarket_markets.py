@@ -3,7 +3,7 @@ from services.supabase_service import insert_market, insert_snapshot
 
 
 def main():
-    markets = get_normalized_active_markets(limit=10)
+    markets = get_normalized_active_markets(limit=100)
 
     print("Markets obtenidos:", len(markets))
 
@@ -12,7 +12,6 @@ def main():
 
         # No mandes raw_payload todavía si tu tabla markets no tiene esa columna
         market_payload = dict(market)
-        market_payload.pop("raw_payload", None)
 
         saved_market = insert_market(market_payload)
         print("Market OK:", saved_market["id"])

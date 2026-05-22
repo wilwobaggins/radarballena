@@ -1,8 +1,13 @@
 from services.supabase_service import get_supabase_client, insert_deepbrief
 from services.deepbrief_generator import generate_deepbrief_for_market
+from services.market_filter import select_top_markets
 
 
 def get_top_markets(limit: int = 5):
+    """
+    Antes: tomaba Top 5 solo por volume.
+    Ahora: trae más candidatos y selecciona usando filtro preliminar del brief.
+    """
     supabase = get_supabase_client()
 
     response = (
@@ -12,11 +17,17 @@ def get_top_markets(limit: int = 5):
         .eq("platform", "polymarket")
         .neq("external_market_id", "test_market_001")
         .order("volume", desc=True)
-        .limit(limit)
+        .limit(50)
         .execute()
     )
 
-    return response.data or []
+    candidates = response.data or []
+    selected = select_top_markets(candidates, limit=limit)
+
+    print("Candidatos desde Supabase:", len(candidates))
+    print("Mercados seleccionados por filtro:", len(selected))
+
+    return selected
 
 
 def main():
