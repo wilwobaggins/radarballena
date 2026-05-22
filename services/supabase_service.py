@@ -24,21 +24,32 @@ def get_supabase_client() -> Client:
     return create_client(url, key)
 
 
+def _first_row(response) -> dict[str, Any]:
+    if not response.data:
+        raise RuntimeError("Supabase no regresó filas en la operación.")
+
+    return response.data[0]
+
+
 def insert_market(market: dict[str, Any]) -> dict[str, Any]:
     """
-    Inserta o actualiza un mercado usando platform + external_market_id.
-    Devuelve el registro guardado.
+    Upsert manual de market.
+
+    Evita duplicados buscando por:
+    - platform
+    - external_market_id
     """
     supabase = get_supabase_client()
 
     external_market_id = str(
         market.get("external_market_id")
-        or market.get("marketId")
+        or market.get("externalMarketId")
+        or market.get("market_id")
         or ""
     )
 
     if not external_market_id:
-        raise ValueError("market necesita external_market_id o marketId")
+        raise ValueError("market necesita external_market_id o market_id")
 
     platform = market.get("platform", "polymarket")
 
@@ -46,8 +57,8 @@ def insert_market(market: dict[str, Any]) -> dict[str, Any]:
         supabase
         .table("markets")
         .select("*")
-        .eq("external_market_id", external_market_id)
         .eq("platform", platform)
+        .eq("external_market_id", external_market_id)
         .limit(1)
         .execute()
     )
@@ -71,13 +82,13 @@ def insert_market(market: dict[str, Any]) -> dict[str, Any]:
     }
 
     if existing.data:
-        marketId = existing.data[0]["id"]
+        market_db_id = existing.data[0]["id"]
 
         response = (
             supabase
             .table("markets")
             .update(payload)
-            .eq("id", marketId)
+            .eq("id", market_db_id)
             .execute()
         )
     else:
@@ -88,10 +99,7 @@ def insert_market(market: dict[str, Any]) -> dict[str, Any]:
             .execute()
         )
 
-    if not response.data:
-        raise RuntimeError("No se pudo guardar market")
-
-    return response.data[0]
+    return _first_row(response)
 
 
 def insert_snapshot(market_db_id: str, market: dict[str, Any]) -> dict[str, Any]:
@@ -101,12 +109,12 @@ def insert_snapshot(market_db_id: str, market: dict[str, Any]) -> dict[str, Any]
     supabase = get_supabase_client()
 
     payload = {
-    "marketId": market_db_id,
-    "current_probability": market.get("current_probability"),
-    "previous_probability_24h": market.get("previous_probability_24h"),
-    "probability_change_24h": market.get("probability_change_24h"),
-    "volume": market.get("volume"),
-    "liquidity": market.get("liquidity"),
+        "marketId": market_db_id,
+        "current_probability": market.get("current_probability"),
+        "previous_probability_24h": market.get("previous_probability_24h"),
+        "probability_change_24h": market.get("probability_change_24h"),
+        "volume": market.get("volume"),
+        "liquidity": market.get("liquidity"),
     }
 
     response = (
@@ -116,10 +124,24 @@ def insert_snapshot(market_db_id: str, market: dict[str, Any]) -> dict[str, Any]
         .execute()
     )
 
-    if not response.data:
-        raise RuntimeError("No se pudo guardar market_snapshot")
+    return _first_row(response)
 
-    return response.data[0]
+
+def upsert_market(market: dict[str, Any]) -> dict[str, Any]:
+    """
+    Alias formal para Trello.
+    """
+    return insert_market(market)
+
+
+def save_market_snapshot(
+    market_db_id: str,
+    market: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Alias formal para Trello.
+    """
+    return insert_snapshot(market_db_id, market)
 
 
 def insert_deepbrief(
