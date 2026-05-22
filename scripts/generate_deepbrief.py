@@ -4,10 +4,6 @@ from services.market_filter import select_top_markets
 
 
 def get_top_markets(limit: int = 5):
-    """
-    Antes: tomaba Top 5 solo por volume.
-    Ahora: trae más candidatos y selecciona usando filtro preliminar del brief.
-    """
     supabase = get_supabase_client()
 
     response = (
@@ -25,7 +21,15 @@ def get_top_markets(limit: int = 5):
     selected = select_top_markets(candidates, limit=limit)
 
     print("Candidatos desde Supabase:", len(candidates))
-    print("Mercados seleccionados por filtro:", len(selected))
+    print("Mercados seleccionados por score:", len(selected))
+
+    for market in selected:
+        print(
+            "Score:",
+            market.get("preliminary_radar_score"),
+            "|",
+            market.get("title"),
+        )
 
     return selected
 

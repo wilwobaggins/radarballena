@@ -1,0 +1,219 @@
+from datetime import datetime, timezone
+from typing import Any
+
+
+def safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        if value is None or value == "":
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def clamp(value: float, min_value: float, max_value: float) -> float:
+    return max(min_value, min(value, max_value))
+
+
+def parse_date(value: Any) -> datetime | None:
+    if not value:
+        return None
+
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+
+        return parsed
+    except ValueError:
+        return None
+
+
+def days_to_close(market: dict[str, Any]) -> int:
+    close_date = parse_date(market.get("close_date"))
+
+    if close_date is None:
+        return 9999
+
+    return max((close_date - datetime.now(timezone.utc)).days, 0)
+
+
+def calculate_volume_score(market: dict[str, Any]) -> int:
+    """
+    0-20 pts.
+    """
+    volume = safe_float(market.get("volume"))
+    return int(clamp((volume / 250_000) * 20, 0, 20))
+
+
+def calculate_liquidity_score(market: dict[str, Any]) -> int:
+    """
+    0-20 pts.
+    """
+    liquidity = safe_float(market.get("liquidity"))
+    return int(clamp((liquidity / 50_000) * 20, 0, 20))
+
+
+def calculate_time_to_close_score(market: dict[str, Any]) -> int:
+    """
+    0-15 pts.
+    Premia cierre relativamente cercano, pero no demasiado inmediato.
+    """
+    days = days_to_close(market)
+
+    if days <= 0:
+        return 0
+    if days <= 7:
+        return 8
+    if days <= 30:
+        return 15
+    if days <= 60:
+        return 12
+    if days <= 90:
+        return 8
+
+    return 0
+
+
+def calculate_probability_movement_score(market: dict[str, Any]) -> int:
+    """
+    0-25 pts.
+    Requiere probability_change_24h.
+    Si no existe, regresa 0.
+    """
+    movement = abs(safe_float(market.get("probability_change_24h")))
+    return int(clamp((movement / 0.05) * 25, 0, 25))
+
+
+def calculate_resolution_score(market: dict[str, Any]) -> int:
+    """
+    0-10 pts.
+    Evalúa claridad básica.
+    """
+    title = str(market.get("title") or "").strip()
+    description = str(market.get("description") or "").strip()
+    outcomes = market.get("outcomes") or []
+
+    if not title:
+        return 0
+
+    score = 4
+
+    if description:
+        score += 3
+
+    if isinstance(outcomes, list) and len(outcomes) >= 2:
+        score += 3
+
+    return int(clamp(score, 0, 10))
+
+
+def calculate_narrative_score(market: dict[str, Any]) -> int:
+    """
+    0-10 pts.
+    MVP simple basado en categoría/título.
+    """
+    category = str(market.get("category") or "").lower()
+    title = str(market.get("title") or "").lower()
+    description = str(market.get("description") or "").lower()
+
+    relevant_categories = {
+        "politics",
+        "macro",
+        "economics",
+        "crypto",
+        "technology",
+        "geopolitics",
+        "entertainment",
+        "sports",
+        "commodities",
+    }
+
+    if category in relevant_categories:
+        return 10
+
+    keywords = [
+        "trump",
+        "president",
+        "election",
+        "bitcoin",
+        "btc",
+        "ethereum",
+        "fed",
+        "inflation",
+        "war",
+        "ceasefire",
+        "ai",
+        "openai",
+        "nvidia",
+        "gta",
+        "rockstar",
+        "oil",
+        "gold",
+        "nba",
+        "nfl",
+    ]
+
+    text = f"{title} {description}"
+
+    if any(keyword in text for keyword in keywords):
+        return 8
+
+    return 4
+
+
+def calculate_preliminary_radar_score(market: dict[str, Any]) -> dict[str, Any]:
+    volume_score = calculate_volume_score(market)
+    liquidity_score = calculate_liquidity_score(market)
+    time_to_close_score = calculate_time_to_close_score(market)
+    probability_movement_score = calculate_probability_movement_score(market)
+    resolution_score = calculate_resolution_score(market)
+    narrative_score = calculate_narrative_score(market)
+
+    total = (
+        volume_score
+        + liquidity_score
+        + time_to_close_score
+        + probability_movement_score
+        + resolution_score
+        + narrative_score
+    )
+
+    preliminary_radar_score = int(clamp(total, 0, 100))
+
+    return {
+        "preliminary_radar_score": preliminary_radar_score,
+        "score_breakdown": {
+            "volume_score": volume_score,
+            "liquidity_score": liquidity_score,
+            "time_to_close_score": time_to_close_score,
+            "probability_movement_score": probability_movement_score,
+            "resolution_score": resolution_score,
+            "narrative_score": narrative_score,
+        },
+    }
+
+
+def score_markets(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    scored = []
+
+    for market in markets:
+        score_result = calculate_preliminary_radar_score(market)
+
+        scored_market = {
+            **market,
+            **score_result,
+        }
+
+        scored.append(scored_market)
+
+    return scored
+
+
+def sort_markets_by_score(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted(
+        markets,
+        key=lambda market: market.get("preliminary_radar_score", 0),
+        reverse=True,
+    )
