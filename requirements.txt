@@ -12,3 +12,4 @@ ruff
 
 # Próxima fase: Supabase
 supabase
+
