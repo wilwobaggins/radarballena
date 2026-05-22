@@ -1,50 +1,81 @@
+import os
+from typing import Any
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
 from services.deepbrief_schema import DeepBriefSchema
 
 
-def generate_deepbrief_for_market(market: dict) -> dict:
-    deepbrief = {
-        "lectura_clave": f"Análisis preliminar del mercado: {market.get('title')}",
-        "radar_score": 60,
-        "radar_score_breakdown": {
-            "movimiento_probabilidad": 5,
-            "volumen": 10,
-            "liquidez": 10,
-            "cercania_cierre": 10,
-            "claridad_resolucion": 10,
-            "fuerza_narrativa": 10,
-            "asimetria_detectada": 5,
-            "riesgo_ruido": 0,
-        },
-        "signal_label": "Watchlist",
-        "estela_de_capital": "Movimiento preliminar basado en volumen y liquidez.",
-        "entorno_de_senal": {
-            "sintesis": "Entorno preliminar sin análisis externo profundo."
-        },
-        "corriente_narrativa": "Narrativa inicial pendiente de validación.",
-        "filtro_de_ruido": {
-            "riesgo_liquidez": "Pendiente de evaluación."
-        },
-        "premortem": {
-            "si_la_tesis_falla_probablemente_seria_por": "Falta de información o baja liquidez.",
-            "senales_tempranas_de_invalidacion": []
-        },
-        "mapa_de_ruptura": {
-            "confirmacion": "Pendiente.",
-            "ruptura_alcista": "Pendiente.",
-            "ruptura_bajista": "Pendiente.",
-            "invalidacion": "Pendiente.",
-            "evento_detonador": "Pendiente."
-        },
-        "mapa_de_escenarios": [],
-        "actualizacion_bayesiana": {
-            "probabilidad_actual_del_mercado": market.get("current_probability"),
-            "direccion_sugerida_del_update": "mantener",
-            "razon": "Análisis preliminar."
-        },
-        "deepsignal_verdict": "DeepBrief preliminar generado correctamente.",
-        "confidence_level": "Low",
-        "watch_triggers": []
+load_dotenv()
+
+
+def build_deepbrief_prompt(market: dict[str, Any]) -> str:
+    return f"""
+Genera un DeepBrief analítico para el siguiente mercado de predicción.
+
+Usa la información disponible del mercado. No inventes datos externos específicos.
+Si falta información, dilo como limitación dentro del análisis.
+
+Mercado:
+- Título: {market.get("title")}
+- Descripción: {market.get("description")}
+- Categoría: {market.get("category")}
+- URL: {market.get("url")}
+- Fecha de cierre: {market.get("close_date")}
+- Probabilidad actual: {market.get("current_probability")}
+- Probabilidad previa 24h: {market.get("previous_probability_24h")}
+- Cambio 24h: {market.get("probability_change_24h")}
+- Volumen: {market.get("volume")}
+- Liquidez: {market.get("liquidity")}
+- Outcomes: {market.get("outcomes")}
+
+Instrucciones:
+- Evalúa señal, ruido, liquidez, narrativa, escenarios y riesgos.
+- El radar_score debe estar entre 0 y 100.
+- signal_label debe ser uno de estos valores aproximados: Ignore, Watchlist, Strong Watch, High Conviction.
+- confidence_level debe ser Low, Medium o High.
+- Responde siguiendo exactamente el schema solicitado.
+"""
+
+
+def generate_deepbrief_for_market(market: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    prompt = build_deepbrief_prompt(market)
+
+    response = client.responses.parse(
+        model=model,
+        input=[
+            {
+                "role": "system",
+                "content": (
+                    "Eres un analista de mercados predictivos. "
+                    "Tu trabajo es generar DeepBriefs estructurados, prudentes y útiles. "
+                    "No inventes datos externos no incluidos en el input."
+                ),
+            },
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ],
+        text_format=DeepBriefSchema,
+    )
+
+    parsed = response.output_parsed
+
+    if parsed is None:
+        raise RuntimeError("El modelo no regresó un DeepBrief válido")
+
+    deepbrief = parsed.model_dump()
+
+    raw_output = {
+        "model": model,
+        "market_input": market,
+        "parsed_output": deepbrief,
+        "response_id": getattr(response, "id", None),
     }
 
-    validated = DeepBriefSchema(**deepbrief)
-    return validated.model_dump()
+    return deepbrief, raw_output
