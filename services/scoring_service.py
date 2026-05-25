@@ -217,3 +217,65 @@ def sort_markets_by_score(markets: list[dict[str, Any]]) -> list[dict[str, Any]]
         key=lambda market: market.get("preliminary_radar_score", 0),
         reverse=True,
     )
+
+def calculate_hybrid_radar_score(
+    preliminary_radar_score: int | float | None,
+    ai_interpretive_score: int | float | None,
+) -> dict:
+    """
+    Score híbrido:
+    final_radar_score = 0.60 preliminary + 0.40 ai_interpretive
+
+    preliminary_radar_score = score cuantitativo del mercado
+    ai_interpretive_score = radar_score generado por el DeepBrief/IA
+    """
+    preliminary = safe_float(preliminary_radar_score)
+    ai_score = safe_float(ai_interpretive_score)
+
+    preliminary = int(clamp(preliminary, 0, 100))
+    ai_score = int(clamp(ai_score, 0, 100))
+
+    final_score = round((0.60 * preliminary) + (0.40 * ai_score))
+
+    final_score = int(clamp(final_score, 0, 100))
+
+    return {
+        "preliminary_radar_score": preliminary,
+        "ai_interpretive_score": ai_score,
+        "final_radar_score": final_score,
+        "score_breakdown": {
+            "formula": "final_radar_score = 0.60 preliminary_radar_score + 0.40 ai_interpretive_score",
+            "weights": {
+                "preliminary_radar_score": 0.60,
+                "ai_interpretive_score": 0.40,
+            },
+            "inputs": {
+                "preliminary_radar_score": preliminary,
+                "ai_interpretive_score": ai_score,
+            },
+            "output": {
+                "final_radar_score": final_score,
+            },
+        },
+    }
+
+def calculate_probability_quality_score(market: dict[str, Any]) -> int:
+    """
+    0-15 pts.
+    Penaliza mercados con probabilidad casi cero o casi 100%.
+    """
+    probability = safe_float(market.get("current_probability"))
+
+    if probability <= 0.01 or probability >= 0.99:
+        return 0
+
+    if probability <= 0.03 or probability >= 0.97:
+        return 3
+
+    if probability <= 0.08 or probability >= 0.92:
+        return 6
+
+    if 0.20 <= probability <= 0.70:
+        return 15
+
+    return 10

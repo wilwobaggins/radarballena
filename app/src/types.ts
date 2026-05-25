@@ -34,6 +34,10 @@ export type DeepBrief = {
   watchTriggers: string[] | null;
   rawOutput: Record<string, unknown> | null;
   createdAt: string | null;
+  preliminaryRadarScore: number | null;
+  aiInterpretiveScore: number | null;
+  finalRadarScore: number | null;
+  hybridScoreBreakdown: Record<string, unknown> | null;
 };
 
 export type DashboardRow = Market & {

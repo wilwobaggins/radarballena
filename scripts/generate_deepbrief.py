@@ -7,6 +7,7 @@ from services.supabase_service import (
 from services.deepbrief_generator import generate_deepbrief_for_market
 from services.market_filter import select_top_markets
 from services.context_client import search_context
+from services.scoring_service import calculate_hybrid_radar_score
 
 def get_top_markets(limit: int = 5):
     supabase = get_supabase_client()
@@ -88,10 +89,28 @@ def main():
             context_sources=context_sources,
         )
 
+        preliminary_radar_score = market.get("preliminary_radar_score")
+        ai_interpretive_score = deepbrief.get("radar_score")
+
+        hybrid_score = calculate_hybrid_radar_score(
+            preliminary_radar_score=preliminary_radar_score,
+            ai_interpretive_score=ai_interpretive_score,
+        )
+
+        print(
+            "Scores:",
+            "preliminary=", hybrid_score["preliminary_radar_score"],
+            "| ai=", hybrid_score["ai_interpretive_score"],
+            "| final=", hybrid_score["final_radar_score"],
+        )
+
+        raw_output["hybrid_score"] = hybrid_score
+
         saved = insert_deepbrief(
             market_db_id=market["id"],
             deepbrief=deepbrief,
             raw_output=raw_output,
+            hybrid_score=hybrid_score,
         )
 
         print("DeepBrief guardado:", saved["id"])

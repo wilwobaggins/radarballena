@@ -148,16 +148,22 @@ def insert_deepbrief(
     market_db_id: str,
     deepbrief: dict[str, Any],
     raw_output: dict[str, Any] | None = None,
+    hybrid_score: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Guarda DeepBrief asociado a un market.
     """
     supabase = get_supabase_client()
 
+    hybrid_score = hybrid_score or {}
+
     payload = {
         "marketId": market_db_id,
         "lecturaClave": deepbrief.get("lectura_clave"),
-        "radarScore": deepbrief.get("radar_score"),
+
+        # Mantengo radarScore como score visible/final
+        "radarScore": hybrid_score.get("final_radar_score", deepbrief.get("radar_score")),
+
         "radarScoreBreakdown": deepbrief.get("radar_score_breakdown"),
         "signalLabel": deepbrief.get("signal_label"),
         "estelaDeCapital": deepbrief.get("estela_de_capital"),
@@ -172,6 +178,12 @@ def insert_deepbrief(
         "confidenceLevel": deepbrief.get("confidence_level"),
         "watchTriggers": deepbrief.get("watch_triggers"),
         "rawOutput": raw_output or deepbrief,
+
+        # Scores híbridos
+        "preliminaryRadarScore": hybrid_score.get("preliminary_radar_score"),
+        "aiInterpretiveScore": hybrid_score.get("ai_interpretive_score"),
+        "finalRadarScore": hybrid_score.get("final_radar_score"),
+        "hybridScoreBreakdown": hybrid_score.get("score_breakdown"),
     }
 
     response = (
