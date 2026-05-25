@@ -3,7 +3,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from supabase import Client, create_client
-
+from datetime import datetime, timezone
 
 load_dotenv()
 
@@ -286,6 +286,65 @@ def insert_pipeline_error(
         supabase
         .table("pipeline_errors")
         .insert(payload)
+        .execute()
+    )
+
+    return _first_row(response)
+
+def start_pipeline_run() -> dict[str, Any]:
+    supabase = get_supabase_client()
+
+    payload = {
+        "status": "running",
+        "startedAt": datetime.now(timezone.utc).isoformat(),
+        "marketsFetched": 0,
+        "marketsFiltered": 0,
+        "marketsAnalyzed": 0,
+        "deepBriefsGenerated": 0,
+        "errorsCount": 0,
+        "errorMessage": None,
+    }
+
+    response = (
+        supabase
+        .table("pipeline_runs")
+        .insert(payload)
+        .execute()
+    )
+
+    return _first_row(response)
+
+
+def finish_pipeline_run(
+    pipeline_run_id: str,
+    status: str,
+    markets_fetched: int,
+    markets_filtered: int,
+    markets_analyzed: int,
+    deepbriefs_generated: int,
+    errors_count: int,
+    duration_seconds: float,
+    error_message: str | None = None,
+) -> dict[str, Any]:
+    supabase = get_supabase_client()
+
+    payload = {
+        "status": status,
+        "finishedAt": datetime.now(timezone.utc).isoformat(),
+        "marketsFetched": markets_fetched,
+        "marketsFiltered": markets_filtered,
+        "marketsAnalyzed": markets_analyzed,
+        "deepBriefsGenerated": deepbriefs_generated,
+        "errorsCount": errors_count,
+        "durationSeconds": duration_seconds,
+        "errorMessage": error_message,
+    }
+
+    response = (
+        supabase
+        .table("pipeline_runs")
+        .update(payload)
+        .eq("id", pipeline_run_id)
         .execute()
     )
 
