@@ -1,7 +1,12 @@
-from services.supabase_service import get_supabase_client, insert_deepbrief
+from services.supabase_service import (
+    get_supabase_client,
+    insert_deepbrief,
+    get_market_context,
+    insert_market_context,
+)
 from services.deepbrief_generator import generate_deepbrief_for_market
 from services.market_filter import select_top_markets
-
+from services.context_client import search_context
 
 def get_top_markets(limit: int = 5):
     supabase = get_supabase_client()
@@ -33,6 +38,35 @@ def get_top_markets(limit: int = 5):
 
     return selected
 
+def ensure_market_context(market: dict, min_sources: int = 3) -> list[dict]:
+    """
+    Garantiza que el mercado tenga contexto externo.
+    Si ya existe en Supabase, lo usa.
+    Si no existe o hay menos de min_sources, busca nuevas fuentes y las guarda.
+    """
+    existing_context = get_market_context(market["id"], limit=min_sources)
+
+    if len(existing_context) >= min_sources:
+        return existing_context
+
+    print(
+        "Contexto insuficiente:",
+        len(existing_context),
+        "| buscando fuentes externas...",
+    )
+
+    new_sources = search_context(market, max_results=min_sources)
+
+    for source in new_sources:
+        insert_market_context(
+            market_db_id=market["id"],
+            source=source,
+        )
+
+    refreshed_context = get_market_context(market["id"], limit=min_sources)
+
+    return refreshed_context
+
 
 def main():
     markets = get_top_markets(limit=5)
@@ -45,7 +79,14 @@ def main():
     for market in markets:
         print("Generando DeepBrief para:", market.get("title"))
 
-        deepbrief, raw_output = generate_deepbrief_for_market(market)
+        context_sources = ensure_market_context(market, min_sources=3)
+
+        print("Fuentes de contexto usadas:", len(context_sources))
+
+        deepbrief, raw_output = generate_deepbrief_for_market(
+            market=market,
+            context_sources=context_sources,
+        )
 
         saved = insert_deepbrief(
             market_db_id=market["id"],
