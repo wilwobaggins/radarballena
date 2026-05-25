@@ -264,3 +264,29 @@ def get_markets_for_context(limit: int = 5) -> list[dict[str, Any]]:
     )
 
     return response.data or []
+
+def insert_pipeline_error(
+    error_record: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Guarda un error del pipeline para revisión posterior.
+    """
+    supabase = get_supabase_client()
+
+    payload = {
+        "errorType": error_record.get("error_type"),
+        "stage": error_record.get("stage"),
+        "message": error_record.get("message"),
+        "marketId": error_record.get("market_id"),
+        "externalMarketId": error_record.get("external_market_id"),
+        "marketTitle": error_record.get("market_title"),
+    }
+
+    response = (
+        supabase
+        .table("pipeline_errors")
+        .insert(payload)
+        .execute()
+    )
+
+    return _first_row(response)

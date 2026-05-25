@@ -8,6 +8,8 @@ from services.deepbrief_generator import generate_deepbrief_for_market
 from services.market_filter import select_top_markets
 from services.context_client import search_context
 from services.scoring_service import calculate_hybrid_radar_score
+from services.error_types import build_error_record
+from services.supabase_service import insert_pipeline_error
 
 def get_top_markets(limit: int = 5):
     supabase = get_supabase_client()
@@ -124,10 +126,23 @@ def main():
         except Exception as error:
             error_count += 1
 
-            print("ERROR generando DeepBrief para:", market.get("title"))
-            print("Error:", error)
-            print("El pipeline continúa con el siguiente mercado.")
+            error_record = build_error_record(
+                error=error,
+                market=market,
+                stage="generate_deepbrief",
+            )
 
+            print("ERROR generando DeepBrief para:", market.get("title"))
+            print("Tipo:", error_record["error_type"])
+            print("Error:", error)
+
+            try:
+                saved_error = insert_pipeline_error(error_record)
+                print("Error registrado:", saved_error["id"])
+            except Exception as save_error:
+                print("No se pudo registrar el error:", save_error)
+
+            print("El pipeline continúa con el siguiente mercado.")
             continue
 
     print("\nGeneración de DeepBriefs terminada.")
