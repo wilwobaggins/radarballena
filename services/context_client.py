@@ -3,6 +3,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from tavily import TavilyClient
+from services.context_ranker import rank_context_sources
 
 
 load_dotenv()
@@ -85,4 +86,8 @@ def search_context(
         if source["source_title"] and source["source_url"]:
             normalized.append(source)
 
-    return normalized
+    return rank_context_sources(
+    market=market,
+    sources=normalized,
+    limit=max_results,
+)
