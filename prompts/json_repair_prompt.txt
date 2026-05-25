@@ -1,0 +1,15 @@
+El intento anterior falló porque la salida no cumplió el schema esperado.
+
+Vuelve a generar el DeepBrief corrigiendo estrictamente estos puntos:
+
+- Devuelve solo datos compatibles con el schema Pydantic solicitado.
+- No agregues markdown.
+- No agregues texto fuera de la estructura.
+- No omitas campos obligatorios.
+- No uses null si el campo espera string; usa una explicación breve.
+- radar_score debe ser número entre 0 y 100.
+- confidence_level debe ser Low, Medium o High.
+- signal_label debe ser Ignore, Watchlist, Strong Watch o High Conviction.
+- mapa_de_escenarios debe incluir escenarios claros.
+- Si no hay suficiente información, dilo como limitación dentro del análisis.
+- No inventes datos externos que no estén en el mercado o contexto.

@@ -77,45 +77,62 @@ def main():
     if len(markets) < 5:
         print("Aviso: hay menos de 5 mercados reales disponibles.")
 
+    success_count = 0
+    error_count = 0
+
     for market in markets:
-        print("Generando DeepBrief para:", market.get("title"))
+        print("\nGenerando DeepBrief para:", market.get("title"))
 
-        context_sources = ensure_market_context(market, min_sources=3)
+        try:
+            context_sources = ensure_market_context(market, min_sources=3)
 
-        print("Fuentes de contexto usadas:", len(context_sources))
+            print("Fuentes de contexto usadas:", len(context_sources))
 
-        deepbrief, raw_output = generate_deepbrief_for_market(
-            market=market,
-            context_sources=context_sources,
-        )
+            deepbrief, raw_output = generate_deepbrief_for_market(
+                market=market,
+                context_sources=context_sources,
+            )
 
-        preliminary_radar_score = market.get("preliminary_radar_score")
-        ai_interpretive_score = deepbrief.get("radar_score")
+            preliminary_radar_score = market.get("preliminary_radar_score")
+            ai_interpretive_score = deepbrief.get("radar_score")
 
-        hybrid_score = calculate_hybrid_radar_score(
-            preliminary_radar_score=preliminary_radar_score,
-            ai_interpretive_score=ai_interpretive_score,
-        )
+            hybrid_score = calculate_hybrid_radar_score(
+                preliminary_radar_score=preliminary_radar_score,
+                ai_interpretive_score=ai_interpretive_score,
+            )
 
-        print(
-            "Scores:",
-            "preliminary=", hybrid_score["preliminary_radar_score"],
-            "| ai=", hybrid_score["ai_interpretive_score"],
-            "| final=", hybrid_score["final_radar_score"],
-        )
+            print(
+                "Scores:",
+                "preliminary=", hybrid_score["preliminary_radar_score"],
+                "| ai=", hybrid_score["ai_interpretive_score"],
+                "| final=", hybrid_score["final_radar_score"],
+            )
 
-        raw_output["hybrid_score"] = hybrid_score
+            raw_output["hybrid_score"] = hybrid_score
 
-        saved = insert_deepbrief(
-            market_db_id=market["id"],
-            deepbrief=deepbrief,
-            raw_output=raw_output,
-            hybrid_score=hybrid_score,
-        )
+            saved = insert_deepbrief(
+                market_db_id=market["id"],
+                deepbrief=deepbrief,
+                raw_output=raw_output,
+                hybrid_score=hybrid_score,
+            )
 
-        print("DeepBrief guardado:", saved["id"])
+            success_count += 1
 
-    print("Generación de DeepBriefs terminada.")
+            print("DeepBrief guardado:", saved["id"])
+
+        except Exception as error:
+            error_count += 1
+
+            print("ERROR generando DeepBrief para:", market.get("title"))
+            print("Error:", error)
+            print("El pipeline continúa con el siguiente mercado.")
+
+            continue
+
+    print("\nGeneración de DeepBriefs terminada.")
+    print("DeepBriefs exitosos:", success_count)
+    print("Errores:", error_count)
 
 
 if __name__ == "__main__":
