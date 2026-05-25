@@ -13,3 +13,4 @@ ruff
 # Próxima fase: Supabase
 supabase
 
+tavily-python

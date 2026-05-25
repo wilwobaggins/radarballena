@@ -185,3 +185,70 @@ def insert_deepbrief(
         raise RuntimeError("No se pudo guardar deepbrief")
 
     return response.data[0]
+
+def insert_market_context(
+    market_db_id: str,
+    source: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Guarda una fuente externa asociada a un mercado.
+    Tu tabla market_context usa camelCase.
+    """
+    supabase = get_supabase_client()
+
+    payload = {
+        "marketId": market_db_id,
+        "sourceTitle": source.get("source_title") or source.get("title"),
+        "sourceUrl": source.get("source_url") or source.get("url"),
+        "publishedDate": source.get("published_date"),
+        "summary": source.get("summary"),
+        "relevanceScore": source.get("relevance_score", 0.7),
+    }
+
+    response = (
+        supabase
+        .table("market_context")
+        .insert(payload)
+        .execute()
+    )
+
+    return _first_row(response)
+
+
+def get_market_context(
+    market_db_id: str,
+    limit: int = 5,
+) -> list[dict[str, Any]]:
+    supabase = get_supabase_client()
+
+    response = (
+        supabase
+        .table("market_context")
+        .select("*")
+        .eq("marketId", market_db_id)
+        .order("relevanceScore", desc=True)
+        .limit(limit)
+        .execute()
+    )
+
+    return response.data or []
+
+
+def get_markets_for_context(limit: int = 5) -> list[dict[str, Any]]:
+    """
+    Toma mercados Polymarket recientes/relevantes para buscar contexto.
+    """
+    supabase = get_supabase_client()
+
+    response = (
+        supabase
+        .table("markets")
+        .select("*")
+        .eq("platform", "polymarket")
+        .neq("external_market_id", "test_market_001")
+        .order("volume", desc=True)
+        .limit(limit)
+        .execute()
+    )
+
+    return response.data or []
