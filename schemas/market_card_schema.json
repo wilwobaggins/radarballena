@@ -1,0 +1,64 @@
+{
+  "markets": [
+    {
+      "market_id": "pm_001",
+      "market_title": "Will the Fed cut rates before July 2026?",
+      "category": "macro",
+      "platform": "polymarket",
+      "current_odds": 0.42,
+      "volume": 1250000,
+      "liquidity": 185000,
+      "closing_date": "2026-07-31T23:59:59Z",
+      "odds_movement": {
+        "previous_24h": 0.39,
+        "change_24h": 0.03,
+        "direction": "up"
+      },
+      "narrative_relevance": "High",
+      "radar_score": 76,
+      "noise_risk": "Medium",
+      "reason_for_selection": "High volume, strong 24h probability movement, and macro relevance.",
+      "brief_status": "generated"
+    },
+    {
+      "market_id": "pm_002",
+      "market_title": "Will a major AI regulation bill pass before September 2026?",
+      "category": "technology",
+      "platform": "polymarket",
+      "current_odds": 0.28,
+      "volume": 780000,
+      "liquidity": 95000,
+      "closing_date": "2026-09-30T23:59:59Z",
+      "odds_movement": {
+        "previous_24h": 0.31,
+        "change_24h": -0.03,
+        "direction": "down"
+      },
+      "narrative_relevance": "High",
+      "radar_score": 68,
+      "noise_risk": "High",
+      "reason_for_selection": "Relevant policy narrative with meaningful volume and recent odds movement.",
+      "brief_status": "pending"
+    },
+    {
+      "market_id": "pm_003",
+      "market_title": "Will Brazil win the 2026 FIFA World Cup?",
+      "category": "sports",
+      "platform": "polymarket",
+      "current_odds": 0.17,
+      "volume": 920000,
+      "liquidity": 110000,
+      "closing_date": "2026-07-20T23:59:59Z",
+      "odds_movement": {
+        "previous_24h": 0.16,
+        "change_24h": 0.01,
+        "direction": "up"
+      },
+      "narrative_relevance": "Medium",
+      "radar_score": 65,
+      "noise_risk": "Medium",
+      "reason_for_selection": "High-volume trending market with enough liquidity and recognizable public narrative.",
+      "brief_status": "generated"
+    }
+  ]
+}
