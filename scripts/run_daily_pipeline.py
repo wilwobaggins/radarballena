@@ -7,7 +7,7 @@ from services.context_client import search_context
 from services.deepbrief_generator import generate_deepbrief_for_market
 from services.error_types import build_error_record
 from services.logger_service import get_logger
-from services.market_filter import is_relevant_market
+from services.market_filter import filter_relevant_markets
 from services.polymarket_client import get_normalized_active_markets
 from services.scoring_service import (
     calculate_hybrid_radar_score,
@@ -105,24 +105,24 @@ def save_snapshots(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def filter_markets(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    logger.info("Filtrando mercados relevantes")
+    logger.info("Filtrando mercados relevantes para DeepEngine MVP")
 
-    filtered = []
+    try:
+        filtered = filter_relevant_markets(markets)
 
-    for market in markets:
-        try:
-            if is_relevant_market(market):
-                filtered.append(market)
-        except Exception as error:
-            register_pipeline_error(
-                error=error,
-                market=market,
-                stage="filter_markets",
-            )
+        logger.info("Mercados filtrados: %s", len(filtered))
 
-    logger.info("Mercados filtrados: %s", len(filtered))
+        return filtered
 
-    return filtered
+    except Exception as error:
+        register_pipeline_error(
+            error=error,
+            market=None,
+            stage="filter_markets",
+        )
+
+        logger.error("Falló el filtro general de mercados")
+        return []
 
 
 def score_market_batch(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:

@@ -1,6 +1,11 @@
 from datetime import datetime, timezone
 from typing import Any
 
+from services.category_filter import (
+    ALLOWED_DEEPENGINE_CATEGORIES,
+    classify_deepengine_category,
+)
+
 
 def safe_float(value: Any, default: float = 0.0) -> float:
     try:
@@ -30,8 +35,38 @@ def parse_date(value: Any) -> datetime | None:
         return None
 
 
+def get_market_value(market: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        value = market.get(key)
+
+        if value not in (None, ""):
+            return value
+
+    raw_payload = market.get("raw_payload") or {}
+
+    if isinstance(raw_payload, dict):
+        for key in keys:
+            value = raw_payload.get(key)
+
+            if value not in (None, ""):
+                return value
+
+    return None
+
+
 def days_to_close(market: dict[str, Any]) -> int:
-    close_date = parse_date(market.get("close_date"))
+    close_date_value = get_market_value(
+        market,
+        "close_date",
+        "closeDate",
+        "closing_date",
+        "closingDate",
+        "end_date",
+        "endDate",
+        "end_date_iso",
+    )
+
+    close_date = parse_date(close_date_value)
 
     if close_date is None:
         return 9999
@@ -112,53 +147,18 @@ def calculate_resolution_score(market: dict[str, Any]) -> int:
 def calculate_narrative_score(market: dict[str, Any]) -> int:
     """
     0-10 pts.
-    MVP simple basado en categoría/título.
+    Solo premia categorías compatibles con DeepEngine MVP.
+    Deportes y categorías ambiguas reciben 0.
     """
-    category = str(market.get("category") or "").lower()
-    title = str(market.get("title") or "").lower()
-    description = str(market.get("description") or "").lower()
+    classification = classify_deepengine_category(market)
 
-    relevant_categories = {
-        "politics",
-        "macro",
-        "economics",
-        "crypto",
-        "technology",
-        "geopolitics",
-        "entertainment",
-        "sports",
-        "commodities",
-    }
+    if not classification["eligible"]:
+        return 0
 
-    if category in relevant_categories:
+    category = classification["category"]
+
+    if category in ALLOWED_DEEPENGINE_CATEGORIES:
         return 10
-
-    keywords = [
-        "trump",
-        "president",
-        "election",
-        "bitcoin",
-        "btc",
-        "ethereum",
-        "fed",
-        "inflation",
-        "war",
-        "ceasefire",
-        "ai",
-        "openai",
-        "nvidia",
-        "gta",
-        "rockstar",
-        "oil",
-        "gold",
-        "nba",
-        "nfl",
-    ]
-
-    text = f"{title} {description}"
-
-    if any(keyword in text for keyword in keywords):
-        return 8
 
     return 4
 
@@ -218,6 +218,7 @@ def sort_markets_by_score(markets: list[dict[str, Any]]) -> list[dict[str, Any]]
         reverse=True,
     )
 
+
 def calculate_hybrid_radar_score(
     preliminary_radar_score: int | float | None,
     ai_interpretive_score: int | float | None,
@@ -225,9 +226,6 @@ def calculate_hybrid_radar_score(
     """
     Score híbrido:
     final_radar_score = 0.60 preliminary + 0.40 ai_interpretive
-
-    preliminary_radar_score = score cuantitativo del mercado
-    ai_interpretive_score = radar_score generado por el DeepBrief/IA
     """
     preliminary = safe_float(preliminary_radar_score)
     ai_score = safe_float(ai_interpretive_score)
@@ -236,7 +234,6 @@ def calculate_hybrid_radar_score(
     ai_score = int(clamp(ai_score, 0, 100))
 
     final_score = round((0.60 * preliminary) + (0.40 * ai_score))
-
     final_score = int(clamp(final_score, 0, 100))
 
     return {
@@ -258,24 +255,3 @@ def calculate_hybrid_radar_score(
             },
         },
     }
-
-def calculate_probability_quality_score(market: dict[str, Any]) -> int:
-    """
-    0-15 pts.
-    Penaliza mercados con probabilidad casi cero o casi 100%.
-    """
-    probability = safe_float(market.get("current_probability"))
-
-    if probability <= 0.01 or probability >= 0.99:
-        return 0
-
-    if probability <= 0.03 or probability >= 0.97:
-        return 3
-
-    if probability <= 0.08 or probability >= 0.92:
-        return 6
-
-    if 0.20 <= probability <= 0.70:
-        return 15
-
-    return 10
