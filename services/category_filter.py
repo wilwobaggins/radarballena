@@ -410,3 +410,83 @@ def summarize_exclusions(excluded_markets: list[dict[str, Any]]) -> dict[str, in
         counter[f"{category}:{reason}"] += 1
 
     return dict(counter)
+
+def map_to_classifier_output_category(category: str) -> str:
+    """
+    Convierte categorías internas del filtro DeepEngine
+    al output v1 pedido por la tarjeta.
+    """
+    if category in {
+        "sports",
+        "football",
+        "soccer",
+        "basketball",
+        "baseball",
+        "mma",
+        "ufc",
+        "boxing",
+        "tennis",
+        "fantasy",
+        "player_props",
+        "esports",
+        "horse_racing",
+    }:
+        return "sports"
+
+    if category == "politics":
+        return "politics"
+
+    if category == "geopolitics":
+        return "geopolitics"
+
+    if category in {"macro", "economy"}:
+        return "macro"
+
+    if category == "crypto":
+        return "crypto"
+
+    if category in {"technology", "ai", "regulation", "business", "science"}:
+        return "technology"
+
+    if category in {"culture", "world_events"}:
+        return "culture"
+
+    return "other"
+
+
+def classify_market(market: dict[str, Any]) -> dict[str, Any]:
+    """
+    Clasificador v1 para DeepEngine MVP.
+
+    Output esperado:
+    {
+        "category": "...",
+        "isDeepEngineEligible": bool,
+        "exclusionReason": str | None
+    }
+    """
+    classification = classify_deepengine_category(market)
+
+    output_category = map_to_classifier_output_category(
+        classification.get("category", "category_unknown")
+    )
+
+    is_eligible = bool(classification.get("eligible"))
+
+    result = {
+        "category": output_category,
+        "isDeepEngineEligible": is_eligible,
+    }
+
+    if not is_eligible:
+        result["exclusionReason"] = classification.get("reason", "not_eligible")
+
+    return result
+
+
+def classifyMarket(market: dict[str, Any]) -> dict[str, Any]:
+    """
+    Alias camelCase para cumplir literalmente la tarjeta.
+    En Python el uso interno recomendado sigue siendo classify_market().
+    """
+    return classify_market(market)
