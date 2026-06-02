@@ -13,6 +13,8 @@ from services.scoring_service import (
     calculate_hybrid_radar_score,
     score_markets,
     sort_markets_by_score,
+    days_to_close,
+    safe_float,
 )
 
 
@@ -134,23 +136,44 @@ def score_market_batch(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     return scored
 
+def build_selection_reason(market: dict[str, Any]) -> str:
+    breakdown = market.get("score_breakdown") or {}
+
+    parts = [
+        f"category={market.get('category') or market.get('deepengine_category')}",
+        f"score={market.get('preliminary_radar_score')}",
+        f"volume={safe_float(market.get('volume')):.0f}",
+        f"liquidity={safe_float(market.get('liquidity')):.0f}",
+        f"prob_move_24h={safe_float(market.get('probability_change_24h')):.4f}",
+        f"days_to_close={days_to_close(market)}",
+    ]
+
+    if breakdown:
+        parts.append(f"breakdown={breakdown}")
+
+    return " | ".join(parts)
 
 def select_top_markets(
     markets: list[dict[str, Any]],
     limit: int | None = None,
 ) -> list[dict[str, Any]]:
-    top_n = limit or env_int("DAILY_PIPELINE_TOP_N", 5)
+    top_n = limit or env_int("DAILY_PIPELINE_TOP_N", 10)
+    candidate_pool_size = env_int("DAILY_PIPELINE_CANDIDATE_POOL", top_n * 3)
 
     sorted_markets = sort_markets_by_score(markets)
-    selected = sorted_markets[:top_n]
+    selected = sorted_markets[:candidate_pool_size]
 
-    logger.info("Top mercados seleccionados: %s", len(selected))
+    logger.info(
+        "Pool de candidatos seleccionado: %s | objetivo_deepbriefs=%s",
+        len(selected),
+        top_n,
+    )
 
     for market in selected:
         logger.info(
-            "Selected | score=%s | title=%s",
-            market.get("preliminary_radar_score"),
+            "Candidate | title=%s | reason=%s",
             market.get("title"),
+            build_selection_reason(market),
         )
 
     return selected
@@ -387,13 +410,29 @@ def main():
         scored_markets = score_market_batch(filtered_markets)
 
         selected_markets = select_top_markets(scored_markets)
-        markets_analyzed = len(selected_markets)
+        target_deepbriefs = env_int("DAILY_PIPELINE_TOP_N", 10)
 
         for market in selected_markets:
+            if deepbriefs_generated >= target_deepbriefs:
+                break
+
             try:
-                logger.info("Procesando mercado: %s", market.get("title"))
+                logger.info("Evaluando candidato: %s", market.get("title"))
+                logger.info(
+                    "Selection reason | market=%s | %s",
+                    market.get("title"),
+                    build_selection_reason(market),
+                )
 
                 context_sources = fetch_context(market, min_sources=3)
+
+                if len(context_sources) < 3:
+                    logger.info(
+                        "Mercado excluido por contexto insuficiente | market=%s | sources=%s",
+                        market.get("title"),
+                        len(context_sources),
+                    )
+                    continue
 
                 logger.info(
                     "Fuentes usadas | market=%s | sources=%s",
@@ -407,6 +446,7 @@ def main():
                 )
 
                 deepbriefs_generated += 1
+                markets_analyzed += 1
 
             except Exception as error:
                 errors_count += 1
