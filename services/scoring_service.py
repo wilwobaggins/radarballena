@@ -5,6 +5,10 @@ from services.category_filter import (
     ALLOWED_DEEPENGINE_CATEGORIES,
     classify_deepengine_category,
 )
+from services.logger_service import get_logger
+
+
+logger = get_logger("scoring_service")
 
 
 def safe_float(value: Any, default: float = 0.0) -> float:
@@ -125,7 +129,7 @@ def calculate_probability_movement_score(market: dict[str, Any]) -> int:
 def calculate_resolution_score(market: dict[str, Any]) -> int:
     """
     0-10 pts.
-    Evalúa claridad básica.
+    Evalua claridad basica.
     """
     title = str(market.get("title") or "").strip()
     description = str(market.get("description") or "").strip()
@@ -148,8 +152,8 @@ def calculate_resolution_score(market: dict[str, Any]) -> int:
 def calculate_narrative_score(market: dict[str, Any]) -> int:
     """
     0-10 pts.
-    Solo premia categorías compatibles con DeepEngine MVP.
-    Deportes y categorías ambiguas reciben 0.
+    Solo premia categorias compatibles con DeepEngine MVP.
+    Deportes y categorias ambiguas reciben 0.
     """
     classification = classify_deepengine_category(market)
 
@@ -225,8 +229,8 @@ def calculate_hybrid_radar_score(
     ai_interpretive_score: int | float | None,
 ) -> dict:
     """
-    Score híbrido:
-    final_radar_score = 0.60 preliminary + 0.40 ai_interpretive
+    Score hibrido:
+    final_radar_score = 0.40 preliminary + 0.60 ai_interpretive
     """
     preliminary = safe_float(preliminary_radar_score)
     ai_score = safe_float(ai_interpretive_score)
@@ -234,18 +238,26 @@ def calculate_hybrid_radar_score(
     preliminary = int(clamp(preliminary, 0, 100))
     ai_score = int(clamp(ai_score, 0, 100))
 
-    final_score = round((0.60 * preliminary) + (0.40 * ai_score))
+    final_score = round((0.40 * preliminary) + (0.60 * ai_score))
     final_score = int(clamp(final_score, 0, 100))
+
+    logger.info(
+        "Hybrid score formula usada | formula=%s | preliminary=%s | ai=%s | final=%s",
+        "final_radar_score = 0.40 preliminary_radar_score + 0.60 ai_interpretive_score",
+        preliminary,
+        ai_score,
+        final_score,
+    )
 
     return {
         "preliminary_radar_score": preliminary,
         "ai_interpretive_score": ai_score,
         "final_radar_score": final_score,
         "score_breakdown": {
-            "formula": "final_radar_score = 0.60 preliminary_radar_score + 0.40 ai_interpretive_score",
+            "formula": "final_radar_score = 0.40 preliminary_radar_score + 0.60 ai_interpretive_score",
             "weights": {
-                "preliminary_radar_score": 0.60,
-                "ai_interpretive_score": 0.40,
+                "preliminary_radar_score": 0.40,
+                "ai_interpretive_score": 0.60,
             },
             "inputs": {
                 "preliminary_radar_score": preliminary,

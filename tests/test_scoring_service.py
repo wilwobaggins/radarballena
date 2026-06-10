@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from services.scoring_service import (
+    calculate_hybrid_radar_score,
     calculate_volume_score,
     calculate_liquidity_score,
     calculate_time_to_close_score,
@@ -74,3 +75,17 @@ def test_sort_markets_by_score():
     sorted_markets = sort_markets_by_score(scored)
 
     assert sorted_markets[0]["preliminary_radar_score"] >= sorted_markets[1]["preliminary_radar_score"]
+
+
+def test_calculate_hybrid_radar_score_weights_ai_more():
+    result = calculate_hybrid_radar_score(
+        preliminary_radar_score=43,
+        ai_interpretive_score=74,
+    )
+
+    assert result["final_radar_score"] == 62
+    assert result["score_breakdown"]["formula"] == (
+        "final_radar_score = 0.40 preliminary_radar_score + 0.60 ai_interpretive_score"
+    )
+    assert result["score_breakdown"]["weights"]["preliminary_radar_score"] == 0.40
+    assert result["score_breakdown"]["weights"]["ai_interpretive_score"] == 0.60

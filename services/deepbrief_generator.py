@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from typing import Any
@@ -6,6 +7,9 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from services.deepbrief_schema import DeepBriefSchema
+from services.logger_service import get_logger
+from services.prompt_service import load_prompt, render_prompt
+from services.scoring_service import days_to_close
 
 
 load_dotenv()
@@ -13,17 +17,73 @@ load_dotenv()
 ROOT_DIR = Path(__file__).resolve().parents[1]
 PROMPTS_DIR = ROOT_DIR / "prompts"
 
+logger = get_logger("deepbrief_generator")
+
+FALLBACK_MASTER_PROMPT = """
+Eres DeepSignal Engine, un sistema de inteligencia estrategica para mercados de prediccion.
+
+Tu objetivo es analizar un mercado usando metodologias internas formales, pero entregar el resultado con nombres visibles de RadarBallena.
+
+Metodologias internas obligatorias:
+- STEEP Analysis
+- Premortem Analysis
+- Red Team Analysis
+- Scenario Planning
+- Weak Signals Analysis
+- Narrative Intelligence
+- Capital Flow / Market Movement Analysis
+- Resolution Risk Analysis
+- Bayesian Update
+- Catalyst / Trigger Analysis
+
+Reglas estrictas:
+- Escribe en espanol.
+- No des asesoria financiera.
+- No prometas ganancias.
+- No uses lenguaje de certeza absoluta.
+- No uses lenguaje directo de compra, venta, apuesta o inversion.
+- Usa solamente el contexto proporcionado.
+- Si no hay fuentes externas verificadas, dilo claramente.
+- Devuelve exclusivamente JSON valido.
+- No agregues markdown.
+- No agregues texto fuera del JSON.
+
+MERCADO:
+{{MERCADO}}
+
+CONTEXTO:
+{{CONTEXTO}}
+
+METRICAS CALCULADAS:
+{{METRICAS}}
+""".strip()
+
 
 def load_json_repair_prompt() -> str:
     prompt_path = PROMPTS_DIR / "json_repair_prompt.txt"
 
     if not prompt_path.exists():
         return (
-            "Corrige la salida anterior. Devuelve una respuesta válida, "
+            "Corrige la salida anterior. Devuelve una respuesta valida, "
             "compatible con el schema solicitado, sin markdown ni texto extra."
         )
 
     return prompt_path.read_text(encoding="utf-8")
+
+
+def load_master_prompt() -> tuple[str, str]:
+    prompt_name = "deepbrief_master_prompt.txt"
+
+    try:
+        prompt = load_prompt(prompt_name)
+        logger.info("Prompt maestro cargado desde archivo: %s", prompt_name)
+        return prompt, prompt_name
+    except FileNotFoundError:
+        logger.warning(
+            "No se encontro %s. Usando fallback seguro de prompt maestro.",
+            prompt_name,
+        )
+        return FALLBACK_MASTER_PROMPT, "fallback"
 
 
 def format_context_sources(
@@ -32,78 +92,78 @@ def format_context_sources(
     if not context_sources:
         return (
             "No hay fuentes externas verificadas para este mercado. "
-            "El análisis debe tratar esto como una limitación explícita."
+            "El analisis debe tratar esto como una limitacion explicita."
         )
 
     blocks = []
 
     for index, source in enumerate(context_sources, start=1):
         blocks.append(
-            f"""
-Fuente {index}:
-- Título: {source.get("sourceTitle") or source.get("source_title")}
-- URL: {source.get("sourceUrl") or source.get("source_url")}
-- Fecha: {source.get("publishedDate") or source.get("published_date")}
-- Resumen: {source.get("summary")}
-- Relevancia: {source.get("relevanceScore") or source.get("relevance_score")}
-"""
+            "\n".join(
+                [
+                    f"Fuente {index}:",
+                    f"- Titulo: {source.get('sourceTitle') or source.get('source_title')}",
+                    f"- URL: {source.get('sourceUrl') or source.get('source_url')}",
+                    f"- Fecha: {source.get('publishedDate') or source.get('published_date')}",
+                    f"- Resumen: {source.get('summary')}",
+                    f"- Relevancia: {source.get('relevanceScore') or source.get('relevance_score')}",
+                ]
+            )
         )
 
-    return "\n".join(blocks)
+    return "\n\n".join(blocks)
+
+
+def build_market_section(market: dict[str, Any]) -> str:
+    market_payload = {
+        "title": market.get("title"),
+        "description": market.get("description"),
+        "category": market.get("category"),
+        "url": market.get("url"),
+        "close_date": market.get("close_date"),
+        "current_probability": market.get("current_probability"),
+        "previous_probability_24h": market.get("previous_probability_24h"),
+        "probability_change_24h": market.get("probability_change_24h"),
+        "volume": market.get("volume"),
+        "liquidity": market.get("liquidity"),
+        "outcomes": market.get("outcomes"),
+    }
+    return json.dumps(market_payload, ensure_ascii=False, indent=2)
+
+
+def build_metrics_section(market: dict[str, Any]) -> str:
+    metrics_payload = {
+        "preliminary_radar_score": market.get("preliminary_radar_score"),
+        "score_breakdown": market.get("score_breakdown"),
+        "days_to_close": days_to_close(market),
+        "volume": market.get("volume"),
+        "liquidity": market.get("liquidity"),
+        "probability_change_24h": market.get("probability_change_24h"),
+    }
+    return json.dumps(metrics_payload, ensure_ascii=False, indent=2)
 
 
 def build_deepbrief_prompt(
     market: dict[str, Any],
     context_sources: list[dict[str, Any]] | None = None,
     repair_note: str | None = None,
-) -> str:
+) -> tuple[str, str]:
+    prompt_template, prompt_source = load_master_prompt()
     formatted_context = format_context_sources(context_sources)
-
-    repair_block = ""
+    rendered_prompt = render_prompt(
+        prompt_template=prompt_template,
+        mercado=build_market_section(market),
+        contexto=formatted_context,
+        metricas=build_metrics_section(market),
+    )
 
     if repair_note:
-        repair_block = f"""
-MODO REPARACIÓN:
-{repair_note}
-"""
+        rendered_prompt = (
+            f"{rendered_prompt}\n\n"
+            f"MODO REPARACION:\n{repair_note}\n"
+        )
 
-    return f"""
-Genera un DeepBrief analítico para el siguiente mercado de predicción.
-
-Usa SOLO la información disponible del mercado y las fuentes externas incluidas abajo.
-No inventes datos externos específicos.
-Si falta información, dilo como limitación dentro del análisis.
-
-{repair_block}
-
-Mercado:
-- Título: {market.get("title")}
-- Descripción: {market.get("description")}
-- Categoría: {market.get("category")}
-- URL: {market.get("url")}
-- Fecha de cierre: {market.get("close_date")}
-- Probabilidad actual: {market.get("current_probability")}
-- Probabilidad previa 24h: {market.get("previous_probability_24h")}
-- Cambio 24h: {market.get("probability_change_24h")}
-- Volumen: {market.get("volume")}
-- Liquidez: {market.get("liquidity")}
-- Outcomes: {market.get("outcomes")}
-
-Contexto externo:
-{formatted_context}
-
-Instrucciones:
-- Evalúa señal, ruido, liquidez, narrativa, escenarios y riesgos.
-- Usa las fuentes externas solo si son relevantes para el mercado.
-- Distingue entre información nueva, información posiblemente ya descontada y ruido.
-- Incluye fechas y URLs cuando el contexto externo influya en la lectura.
-- Si las fuentes externas son débiles o poco relacionadas, dilo claramente.
-- No afirmes que algo es cierto si la fuente solo lo sugiere.
-- El radar_score debe estar entre 0 y 100.
-- signal_label debe ser uno de estos valores: Ignore, Watchlist, Strong Watch, High Conviction.
-- confidence_level debe ser Low, Medium o High.
-- Responde siguiendo exactamente el schema solicitado.
-"""
+    return rendered_prompt, prompt_source
 
 
 def generate_deepbrief_for_market(
@@ -128,7 +188,7 @@ def generate_deepbrief_for_market(
             if last_error:
                 repair_note += f"\n\nError anterior:\n{last_error}"
 
-        prompt = build_deepbrief_prompt(
+        prompt, prompt_source = build_deepbrief_prompt(
             market=market,
             context_sources=context_sources,
             repair_note=repair_note,
@@ -142,10 +202,10 @@ def generate_deepbrief_for_market(
                         "role": "system",
                         "content": (
                             "Eres DeepSignal Engine, un analista de mercados predictivos. "
-                            "Tu trabajo es generar DeepBriefs estructurados, prudentes y útiles. "
+                            "Tu trabajo es generar DeepBriefs estructurados, prudentes y utiles. "
                             "No inventes datos externos no incluidos en el input. "
                             "Cuando uses contexto externo, menciona su relevancia, fecha o URL si aplica. "
-                            "Distingue información nueva, información ya descontada y ruido."
+                            "Distingue informacion nueva, informacion ya descontada y ruido."
                         ),
                     },
                     {
@@ -159,7 +219,7 @@ def generate_deepbrief_for_market(
             parsed = response.output_parsed
 
             if parsed is None:
-                raise RuntimeError("El modelo no regresó un DeepBrief válido")
+                raise RuntimeError("El modelo no regreso un DeepBrief valido")
 
             deepbrief = parsed.model_dump()
 
@@ -170,6 +230,7 @@ def generate_deepbrief_for_market(
                 "attempt_count": attempt,
                 "market_input": market,
                 "context_sources": context_sources or [],
+                "prompt_source": prompt_source,
                 "prompt": prompt,
                 "parsed_output": deepbrief,
                 "response_id": getattr(response, "id", None),
@@ -196,9 +257,12 @@ def generate_deepbrief_for_market(
                     "attempt_count": attempt,
                     "market_input": market,
                     "context_sources": context_sources or [],
+                    "prompt_source": prompt_source,
                     "last_error": last_error,
                 }
 
-                raise RuntimeError(f"DeepBrief falló después de retries: {last_error}") from error
+                raise RuntimeError(
+                    f"DeepBrief fallo despues de retries: {last_error}"
+                ) from error
 
-    raise RuntimeError("DeepBrief falló de forma inesperada")
+    raise RuntimeError("DeepBrief fallo de forma inesperada")

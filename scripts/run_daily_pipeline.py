@@ -262,6 +262,12 @@ def generate_deepbrief(
         context_sources=context_sources,
     )
 
+    logger.info(
+        "Prompt usado | market=%s | source=%s",
+        market.get("title"),
+        raw_output.get("prompt_source", "unknown"),
+    )
+
     validate_output(
         deepbrief=deepbrief,
         raw_output=raw_output,
