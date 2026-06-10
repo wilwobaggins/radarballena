@@ -349,3 +349,29 @@ def finish_pipeline_run(
     )
 
     return _first_row(response)
+
+def get_recent_deepbrief(
+    market_db_id: str,
+    hours: int = 12,
+) -> dict[str, Any] | None:
+    from datetime import timedelta
+
+    supabase = get_supabase_client()
+
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+
+    response = (
+        supabase
+        .table("deepbriefs")
+        .select("id, marketId, createdAt")
+        .eq("marketId", market_db_id)
+        .gte("createdAt", cutoff.isoformat())
+        .order("createdAt", desc=True)
+        .limit(1)
+        .execute()
+    )
+
+    if not response.data:
+        return None
+
+    return response.data[0]

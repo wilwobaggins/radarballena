@@ -63,6 +63,7 @@ def days_to_close(market: dict[str, Any]) -> int:
         "closingDate",
         "end_date",
         "endDate",
+        "endDateIso",
         "end_date_iso",
     )
 

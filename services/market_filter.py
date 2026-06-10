@@ -1,16 +1,33 @@
 import json
+from collections import Counter
+from datetime import datetime, timezone
 from typing import Any
 
 from services.category_filter import (
+    BLOCKED_DEEPENGINE_CATEGORIES,
     classify_deepengine_category,
     filter_deepengine_eligible_markets,
     summarize_exclusions,
 )
 from services.scoring_service import (
+    days_to_close,
+    get_market_value,
+    parse_date,
+    safe_float,
     score_markets,
     sort_markets_by_score,
-    days_to_close,
-    safe_float,
+)
+
+
+CLOSE_DATE_KEYS = (
+    "close_date",
+    "closeDate",
+    "closing_date",
+    "closingDate",
+    "end_date",
+    "endDate",
+    "endDateIso",
+    "end_date_iso",
 )
 
 
@@ -47,6 +64,88 @@ def get_market_outcomes(market: dict[str, Any]) -> list[Any]:
     return []
 
 
+def coerce_optional_bool(value: Any) -> bool | None:
+    if isinstance(value, bool):
+        return value
+
+    if value is None or value == "":
+        return None
+
+    if isinstance(value, (int, float)):
+        if value == 1:
+            return True
+        if value == 0:
+            return False
+        return None
+
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+
+        if normalized in {"true", "1", "yes"}:
+            return True
+
+        if normalized in {"false", "0", "no"}:
+            return False
+
+    return None
+
+
+def get_market_close_date(market: dict[str, Any]) -> datetime | None:
+    close_date_value = get_market_value(market, *CLOSE_DATE_KEYS)
+    return parse_date(close_date_value)
+
+
+def get_market_open_status(
+    market: dict[str, Any],
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    reference_now = now or datetime.now(timezone.utc)
+    reasons: list[str] = []
+    flags: dict[str, Any] = {}
+
+    close_date = get_market_close_date(market)
+    if close_date is not None and close_date <= reference_now:
+        reasons.append("closed_by_date")
+        flags["close_date"] = close_date.isoformat()
+
+    closed_flag = coerce_optional_bool(get_market_value(market, "closed"))
+    if closed_flag is True:
+        reasons.append("closed_by_flag")
+        flags["closed"] = True
+
+    archived_flag = coerce_optional_bool(get_market_value(market, "archived"))
+    if archived_flag is True:
+        reasons.append("closed_by_flag")
+        flags["archived"] = True
+
+    active_flag = coerce_optional_bool(get_market_value(market, "active"))
+    if active_flag is False:
+        reasons.append("inactive_market_excluded")
+        flags["active"] = False
+
+    accepting_orders_flag = coerce_optional_bool(
+        get_market_value(market, "acceptingOrders")
+    )
+    if accepting_orders_flag is False:
+        reasons.append("closed_by_flag")
+        flags["acceptingOrders"] = False
+
+    deduped_reasons = sorted(set(reasons))
+
+    return {
+        "is_open": not deduped_reasons,
+        "reasons": deduped_reasons,
+        "flags": flags,
+    }
+
+
+def is_market_open(
+    market: dict[str, Any],
+    now: datetime | None = None,
+) -> bool:
+    return bool(get_market_open_status(market=market, now=now)["is_open"])
+
+
 def has_clear_resolution(market: dict[str, Any]) -> bool:
     title = str(market.get("title") or "").strip()
     outcomes = get_market_outcomes(market)
@@ -71,6 +170,9 @@ def passes_basic_market_quality(
     min_volume: float = 1_000,
     max_days_to_close: int = 1200,
 ) -> bool:
+    if not is_market_open(market):
+        return False
+
     liquidity = safe_float(market.get("liquidity"))
     volume = safe_float(market.get("volume"))
     close_days = days_to_close(market)
@@ -101,8 +203,8 @@ def is_relevant_market(
     Relevancia para DeepEngine MVP.
 
     Nota:
-    El filtro de categorías se aplica antes en filter_relevant_markets().
-    Esta función asume que el mercado ya es elegible para DeepEngine.
+    El filtro de categorias se aplica antes en filter_relevant_markets().
+    Esta funcion asume que el mercado ya es elegible para DeepEngine.
     """
     classification = classify_deepengine_category(market)
 
@@ -127,33 +229,106 @@ def is_relevant_market(
     return has_movement or has_high_volume or has_allowed_category
 
 
-def filter_relevant_markets(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """
-    Primero excluye deportes y categorías incompatibles con DeepEngine MVP.
-    Luego aplica filtros básicos de liquidez, volumen, cierre y resolución.
-    """
-    eligible_markets, excluded_markets = filter_deepengine_eligible_markets(markets)
-
-    if excluded_markets:
-        print(
-            "DeepEngine category filter exclusions:",
-            summarize_exclusions(excluded_markets),
-        )
-
-    relevant_markets = [
-        market for market in eligible_markets if is_relevant_market(market)
-    ]
-
-    print(
-        "DeepEngine filter:",
+def summarize_open_market_exclusions(
+    excluded_markets: list[dict[str, Any]],
+) -> dict[str, int]:
+    counter = Counter(
         {
-            "input_markets": len(markets),
-            "category_eligible": len(eligible_markets),
-            "category_excluded": len(excluded_markets),
-            "relevant_after_quality_filter": len(relevant_markets),
-        },
+            "closed_market_excluded": 0,
+            "closed_by_date": 0,
+            "closed_by_flag": 0,
+            "inactive_market_excluded": 0,
+        }
     )
 
+    for market in excluded_markets:
+        counter["closed_market_excluded"] += 1
+
+        for reason in set(market.get("market_open_exclusion_reasons") or []):
+            counter[reason] += 1
+
+    return dict(counter)
+
+
+def summarize_category_buckets(excluded_markets: list[dict[str, Any]]) -> dict[str, int]:
+    sports_excluded = 0
+    unknown_excluded = 0
+
+    for market in excluded_markets:
+        category = market.get("deepengine_category") or "category_unknown"
+        reason = market.get("deepengine_filter_reason") or "unknown"
+
+        if category in BLOCKED_DEEPENGINE_CATEGORIES or category == "sports":
+            sports_excluded += 1
+        elif category == "category_unknown" or reason == "ambiguous_category":
+            unknown_excluded += 1
+
+    return {
+        "sports_market_excluded": sports_excluded,
+        "unknown_market_excluded": unknown_excluded,
+    }
+
+
+def filter_relevant_markets_with_stats(
+    markets: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """
+    Primero excluye deportes y categorias incompatibles con DeepEngine MVP.
+    Luego excluye mercados cerrados/inactivos y por ultimo aplica
+    filtros basicos de liquidez, volumen, cierre y resolucion.
+    """
+    eligible_markets, category_excluded_markets = filter_deepengine_eligible_markets(
+        markets
+    )
+
+    if category_excluded_markets:
+        print(
+            "DeepEngine category filter exclusions:",
+            summarize_exclusions(category_excluded_markets),
+        )
+
+    open_markets: list[dict[str, Any]] = []
+    closed_or_inactive_markets: list[dict[str, Any]] = []
+
+    for market in eligible_markets:
+        open_status = get_market_open_status(market)
+
+        if open_status["is_open"]:
+            open_markets.append(market)
+            continue
+
+        closed_or_inactive_markets.append(
+            {
+                **market,
+                "market_open_exclusion_reasons": open_status["reasons"],
+                "market_open_exclusion_flags": open_status["flags"],
+            }
+        )
+
+    relevant_markets = [market for market in open_markets if is_relevant_market(market)]
+    open_market_summary = summarize_open_market_exclusions(closed_or_inactive_markets)
+    category_bucket_summary = summarize_category_buckets(category_excluded_markets)
+    quality_excluded = len(open_markets) - len(relevant_markets)
+    stats = {
+        "input_markets": len(markets),
+        "category_eligible": len(eligible_markets),
+        "category_excluded": len(category_excluded_markets),
+        **category_bucket_summary,
+        **open_market_summary,
+        "quality_market_excluded": quality_excluded,
+        "eligible_after_filters": len(relevant_markets),
+    }
+
+    if closed_or_inactive_markets:
+        print("DeepEngine open-market exclusions:", open_market_summary)
+
+    print("DeepEngine filter:", stats)
+
+    return relevant_markets, stats
+
+
+def filter_relevant_markets(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    relevant_markets, _stats = filter_relevant_markets_with_stats(markets)
     return relevant_markets
 
 

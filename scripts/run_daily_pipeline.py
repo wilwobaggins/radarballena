@@ -7,14 +7,14 @@ from services.context_client import search_context
 from services.deepbrief_generator import generate_deepbrief_for_market
 from services.error_types import build_error_record
 from services.logger_service import get_logger
-from services.market_filter import filter_relevant_markets
+from services.market_filter import filter_relevant_markets_with_stats
 from services.polymarket_client import get_normalized_active_markets
 from services.scoring_service import (
     calculate_hybrid_radar_score,
-    score_markets,
-    sort_markets_by_score,
     days_to_close,
     safe_float,
+    score_markets,
+    sort_markets_by_score,
 )
 
 
@@ -106,15 +106,18 @@ def save_snapshots(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return saved_markets
 
 
-def filter_markets(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def filter_markets(
+    markets: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     logger.info("Filtrando mercados relevantes para DeepEngine MVP")
 
     try:
-        filtered = filter_relevant_markets(markets)
+        filtered, filter_stats = filter_relevant_markets_with_stats(markets)
 
         logger.info("Mercados filtrados: %s", len(filtered))
+        logger.info("Resumen de filtros: %s", filter_stats)
 
-        return filtered
+        return filtered, filter_stats
 
     except Exception as error:
         register_pipeline_error(
@@ -123,8 +126,8 @@ def filter_markets(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
             stage="filter_markets",
         )
 
-        logger.error("Falló el filtro general de mercados")
-        return []
+        logger.error("Fallo el filtro general de mercados")
+        return [], {}
 
 
 def score_market_batch(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -135,6 +138,7 @@ def score_market_batch(markets: list[dict[str, Any]]) -> list[dict[str, Any]]:
     logger.info("Mercados con score: %s", len(scored))
 
     return scored
+
 
 def build_selection_reason(market: dict[str, Any]) -> str:
     breakdown = market.get("score_breakdown") or {}
@@ -152,6 +156,7 @@ def build_selection_reason(market: dict[str, Any]) -> str:
         parts.append(f"breakdown={breakdown}")
 
     return " | ".join(parts)
+
 
 def select_top_markets(
     markets: list[dict[str, Any]],
@@ -298,14 +303,15 @@ def generate_deepbrief(
 
     return saved
 
+
 def validate_output(
     deepbrief: dict[str, Any],
     raw_output: dict[str, Any],
 ) -> bool:
     """
-    Validación mínima post-generación.
+    Validacion minima post-generacion.
 
-    La validación fuerte ya ocurre en generate_deepbrief_for_market()
+    La validacion fuerte ya ocurre en generate_deepbrief_for_market()
     usando Structured Outputs + Pydantic.
     """
     required_fields = [
@@ -318,18 +324,18 @@ def validate_output(
 
     for field in required_fields:
         if field not in deepbrief:
-            raise ValueError(f"DeepBrief inválido: falta {field}")
+            raise ValueError(f"DeepBrief invalido: falta {field}")
 
     radar_score = deepbrief.get("radar_score")
 
     if not isinstance(radar_score, int | float):
-        raise ValueError("DeepBrief inválido: radar_score no es numérico")
+        raise ValueError("DeepBrief invalido: radar_score no es numerico")
 
     if radar_score < 0 or radar_score > 100:
-        raise ValueError("DeepBrief inválido: radar_score fuera de 0-100")
+        raise ValueError("DeepBrief invalido: radar_score fuera de 0-100")
 
     if not raw_output:
-        raise ValueError("DeepBrief inválido: raw_output vacío")
+        raise ValueError("DeepBrief invalido: raw_output vacio")
 
     return True
 
@@ -361,10 +367,10 @@ def create_alerts(
     hybrid_score: dict[str, Any],
 ) -> list[dict[str, Any]]:
     """
-    MVP: todavía no envía alertas.
+    MVP: todavia no envia alertas.
     Solo construye alerta candidata si el score final es alto.
 
-    Después esto puede guardar en tabla alerts o mandar Telegram/email.
+    Despues esto puede guardar en tabla alerts o mandar Telegram/email.
     """
     final_score = hybrid_score.get("final_radar_score", 0)
 
@@ -377,12 +383,16 @@ def create_alerts(
         "final_radar_score": final_score,
         "signal_label": deepbrief.get("signal_label"),
         "message": (
-            f"RadarBallena detectó mercado relevante: "
+            f"RadarBallena detecto mercado relevante: "
             f"{market.get('title')} | score={final_score}"
         ),
     }
 
-    logger.info("Alerta candidata creada | market=%s | score=%s", market.get("title"), final_score)
+    logger.info(
+        "Alerta candidata creada | market=%s | score=%s",
+        market.get("title"),
+        final_score,
+    )
 
     return [alert]
 
@@ -397,6 +407,7 @@ def main():
     markets_analyzed = 0
     deepbriefs_generated = 0
     errors_count = 0
+    filter_stats: dict[str, Any] = {}
 
     try:
         raw_markets = fetch_markets()
@@ -404,7 +415,7 @@ def main():
 
         saved_markets = save_snapshots(raw_markets)
 
-        filtered_markets = filter_markets(saved_markets)
+        filtered_markets, filter_stats = filter_markets(saved_markets)
         markets_filtered = len(filtered_markets)
 
         scored_markets = score_market_batch(filtered_markets)
@@ -413,6 +424,22 @@ def main():
         target_deepbriefs = env_int("DAILY_PIPELINE_TOP_N", 10)
 
         for market in selected_markets:
+            freshness_hours = env_int("DEEPBRIEF_FRESHNESS_HOURS", 12)
+
+            recent_deepbrief = db.get_recent_deepbrief(
+                market_db_id=market["id"],
+                hours=freshness_hours,
+            )
+
+            if recent_deepbrief:
+                logger.info(
+                    "DeepBrief reciente existe; saltando | market=%s | deepbrief_id=%s | freshness_hours=%s",
+                    market.get("title"),
+                    recent_deepbrief.get("id"),
+                    freshness_hours,
+                )
+                continue
+
             if deepbriefs_generated >= target_deepbriefs:
                 break
 
@@ -458,7 +485,7 @@ def main():
                 )
 
                 logger.error(
-                    "El pipeline continúa con el siguiente mercado | failed_market=%s",
+                    "El pipeline continua con el siguiente mercado | failed_market=%s",
                     market.get("title"),
                 )
 
@@ -481,6 +508,19 @@ def main():
 
         logger.info("Pipeline terminado")
         logger.info("Markets fetched: %s", markets_fetched)
+        logger.info(
+            "Excluded closed: %s | closed_by_date=%s | closed_by_flag=%s | inactive=%s",
+            filter_stats.get("closed_market_excluded", 0),
+            filter_stats.get("closed_by_date", 0),
+            filter_stats.get("closed_by_flag", 0),
+            filter_stats.get("inactive_market_excluded", 0),
+        )
+        logger.info(
+            "Excluded sports: %s | excluded unknown: %s | eligible after filters: %s",
+            filter_stats.get("sports_market_excluded", 0),
+            filter_stats.get("unknown_market_excluded", 0),
+            filter_stats.get("eligible_after_filters", markets_filtered),
+        )
         logger.info("Markets filtered: %s", markets_filtered)
         logger.info("Markets analyzed: %s", markets_analyzed)
         logger.info("DeepBriefs generated: %s", deepbriefs_generated)
@@ -489,6 +529,19 @@ def main():
 
         print("\nPipeline maestro terminado.")
         print("Markets fetched:", markets_fetched)
+        print("Excluded closed:", filter_stats.get("closed_market_excluded", 0))
+        print("Closed by date:", filter_stats.get("closed_by_date", 0))
+        print("Closed by flag:", filter_stats.get("closed_by_flag", 0))
+        print(
+            "Inactive excluded:",
+            filter_stats.get("inactive_market_excluded", 0),
+        )
+        print("Excluded sports:", filter_stats.get("sports_market_excluded", 0))
+        print("Excluded unknown:", filter_stats.get("unknown_market_excluded", 0))
+        print(
+            "Eligible after filters:",
+            filter_stats.get("eligible_after_filters", markets_filtered),
+        )
         print("Markets filtered:", markets_filtered)
         print("Markets analyzed:", markets_analyzed)
         print("DeepBriefs generated:", deepbriefs_generated)
@@ -517,7 +570,7 @@ def main():
             error_message=str(fatal_error),
         )
 
-        logger.exception("Pipeline maestro falló completamente: %s", fatal_error)
+        logger.exception("Pipeline maestro fallo completamente: %s", fatal_error)
 
         raise
 
