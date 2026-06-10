@@ -263,9 +263,11 @@ def generate_deepbrief(
     )
 
     logger.info(
-        "Prompt usado | market=%s | source=%s",
+        "Prompt usado | market=%s | source=%s | provider=%s | fallback_used=%s",
         market.get("title"),
         raw_output.get("prompt_source", "unknown"),
+        raw_output.get("provider", "unknown"),
+        raw_output.get("fallback_used", False),
     )
 
     validate_output(

@@ -1,0 +1,953 @@
+
+COMPARACIÓN DE MODELOS — RADARBALLENA DEEPENGINE
+Fecha: 2026-06-10T13:51:29.404631
+
+Modelo A: gpt-4.1
+Modelo B: gpt-5.4
+Modelo juez: gpt-5.4
+
+============================================================
+MERCADO SELECCIONADO
+============================================================
+
+{
+  "external_market_id": "559661",
+  "platform": "polymarket",
+  "title": "Will Jon Ossoff win the 2028 Democratic presidential nomination?",
+  "description": "This market will resolve to “Yes” if the named individual wins and accepts the 2028 nomination of the Democratic Party for U.S. president. Otherwise, this market will resolve to “No”.\n\nThe resolution source for this market will be a consensus of official Democratic Party sources.\n\nAny replacement of the democratic nominee before election day will not change the resolution of the market.",
+  "category": "politics",
+  "url": "https://polymarket.com/event/will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
+  "close_date": "2028-11-07T00:00:00+00:00",
+  "current_probability": 0.0765,
+  "previous_probability_24h": 0.0725,
+  "probability_change_24h": 0.004,
+  "volume": 76929.833661,
+  "liquidity": 219588.96791,
+  "outcomes": [
+    "Yes",
+    "No"
+  ],
+  "last_updated": "2026-06-10T19:46:44.748933+00:00",
+  "raw_payload": {
+    "id": "559661",
+    "new": false,
+    "cyom": false,
+    "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Jon_Ossoff.png",
+    "slug": "will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
+    "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/Jon_Ossoff.png",
+    "ready": false,
+    "active": true,
+    "closed": false,
+    "events": [
+      {
+        "id": "30829",
+        "new": false,
+        "cyom": false,
+        "icon": "https://polymarket-upload.s3.us-east-2.amazonaws.com/democrats+2028+donkey.png",
+        "slug": "democratic-presidential-nominee-2028",
+        "image": "https://polymarket-upload.s3.us-east-2.amazonaws.com/democrats+2028+donkey.png",
+        "title": "Democratic Presidential Nominee 2028",
+        "active": true,
+        "closed": false,
+        "sortBy": "price",
+        "ticker": "democratic-presidential-nominee-2028",
+        "volume": 1191739139.0517294,
+        "endDate": "2028-11-07T00:00:00Z",
+        "negRisk": true,
+        "archived": false,
+        "featured": true,
+        "createdAt": "2025-07-03T20:36:57.824243Z",
+        "deploying": false,
+        "liquidity": 66112977.30081,
+        "startDate": "2025-07-11T18:41:17.827458Z",
+        "startTime": "2028-11-07T12:00:00Z",
+        "updatedAt": "2026-06-10T19:43:03.152594Z",
+        "volume1mo": 56395044.52952303,
+        "volume1wk": 11702439.016920997,
+        "volume1yr": 1191740661.3106108,
+        "restricted": true,
+        "volume24hr": 1085453.44918,
+        "competitive": 0.9346141597316349,
+        "countryName": "U.S.",
+        "description": "This market will resolve to “Yes” if the named individual wins and accepts the 2028 nomination of the Democratic Party for U.S. president. Otherwise, this market will resolve to “No”.\n\nThe resolution source for this market will be a consensus of official Democratic Party sources.\n\nAny replacement of the democratic nominee before election day will not change the resolution of the market.",
+        "commentCount": 763,
+        "creationDate": "2025-07-11T18:41:17.827389Z",
+        "electionType": "Democratic Nomination",
+        "gmpChartMode": "default",
+        "openInterest": 15891366.800560992,
+        "enableNegRisk": true,
+        "estimateValue": false,
+        "eventMetadata": {
+          "context_updated_at": "2026-06-10T19:15:48.018Z",
+          "context_description": "Gavin Newsom holds the leading trader consensus in the fragmented 2028 Democratic field because his record as California governor and national visibility on issues such as climate policy and state-level governance give him early advantages in name recognition and fundraising potential. Recent visits by potential contenders including Kamala Harris and Alexandria Ocasio-Cortez to Southern states underscore the importance of securing support from Black voters who have historically shaped Democratic nomination outcomes. Polling from May 2026 shows mixed results among Harris, Newsom, and others, with no candidate yet consolidating broad backing. Factors that could shift implied probabilities include upcoming primary performances in battleground states, endorsements from party leaders, and developments in voter turnout patterns among key demographics. The absence of formal announcements keeps the race wide open, with support likely to consolidate around candidates demonstrating strength in early contests and general-election appeal.",
+          "context_requires_regen": true
+        },
+        "liquidityClob": 66112977.30081,
+        "enableOrderBook": true,
+        "negRiskMarketID": "0x2c3d7e0eee6f058be3006baabf0d54a07da254ba47fe6e3e095e7990c7814700",
+        "showAllOutcomes": true,
+        "negRiskAugmented": true,
+        "resolutionSource": "",
+        "showMarketImages": true,
+        "cumulativeMarkets": false,
+        "pendingDeployment": false,
+        "deployingTimestamp": "2025-07-11T18:14:44.108448Z",
+        "automaticallyActive": true,
+        "requiresTranslation": false
+      }
+    ],
+    "funded": false,
+    "spread": 0.001,
+    "volume": "11637542.296471907",
+    "bestAsk": 0.077,
+    "bestBid": 0.076,
+    "endDate": "2028-11-07T00:00:00Z",
+    "feeType": "politics_fees",
+    "negRisk": true,
+    "umaBond": "25000",
+    "approved": true,
+    "archived": false,
+    "featured": false,
+    "outcomes": "[\"Yes\", \"No\"]",
+    "question": "Will Jon Ossoff win the 2028 Democratic presidential nomination?",
+    "createdAt": "2025-07-03T20:37:05.98276Z",
+    "deploying": false,
+    "liquidity": "219588.96791",
+    "startDate": "2025-07-11T18:36:06.838Z",
+    "umaReward": "10",
+    "updatedAt": "2026-06-10T19:41:49.223723Z",
+    "volume1mo": 546866.3215580004,
+    "volume1wk": 243636.32023399998,
+    "volume1yr": 11637542.296471935,
+    "volumeNum": 11637542.296471907,
+    "endDateIso": "2028-11-07",
+    "questionID": "0x2c3d7e0eee6f058be3006baabf0d54a07da254ba47fe6e3e095e7990c7814709",
+    "resolvedBy": "0x2F5e3684cb1F318ec51b00Edba38d79Ac2c0aA9d",
+    "restricted": true,
+    "rfqEnabled": false,
+    "volume24hr": 76929.833661,
+    "volumeClob": 11637542.296471907,
+    "clobRewards": [
+      {
+        "id": "415075",
+        "endDate": "2500-12-31",
+        "startDate": "2026-05-31",
+        "conditionId": "0x74dba1ce1ae9dd535414e85f2d9ab5ea32c0fb1acc9b7130b67e6d91217e24e1",
+        "assetAddress": "0xc011a7e12a19f7b1f670d46f03b03f3342e82dfb",
+        "rewardsAmount": 0,
+        "rewardsDailyRate": 0.001
+      }
+    ],
+    "competitive": 0.8479230865926614,
+    "conditionId": "0x74dba1ce1ae9dd535414e85f2d9ab5ea32c0fb1acc9b7130b67e6d91217e24e1",
+    "description": "This market will resolve to “Yes” if the named individual wins and accepts the 2028 nomination of the Democratic Party for U.S. president. Otherwise, this market will resolve to “No”.\n\nThe resolution source for this market will be a consensus of official Democratic Party sources.\n\nAny replacement of the democratic nominee before election day will not change the resolution of the market.",
+    "feeSchedule": {
+      "rate": 0.04,
+      "exponent": 1,
+      "takerOnly": true,
+      "rebateRate": 0.25
+    },
+    "feesEnabled": true,
+    "seriesColor": "",
+    "clobTokenIds": "[\"70071592420137476676935286377781779672157004436137616627487590484756055232944\", \"107829893465244243112531790315844862173967342141753896250561816305880797209350\"]",
+    "liquidityNum": 219588.96791,
+    "makerBaseFee": 1000,
+    "negRiskOther": false,
+    "orderMinSize": 5,
+    "startDateIso": "2025-07-11",
+    "submitted_by": "0x91430CaD2d3975766499717fA0D66A78D814E5c5",
+    "takerBaseFee": 1000,
+    "liquidityClob": 219588.96791,
+    "outcomePrices": "[\"0.0765\", \"0.9235\"]",
+    "showGmpSeries": false,
+    "volume1moClob": 546866.3215580004,
+    "volume1wkClob": 243636.32023399998,
+    "volume1yrClob": 11637542.296471935,
+    "customLiveness": 0,
+    "groupItemTitle": "Jon Ossoff",
+    "lastTradePrice": 0.077,
+    "rewardsMinSize": 0,
+    "showGmpOutcome": false,
+    "volume24hrClob": 76929.833661,
+    "acceptingOrders": true,
+    "enableOrderBook": true,
+    "negRiskMarketID": "0x2c3d7e0eee6f058be3006baabf0d54a07da254ba47fe6e3e095e7990c7814700",
+    "clearBookOnStart": true,
+    "hasReviewedDates": true,
+    "manualActivation": false,
+    "negRiskRequestID": "0x0acc402b6b714f32714fcf123b842a66628eb3f769299b9bfe44ea583cd306aa",
+    "resolutionSource": "",
+    "rewardsMaxSpread": 0,
+    "oneDayPriceChange": 0.004,
+    "pendingDeployment": false,
+    "deployingTimestamp": "2025-07-11T18:15:13.360248Z",
+    "groupItemThreshold": "9",
+    "marketMakerAddress": "",
+    "oneWeekPriceChange": 0.017,
+    "automaticallyActive": true,
+    "oneMonthPriceChange": 0.012,
+    "requiresTranslation": false,
+    "holdingRewardsEnabled": true,
+    "orderPriceMinTickSize": 0.001,
+    "umaResolutionStatuses": "[]",
+    "acceptingOrdersTimestamp": "2025-07-11T18:35:44Z",
+    "pagerDutyNotificationEnabled": false
+  },
+  "id": "7935d0e7-e8fe-4124-947a-faf01fdd7fe3",
+  "externalMarketId": null,
+  "closeDate": null,
+  "currentProbability": null,
+  "previousProbability24h": null,
+  "probabilityChange24h": null,
+  "lastUpdated": null,
+  "createdAt": "2026-05-22T18:39:20.821544+00:00",
+  "updatedAt": "2026-06-10T19:49:19.964905+00:00",
+  "created_at": "2026-05-22T18:39:20.821544+00:00",
+  "deepengine_category": "politics",
+  "deepengine_eligible": true,
+  "deepengine_filter_reason": "allowed_keyword_inference",
+  "deepengine_filter_keywords": [],
+  "preliminary_radar_score": 48,
+  "score_breakdown": {
+    "volume_score": 6,
+    "liquidity_score": 20,
+    "time_to_close_score": 0,
+    "probability_movement_score": 2,
+    "resolution_score": 10,
+    "narrative_score": 10
+  }
+}
+
+============================================================
+FILTER STATS
+============================================================
+
+{
+  "input_markets": 100,
+  "category_eligible": 40,
+  "category_excluded": 60,
+  "sports_market_excluded": 58,
+  "unknown_market_excluded": 2,
+  "closed_market_excluded": 6,
+  "closed_by_date": 6,
+  "closed_by_flag": 0,
+  "inactive_market_excluded": 0,
+  "quality_market_excluded": 0,
+  "eligible_after_filters": 34
+}
+
+============================================================
+SELECTION REASON
+============================================================
+
+category=politics | score=48 | volume=76930 | liquidity=219589 | prob_move_24h=0.0040 | days_to_close=880 | breakdown={'volume_score': 6, 'liquidity_score': 20, 'time_to_close_score': 0, 'probability_movement_score': 2, 'resolution_score': 10, 'narrative_score': 10}
+
+============================================================
+CONTEXTO USADO
+============================================================
+
+[
+  {
+    "id": "397b89d1-9b18-4846-bf81-d999b2452a2d",
+    "marketId": "7935d0e7-e8fe-4124-947a-faf01fdd7fe3",
+    "sourceTitle": "Ossoff's Chances of Being 2028 Nominee Rise as He Slams 'Mar-a ...",
+    "sourceUrl": "https://www.newsweek.com/ossoffs-chances-2028-nominee-surge-slams-mar-lago-mafia-11851464",
+    "publishedDate": null,
+    "summary": "Senator Jon Ossoff now sits among the top most-likely candidates for the 2028 Democrat nominee for president.",
+    "relevanceScore": 0.5489,
+    "createdAt": "2026-06-05T19:22:25.585743+00:00",
+    "source_title": null,
+    "source_url": null,
+    "published_date": null,
+    "relevance_score": null,
+    "raw_payload": null,
+    "created_at": "2026-06-05T19:22:25.585743+00:00"
+  },
+  {
+    "id": "2e46255e-aa92-4c03-ad32-f5adfc1d3d8c",
+    "marketId": "7935d0e7-e8fe-4124-947a-faf01fdd7fe3",
+    "sourceTitle": "2028 Democratic Presidential Nominee Odds - DeFi Rate",
+    "sourceUrl": "https://defirate.com/prediction-markets/democratic-presidential-nominee-odds",
+    "publishedDate": null,
+    "summary": "Gavin Newsom leads the 2028 Democratic nomination at 24.5%, holding frontrunner status off a February book tour that doubled as a campaign prelude and a",
+    "relevanceScore": 0.548,
+    "createdAt": "2026-06-05T19:22:25.729849+00:00",
+    "source_title": null,
+    "source_url": null,
+    "published_date": null,
+    "relevance_score": null,
+    "raw_payload": null,
+    "created_at": "2026-06-05T19:22:25.729849+00:00"
+  },
+  {
+    "id": "bd7e88ca-8bfe-4c32-899b-bf7435bd908a",
+    "marketId": "7935d0e7-e8fe-4124-947a-faf01fdd7fe3",
+    "sourceTitle": "2028 Election Prediction | Jon Ossoff vs. JD Vance - YouTube",
+    "sourceUrl": "https://www.youtube.com/watch?v=pFZAgjaoEog",
+    "publishedDate": null,
+    "summary": "Subscribe for daily election analyses: http://bit.ly/LetsTalkElections Become a Channel Member: https://bit.ly/2MrXW2q Join the",
+    "relevanceScore": 0.5389,
+    "createdAt": "2026-06-05T19:22:25.849579+00:00",
+    "source_title": null,
+    "source_url": null,
+    "published_date": null,
+    "relevance_score": null,
+    "raw_payload": null,
+    "created_at": "2026-06-05T19:22:25.849579+00:00"
+  }
+]
+
+============================================================
+OUTPUT MODELO A — gpt-4.1
+============================================================
+
+DeepBrief:
+{
+  "lectura_clave": "El mercado asigna actualmente una probabilidad baja (7.65%) a que Jon Ossoff obtenga la nominación presidencial demócrata en 2028. El movimiento reciente es leve, aunque algunas fuentes lo posicionan entre los candidatos más probables. A pesar del crecimiento relativo, otros como Gavin Newsom mantienen ventaja significativa.",
+  "radar_score": 48.0,
+  "radar_score_breakdown": {
+    "movimiento_probabilidad": 2.0,
+    "volumen": 6.0,
+    "liquidez": 20.0,
+    "cercania_cierre": 0.0,
+    "claridad_resolucion": 10.0,
+    "fuerza_narrativa": 10.0,
+    "asimetria_detectada": 0.0,
+    "riesgo_ruido": 0.0
+  },
+  "signal_label": "Watchlist",
+  "estela_de_capital": "El mercado mantiene niveles de volumen y liquidez saludables para un evento tan lejano. No hay saltos bruscos en capital recientes; los flujos sugieren interés sostenido, pero sin evidencia de movimientos atípicos.",
+  "entorno_de_senal": {
+    "steep_social": "La figura de Ossoff crece en conocimiento y favorabilidad, especialmente tras acciones mediáticas contra líderes opositores, lo que incrementa su perfil entre votantes progresistas, aunque aún falta demostrar fortaleza estructural a nivel nacional.",
+    "steep_tecnologico": "No se detectan factores tecnológicos disruptivos que alteren las dinámicas de preferencia o comunicación para su candidatura a la fecha.",
+    "steep_economico": "La situación macroeconómica general de EE.UU. puede influir indirectamente, pero no existen aún datos que vinculen directamente impacto económico relevante con la probabilidad de nominación de Ossoff.",
+    "steep_ecologico": "No hay señales de que cuestiones ambientales estén alterando el panorama de precandidaturas demócratas en este momento.",
+    "steep_politico_regulatorio": "El entorno presenta una competencia interna intensa, especialmente frente a figuras como Newsom; no se presentan cambios regulatorios que favorezcan un salto inesperado de Ossoff.",
+    "sintesis": "El contexto STEEP sugiere que la narrativa alrededor de Ossoff está en ascenso moderado, pero aún carece de elementos disruptivos o de infraestructura política consolidada para generar un cambio de escenario relevante a corto o mediano plazo."
+  },
+  "corriente_narrativa": "Las coberturas recientes (ej. Newsweek) refuerzan la percepción de Ossoff como emergente, aunque el consenso mediático y en predicción se inclina por Newsom y otros como favoritos. La narrativa principal es de potencial en crecimiento, pero sin momentum suficiente para disputa frontal por la nominación.",
+  "filtro_de_ruido": {
+    "red_team": "El argumento de que un solo evento mediático asegure la candidatura de Ossoff no está respaldado por mecanismos internos del partido ni estructuras de apoyo territorial.",
+    "sesgos_detectados": "Posible efecto de disponibilidad por presencia mediática reciente, y sesgo recency en la interpretación de movimientos del mercado.",
+    "riesgo_liquidez": "La liquidez es alta, lo que reduce riesgos de movimientos manipulados en corto plazo.",
+    "riesgo_resolucion": "Riesgo bajo: la resolución depende de fuentes oficiales del partido, criterio estándar en política estadounidense.",
+    "informacion_ya_descontada": "La notoriedad reciente de Ossoff y su perfil en alza ya parecen reflejados en el precio; movimientos recientes probablemente reflejan estas percepciones."
+  },
+  "premortem": {
+    "si_la_tesis_falla_probablemente_seria_por": "Una consolidación acelerada de Ossoff como figura de consenso nacional demócrata, o un evento disruptivo desplazando a los actuales favoritos del partido.",
+    "senales_tempranas_de_invalidacion": [
+      "Aparición de encuestas nacionales con Ossoff liderando o en empate con los favoritos.",
+      "Incremento brusco y sostenido en la probabilidad de mercado (>5% en corto plazo).",
+      "Confirmación de apoyos clave dentro del DNC o de figuras relevantes."
+    ]
+  },
+  "mapa_de_ruptura": {
+    "confirmacion": "Ossoff mantiene o incrementa presencia en medios, sin desplazar a líderes en encuestas ni en infraestructura.",
+    "ruptura_alcista": "Un giro inesperado, como el retiro de Newsom o un escándalo afectando a otro favorito, eleva probabilidades de Ossoff rápidamente.",
+    "ruptura_bajista": "Ossoff pierde relevancia mediática o cae en escándalos personales/políticos, disminuyendo aún más su viabilidad.",
+    "invalidacion": "Se confirma la candidatura de otro actor fuerte o surge un consenso en torno a figuras más establecidas.",
+    "evento_detonador": "Encuestas nacionales disruptivas, anuncios sorpresivos del DNC, o respaldo público de figuras clave del partido."
+  },
+  "mapa_de_escenarios": [
+    {
+      "escenario": "Base",
+      "probabilidad_interna": "70%",
+      "descripcion": "Ossoff sigue elevando perfil pero no supera a favoritos como Newsom; permanece entre los posibles, pero sin instalaciones nacionales para disputar firmemente la nominación.",
+      "impacto_en_mercado": "Ligeros aumentos de precio, pero manteniéndose bajo el umbral del 15%."
+    },
+    {
+      "escenario": "Ruptura",
+      "probabilidad_interna": "20%",
+      "descripcion": "Ocurre un incidente significativo (retirada de favoritos, escándalos rivales, respaldo de élites) que catapulta a Ossoff al centro de la contienda.",
+      "impacto_en_mercado": "Repunte acelerado de probabilidades y volumen, posiblemente duplicando valor actual en días o semanas."
+    },
+    {
+      "escenario": "Contrario",
+      "probabilidad_interna": "10%",
+      "descripcion": "Ossoff pierde visibilidad nacional o enfrenta dificultades graves, regresando a relevancia marginal.",
+      "impacto_en_mercado": "Caída de probabilidad por debajo del 3% y posible salida de capital."
+    }
+  ],
+  "actualizacion_bayesiana": {
+    "probabilidad_actual_del_mercado": "7.65%",
+    "lectura_deepsignal": "El aumento leve parece consistente con una atención mediática reciente, pero los fundamentos de nominación todavía favorecen a otros.",
+    "direccion_sugerida_del_update": "ligeramente subir",
+    "razon": "La información reciente tiende a mostrar un alza de perfil de Ossoff, aunque con límites claros. No hay cambios estructurales, pero el momentum mediático justifica una leve actualización al alza dentro de rango bajo."
+  },
+  "deepsignal_verdict": "La señal es de vigilancia: Jon Ossoff está ganando visibilidad en medios e incrementando ligeramente su probabilidad, aunque parte de un nivel bajo y sin elementos estructurales que permitan anticipar desplazamiento de favoritos actuales como Gavin Newsom. Mantener seguimiento de posibles detonadores narrativos o institucionales.",
+  "confidence_level": "Medium",
+  "watch_triggers": [
+    "Nuevos respaldos institucionales a Ossoff.",
+    "Encuestas nacionales en las que Ossoff figure entre los tres primeros.",
+    "Noticias de deserción o debilitamiento de favoritos actuales."
+  ]
+}
+
+Hybrid Score:
+{
+  "preliminary_radar_score": 48,
+  "ai_interpretive_score": 48,
+  "final_radar_score": 48,
+  "score_breakdown": {
+    "formula": "final_radar_score = 0.40 preliminary_radar_score + 0.60 ai_interpretive_score",
+    "weights": {
+      "preliminary_radar_score": 0.4,
+      "ai_interpretive_score": 0.6
+    },
+    "inputs": {
+      "preliminary_radar_score": 48,
+      "ai_interpretive_score": 48
+    },
+    "output": {
+      "final_radar_score": 48
+    }
+  }
+}
+
+Prompt usado:
+Eres DeepSignal Engine, un sistema de inteligencia estratégica para mercados de predicción.
+
+Tu objetivo es analizar un mercado usando metodologías internas formales, pero entregar el resultado con nombres visibles de RadarBallena.
+
+Metodologías internas obligatorias:
+- STEEP Analysis
+- Premortem Analysis
+- Red Team Analysis
+- Scenario Planning
+- Weak Signals Analysis
+- Narrative Intelligence
+- Capital Flow / Market Movement Analysis
+- Resolution Risk Analysis
+- Bayesian Update
+- Catalyst / Trigger Analysis
+
+Nombres visibles RadarBallena:
+- Lectura Clave
+- Radar Score
+- Estela de Capital
+- Entorno de Señal
+- Corriente Narrativa
+- Filtro de Ruido
+- Mapa de Ruptura
+- Mapa de Escenarios
+- DeepSignal Verdict
+
+Reglas estrictas:
+- Escribe en español.
+- No des asesoría financiera.
+- No prometas ganancias.
+- No uses lenguaje de certeza absoluta.
+- No uses lenguaje directo de compra, venta, apuesta o inversión.
+- Usa solamente el contexto proporcionado.
+- Si no hay fuentes externas verificadas, dilo claramente.
+- Si no hay actividad whale, no menciones whales, ballenas ni grandes operadores.
+- Devuelve exclusivamente JSON válido.
+- No agregues markdown.
+- No agregues texto fuera del JSON.
+
+MERCADO:
+{
+  "title": "Will Jon Ossoff win the 2028 Democratic presidential nomination?",
+  "description": "This market will resolve to “Yes” if the named individual wins and accepts the 2028 nomination of the Democratic Party for U.S. president. Otherwise, this market will resolve to “No”.\n\nThe resolution source for this market will be a consensus of official Democratic Party sources.\n\nAny replacement of the democratic nominee before election day will not change the resolution of the market.",
+  "category": "politics",
+  "url": "https://polymarket.com/event/will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
+  "close_date": "2028-11-07T00:00:00+00:00",
+  "current_probability": 0.0765,
+  "previous_probability_24h": 0.0725,
+  "probability_change_24h": 0.004,
+  "volume": 76929.833661,
+  "liquidity": 219588.96791,
+  "outcomes": [
+    "Yes",
+    "No"
+  ]
+}
+
+CONTEXTO:
+Fuente 1:
+- Titulo: Ossoff's Chances of Being 2028 Nominee Rise as He Slams 'Mar-a ...
+- URL: https://www.newsweek.com/ossoffs-chances-2028-nominee-surge-slams-mar-lago-mafia-11851464
+- Fecha: None
+- Resumen: Senator Jon Ossoff now sits among the top most-likely candidates for the 2028 Democrat nominee for president.
+- Relevancia: 0.5489
+
+Fuente 2:
+- Titulo: 2028 Democratic Presidential Nominee Odds - DeFi Rate
+- URL: https://defirate.com/prediction-markets/democratic-presidential-nominee-odds
+- Fecha: None
+- Resumen: Gavin Newsom leads the 2028 Democratic nomination at 24.5%, holding frontrunner status off a February book tour that doubled as a campaign prelude and a
+- Relevancia: 0.548
+
+Fuente 3:
+- Titulo: 2028 Election Prediction | Jon Ossoff vs. JD Vance - YouTube
+- URL: https://www.youtube.com/watch?v=pFZAgjaoEog
+- Fecha: None
+- Resumen: Subscribe for daily election analyses: http://bit.ly/LetsTalkElections Become a Channel Member: https://bit.ly/2MrXW2q Join the
+- Relevancia: 0.5389
+
+MÉTRICAS CALCULADAS:
+{
+  "preliminary_radar_score": 48,
+  "score_breakdown": {
+    "volume_score": 6,
+    "liquidity_score": 20,
+    "time_to_close_score": 0,
+    "probability_movement_score": 2,
+    "resolution_score": 10,
+    "narrative_score": 10
+  },
+  "days_to_close": 880,
+  "volume": 76929.833661,
+  "liquidity": 219588.96791,
+  "probability_change_24h": 0.004
+}
+
+Devuelve exactamente este JSON:
+
+{
+  "lectura_clave": "",
+  "radar_score": 0,
+  "radar_score_breakdown": {
+    "movimiento_probabilidad": 0,
+    "volumen": 0,
+    "liquidez": 0,
+    "cercania_cierre": 0,
+    "claridad_resolucion": 0,
+    "fuerza_narrativa": 0,
+    "asimetria_detectada": 0,
+    "riesgo_ruido": 0
+  },
+  "signal_label": "",
+  "estela_de_capital": "",
+  "entorno_de_senal": {
+    "steep_social": "",
+    "steep_tecnologico": "",
+    "steep_economico": "",
+    "steep_ecologico": "",
+    "steep_politico_regulatorio": "",
+    "sintesis": ""
+  },
+  "corriente_narrativa": "",
+  "filtro_de_ruido": {
+    "red_team": "",
+    "sesgos_detectados": "",
+    "riesgo_liquidez": "",
+    "riesgo_resolucion": "",
+    "informacion_ya_descontada": ""
+  },
+  "premortem": {
+    "si_la_tesis_falla_probablemente_seria_por": "",
+    "senales_tempranas_de_invalidacion": []
+  },
+  "mapa_de_ruptura": {
+    "confirmacion": "",
+    "ruptura_alcista": "",
+    "ruptura_bajista": "",
+    "invalidacion": "",
+    "evento_detonador": ""
+  },
+  "mapa_de_escenarios": [
+    {
+      "escenario": "Base",
+      "probabilidad_interna": "",
+      "descripcion": "",
+      "impacto_en_mercado": ""
+    },
+    {
+      "escenario": "Ruptura",
+      "probabilidad_interna": "",
+      "descripcion": "",
+      "impacto_en_mercado": ""
+    },
+    {
+      "escenario": "Contrario",
+      "probabilidad_interna": "",
+      "descripcion": "",
+      "impacto_en_mercado": ""
+    }
+  ],
+  "actualizacion_bayesiana": {
+    "probabilidad_actual_del_mercado": "",
+    "lectura_deepsignal": "",
+    "direccion_sugerida_del_update": "subir",
+    "razon": ""
+  },
+  "deepsignal_verdict": "",
+  "confidence_level": "Medium",
+  "watch_triggers": []
+}
+
+============================================================
+OUTPUT MODELO B — gpt-5.4
+============================================================
+
+DeepBrief:
+{
+  "lectura_clave": "El mercado mantiene a Jon Ossoff como opción secundaria para la nominación demócrata de 2028, con una probabilidad implícita de 7.65% y un avance de 0.40 puntos en 24h. La señal existe, pero todavía parece temprana, narrativa y dependiente de catalizadores futuros más que de evidencia decisiva. No hay fuentes externas plenamente verificadas en el input con fecha clara, por lo que conviene tratar el movimiento como vigilancia y no como confirmación.",
+  "radar_score": 48.0,
+  "radar_score_breakdown": {
+    "movimiento_probabilidad": 2.0,
+    "volumen": 6.0,
+    "liquidez": 20.0,
+    "cercania_cierre": 0.0,
+    "claridad_resolucion": 10.0,
+    "fuerza_narrativa": 10.0,
+    "asimetria_detectada": 5.0,
+    "riesgo_ruido": 5.0
+  },
+  "signal_label": "Watchlist",
+  "estela_de_capital": "La actividad muestra mercado utilizable en volumen y liquidez, con un repunte moderado de probabilidad en 24h. La estela de capital sugiere interés táctico suficiente para incorporar narrativa, pero no un desplazamiento fuerte de consenso. Dado que faltan 880 días al cierre, parte importante del flujo puede responder a posicionamiento temprano y rotación narrativa más que a información concluyente.",
+  "entorno_de_senal": {
+    "steep_social": "La viabilidad de Ossoff depende de si logra ampliar reconocimiento nacional dentro del electorado y de la coalición demócrata. La mención en Newsweek de una mejora en sus opciones aporta una señal social débil, pero sin fecha visible y sin confirmación externa adicional plenamente verificable en el input.",
+    "steep_tecnologico": "No hay señales tecnológicas directas sobre la resolución del mercado. Sí existe un componente de amplificación mediática y de contenido digital, incluyendo una referencia de YouTube, pero ese tipo de fuente puede intensificar conversación sin necesariamente mejorar la probabilidad real.",
+    "steep_economico": "No hay datos económicos directos en el input que favorezcan o perjudiquen a Ossoff. Aun así, el entorno macro futuro podría reordenar preferencias del partido y beneficiar figuras con mejor lectura del ciclo económico, lo que hoy sigue abierto.",
+    "steep_ecologico": "No hay señal ecológica específica en el contexto proporcionado. Su relevancia potencial dependería de cómo temas climáticos pesen en las primarias de 2028 y de si Ossoff consigue apropiarse de esa agenda.",
+    "steep_politico_regulatorio": "El componente político-regulatorio es el más relevante: la nominación demócrata depende de competencia interna, calendario electoral, desempeño partidario y validación por fuentes oficiales demócratas para la resolución. La Fuente 2 sugiere que Gavin Newsom lidera ampliamente con 24.5%, lo que coloca a Ossoff en una posición de perseguidor y no de favorito.",
+    "sintesis": "El entorno de señal es principalmente político y narrativo. Hay una mejora marginal en precio y menciones externas, pero la estructura competitiva sigue abierta y probablemente dominada por figuras con mayor reconocimiento. Señal útil para seguimiento, no concluyente."
+  },
+  "corriente_narrativa": "La narrativa observable es la de ascenso incipiente: Ossoff empieza a aparecer en conversaciones sobre 2028 y su tono confrontacional hacia rivales republicanos puede estar ayudando a construir perfil nacional. Sin embargo, la corriente narrativa del mercado aún parece subordinada a un marco más amplio donde otros nombres tienen mayor centralidad. Parte de la información podría estar ya descontada por el simple hecho de que su nombre haya entrado en listas de contendientes viables.",
+  "filtro_de_ruido": {
+    "red_team": "La tesis alcista puede estar sobreinterpretando cobertura mediática y contenido opinativo como si fueran evidencia de tracción real en una primaria todavía muy lejana. Que aparezca entre candidatos mencionados no implica consolidación organizativa, financiera o de apoyo partidario suficiente para ganar la nominación.",
+    "sesgos_detectados": "Riesgo de sesgo de novedad, sesgo de disponibilidad por titulares llamativos, y sesgo de extrapolación a largo plazo desde un movimiento de 24h muy pequeño. También hay riesgo de confundir visibilidad mediática con fortaleza estructural.",
+    "riesgo_liquidez": "La liquidez es razonable para seguimiento, pero en un mercado tan lejano incluso liquidez aceptable puede no impedir movimientos sensibles a narrativa. El riesgo no parece extremo, aunque sí suficiente para exigir cautela al interpretar cambios cortos.",
+    "riesgo_resolucion": "El criterio de resolución luce relativamente claro: ganar y aceptar la nominación demócrata, con consenso de fuentes oficiales del partido. El principal riesgo no está en la redacción, sino en el largo horizonte temporal y en eventos políticos imprevisibles antes de la convención.",
+    "informacion_ya_descontada": "El hecho de que Ossoff ya sea tratado como contendiente potencial probablemente esté parcialmente reflejado en el 7.65% actual. También parece ya descontado que no es el favorito principal, dada la referencia a un líder alternativo en Fuente 2."
+  },
+  "premortem": {
+    "si_la_tesis_falla_probablemente_seria_por": "La tesis de mejora en sus opciones probablemente fallaría si el repunte actual resulta ser solo expansión narrativa temprana sin traducción en liderazgo nacional, si otros aspirantes consolidan ventaja clara, o si la conversación sobre 2028 rota rápidamente hacia figuras con mayor infraestructura política.",
+    "senales_tempranas_de_invalidacion": [
+      "Retroceso sostenido de la probabilidad hacia niveles previos o inferiores al 7% sin nuevos catalizadores",
+      "Mayor concentración narrativa y de mercado en otros aspirantes demócratas",
+      "Ausencia prolongada de nuevas fuentes verificables que respalden su ascenso",
+      "Subidas puntuales seguidas de reversión rápida, señalando ruido más que cambio de régimen"
+    ]
+  },
+  "mapa_de_ruptura": {
+    "confirmacion": "La señal mejoraría si la probabilidad deja de depender de un solo impulso mediático y logra sostenerse con nuevas referencias verificables y continuidad en mercado.",
+    "ruptura_alcista": "Un avance sostenido por encima de la zona actual, acompañado por mayor volumen y nueva cobertura verificable sobre competitividad real de Ossoff, sugeriría que el mercado empieza a asignarle una opción más seria dentro del campo demócrata.",
+    "ruptura_bajista": "Si el repunte reciente se revierte y la probabilidad vuelve a comprimirse mientras otros nombres absorben atención y capital, la lectura pasaría a ser de ruido narrativo transitorio.",
+    "invalidacion": "Quedaría debilitada la tesis de mejora si no aparecen catalizadores adicionales y el mercado permanece anclado en dígito simple bajo durante un periodo prolongado.",
+    "evento_detonador": "Nuevas fuentes verificables sobre posicionamiento nacional, actividad política pre-campaña, apoyo partidario o cambios visibles en las cuotas comparativas frente a otros contendientes demócratas."
+  },
+  "mapa_de_escenarios": [
+    {
+      "escenario": "Base",
+      "probabilidad_interna": "65%",
+      "descripcion": "Ossoff permanece como aspirante plausible pero no central. La narrativa mejora de forma intermitente, aunque sin desplazar a los nombres más consolidados del campo demócrata.",
+      "impacto_en_mercado": "Probabilidad oscilando en rango bajo a medio-bajo, con episodios de volatilidad por cobertura y debate anticipado."
+    },
+    {
+      "escenario": "Ruptura",
+      "probabilidad_interna": "20%",
+      "descripcion": "Logra encadenar catalizadores políticos y mediáticos verificables, mejora su perfil nacional y empieza a ser tratado como contendiente de primera línea.",
+      "impacto_en_mercado": "Repricing alcista sostenido, con expansión de volumen y fortalecimiento narrativo."
+    },
+    {
+      "escenario": "Contrario",
+      "probabilidad_interna": "15%",
+      "descripcion": "El interés reciente se diluye, otros aspirantes consolidan ventaja y su candidatura queda como posibilidad periférica.",
+      "impacto_en_mercado": "Compresión de probabilidad y pérdida de tracción narrativa."
+    }
+  ],
+  "actualizacion_bayesiana": {
+    "probabilidad_actual_del_mercado": "7.65%",
+    "lectura_deepsignal": "La evidencia nueva es débil a moderada: hay subida marginal de precio y algunas referencias narrativas, pero sin validación robusta ni fechada en el input.",
+    "direccion_sugerida_del_update": "subir",
+    "razon": "El movimiento de 24h y la presencia creciente en cobertura sugieren un ajuste incremental al alza, no un cambio estructural. La actualización sugerida sería pequeña por la alta incertidumbre, el largo horizonte y la falta de fuentes externas sólidas con fecha clara."
+  },
+  "deepsignal_verdict": "Señal temprana de vigilancia. El mercado reconoce una mejora modesta en la opción de Jon Ossoff, pero por ahora la evidencia parece más narrativa que estructural. La lectura favorece seguimiento de catalizadores antes que una conclusión firme sobre su probabilidad real de ganar la nominación.",
+  "confidence_level": "Medium",
+  "watch_triggers": [
+    "Nueva cobertura verificable y fechada sobre viabilidad nacional de Ossoff",
+    "Cambios sostenidos en probabilidad con aumento de volumen",
+    "Señales comparativas frente a favoritos mencionados en el contexto, especialmente si reduce brecha",
+    "Persistencia del precio por encima del nivel actual sin reversión rápida",
+    "Cualquier referencia oficial o semioficial vinculada a preparación pre-campaña o apoyo dentro del partido"
+  ]
+}
+
+Hybrid Score:
+{
+  "preliminary_radar_score": 48,
+  "ai_interpretive_score": 48,
+  "final_radar_score": 48,
+  "score_breakdown": {
+    "formula": "final_radar_score = 0.40 preliminary_radar_score + 0.60 ai_interpretive_score",
+    "weights": {
+      "preliminary_radar_score": 0.4,
+      "ai_interpretive_score": 0.6
+    },
+    "inputs": {
+      "preliminary_radar_score": 48,
+      "ai_interpretive_score": 48
+    },
+    "output": {
+      "final_radar_score": 48
+    }
+  }
+}
+
+Prompt usado:
+Eres DeepSignal Engine, un sistema de inteligencia estratégica para mercados de predicción.
+
+Tu objetivo es analizar un mercado usando metodologías internas formales, pero entregar el resultado con nombres visibles de RadarBallena.
+
+Metodologías internas obligatorias:
+- STEEP Analysis
+- Premortem Analysis
+- Red Team Analysis
+- Scenario Planning
+- Weak Signals Analysis
+- Narrative Intelligence
+- Capital Flow / Market Movement Analysis
+- Resolution Risk Analysis
+- Bayesian Update
+- Catalyst / Trigger Analysis
+
+Nombres visibles RadarBallena:
+- Lectura Clave
+- Radar Score
+- Estela de Capital
+- Entorno de Señal
+- Corriente Narrativa
+- Filtro de Ruido
+- Mapa de Ruptura
+- Mapa de Escenarios
+- DeepSignal Verdict
+
+Reglas estrictas:
+- Escribe en español.
+- No des asesoría financiera.
+- No prometas ganancias.
+- No uses lenguaje de certeza absoluta.
+- No uses lenguaje directo de compra, venta, apuesta o inversión.
+- Usa solamente el contexto proporcionado.
+- Si no hay fuentes externas verificadas, dilo claramente.
+- Si no hay actividad whale, no menciones whales, ballenas ni grandes operadores.
+- Devuelve exclusivamente JSON válido.
+- No agregues markdown.
+- No agregues texto fuera del JSON.
+
+MERCADO:
+{
+  "title": "Will Jon Ossoff win the 2028 Democratic presidential nomination?",
+  "description": "This market will resolve to “Yes” if the named individual wins and accepts the 2028 nomination of the Democratic Party for U.S. president. Otherwise, this market will resolve to “No”.\n\nThe resolution source for this market will be a consensus of official Democratic Party sources.\n\nAny replacement of the democratic nominee before election day will not change the resolution of the market.",
+  "category": "politics",
+  "url": "https://polymarket.com/event/will-jon-ossoff-win-the-2028-democratic-presidential-nomination-885",
+  "close_date": "2028-11-07T00:00:00+00:00",
+  "current_probability": 0.0765,
+  "previous_probability_24h": 0.0725,
+  "probability_change_24h": 0.004,
+  "volume": 76929.833661,
+  "liquidity": 219588.96791,
+  "outcomes": [
+    "Yes",
+    "No"
+  ]
+}
+
+CONTEXTO:
+Fuente 1:
+- Titulo: Ossoff's Chances of Being 2028 Nominee Rise as He Slams 'Mar-a ...
+- URL: https://www.newsweek.com/ossoffs-chances-2028-nominee-surge-slams-mar-lago-mafia-11851464
+- Fecha: None
+- Resumen: Senator Jon Ossoff now sits among the top most-likely candidates for the 2028 Democrat nominee for president.
+- Relevancia: 0.5489
+
+Fuente 2:
+- Titulo: 2028 Democratic Presidential Nominee Odds - DeFi Rate
+- URL: https://defirate.com/prediction-markets/democratic-presidential-nominee-odds
+- Fecha: None
+- Resumen: Gavin Newsom leads the 2028 Democratic nomination at 24.5%, holding frontrunner status off a February book tour that doubled as a campaign prelude and a
+- Relevancia: 0.548
+
+Fuente 3:
+- Titulo: 2028 Election Prediction | Jon Ossoff vs. JD Vance - YouTube
+- URL: https://www.youtube.com/watch?v=pFZAgjaoEog
+- Fecha: None
+- Resumen: Subscribe for daily election analyses: http://bit.ly/LetsTalkElections Become a Channel Member: https://bit.ly/2MrXW2q Join the
+- Relevancia: 0.5389
+
+MÉTRICAS CALCULADAS:
+{
+  "preliminary_radar_score": 48,
+  "score_breakdown": {
+    "volume_score": 6,
+    "liquidity_score": 20,
+    "time_to_close_score": 0,
+    "probability_movement_score": 2,
+    "resolution_score": 10,
+    "narrative_score": 10
+  },
+  "days_to_close": 880,
+  "volume": 76929.833661,
+  "liquidity": 219588.96791,
+  "probability_change_24h": 0.004
+}
+
+Devuelve exactamente este JSON:
+
+{
+  "lectura_clave": "",
+  "radar_score": 0,
+  "radar_score_breakdown": {
+    "movimiento_probabilidad": 0,
+    "volumen": 0,
+    "liquidez": 0,
+    "cercania_cierre": 0,
+    "claridad_resolucion": 0,
+    "fuerza_narrativa": 0,
+    "asimetria_detectada": 0,
+    "riesgo_ruido": 0
+  },
+  "signal_label": "",
+  "estela_de_capital": "",
+  "entorno_de_senal": {
+    "steep_social": "",
+    "steep_tecnologico": "",
+    "steep_economico": "",
+    "steep_ecologico": "",
+    "steep_politico_regulatorio": "",
+    "sintesis": ""
+  },
+  "corriente_narrativa": "",
+  "filtro_de_ruido": {
+    "red_team": "",
+    "sesgos_detectados": "",
+    "riesgo_liquidez": "",
+    "riesgo_resolucion": "",
+    "informacion_ya_descontada": ""
+  },
+  "premortem": {
+    "si_la_tesis_falla_probablemente_seria_por": "",
+    "senales_tempranas_de_invalidacion": []
+  },
+  "mapa_de_ruptura": {
+    "confirmacion": "",
+    "ruptura_alcista": "",
+    "ruptura_bajista": "",
+    "invalidacion": "",
+    "evento_detonador": ""
+  },
+  "mapa_de_escenarios": [
+    {
+      "escenario": "Base",
+      "probabilidad_interna": "",
+      "descripcion": "",
+      "impacto_en_mercado": ""
+    },
+    {
+      "escenario": "Ruptura",
+      "probabilidad_interna": "",
+      "descripcion": "",
+      "impacto_en_mercado": ""
+    },
+    {
+      "escenario": "Contrario",
+      "probabilidad_interna": "",
+      "descripcion": "",
+      "impacto_en_mercado": ""
+    }
+  ],
+  "actualizacion_bayesiana": {
+    "probabilidad_actual_del_mercado": "",
+    "lectura_deepsignal": "",
+    "direccion_sugerida_del_update": "subir",
+    "razon": ""
+  },
+  "deepsignal_verdict": "",
+  "confidence_level": "Medium",
+  "watch_triggers": []
+}
+
+============================================================
+COMPARACIÓN
+============================================================
+
+Ganador general: Modelo B
+
+Scores por criterio (1-10)
+
+1. Apego al contexto disponible
+- Modelo A: 5
+- Modelo B: 9
+
+2. Profundidad estratégica
+- Modelo A: 6
+- Modelo B: 8
+
+3. Detección de señal vs ruido
+- Modelo A: 6
+- Modelo B: 9
+
+4. Claridad de lectura clave
+- Modelo A: 7
+- Modelo B: 9
+
+5. Prudencia y manejo de incertidumbre
+- Modelo A: 5
+- Modelo B: 10
+
+6. Calidad de escenarios
+- Modelo A: 6
+- Modelo B: 8
+
+7. Calidad de watch triggers
+- Modelo A: 6
+- Modelo B: 9
+
+8. Consistencia entre radarScore, signalLabel y verdict
+- Modelo A: 8
+- Modelo B: 8
+
+9. Riesgo de alucinación
+- Modelo A: 4
+- Modelo B: 9
+
+10. Utilidad para dashboard
+- Modelo A: 6
+- Modelo B: 9
+
+Fortalezas del modelo A
+- Da una lectura rápida y entendible del caso.
+- Mantiene coherencia general entre probabilidad baja, señal tipo Watchlist y verdict prudente.
+- El mapa de escenarios es simple y usable.
+- Identifica correctamente que Ossoff no es favorito y que la señal actual no es estructural.
+
+Fortalezas del modelo B
+- Está mucho más pegado al contexto realmente disponible y marca explícitamente límites de verificación.
+- Distingue mejor entre movimiento narrativo temprano y evidencia estructural.
+- Maneja mejor la incertidumbre temporal: mercado lejano, cierre distante, señal pequeña y riesgo de sobreinterpretación.
+- Los triggers son más operativos para seguimiento en dashboard: persistencia del precio, aumento de volumen, reducción de brecha frente a favoritos, nuevas fuentes verificables.
+- Hace mejor trabajo de red teaming: cuestiona titulares, contenido opinativo y extrapolación desde 24h.
+- La lectura clave es más accionable porque dice no solo qué pasa, sino cuánto confiar en ello.
+- Mejor utilidad de vigilancia para RadarBallena: convierte el brief en una lista de condiciones observables.
+
+Debilidades del modelo A
+- Introduce afirmaciones no sustentadas por el contexto dado, por ejemplo:
+  - “algunas fuentes lo posicionan entre los candidatos más probables”
+  - “acciones mediáticas contra líderes opositores”
+  - detalles sobre favorabilidad y perfil progresista
+- Tiende a rellenar STEEP con texto genérico o especulativo en vez de reconocer ausencia de señal.
+- El manejo de incertidumbre es flojo: no deja suficientemente claro qué viene del input y qué es inferencia.
+- Los triggers son correctos pero demasiado genéricos para dashboard.
+- En varios puntos parece usar conocimiento externo no mostrado, elevando riesgo de alucinación.
+- El breakdown añade asimetría y riesgo_ruido en 0 sin justificar por qué, cuando el propio texto sí sugiere incertidumbre narrativa.
+
+Debilidades del modelo B
+- También parece apoyarse parcialmente en contexto externo no visible cuando menciona “Fuente 2”, “Newsweek” o “YouTube”; lo hace con cautela, pero sigue siendo una dependencia implícita.
+- El radar_score_breakdown introduce asimetría_detectada 5 y riesgo_ruido 5 aunque el score total sigue en 48; eso sugiere un breakdown interpretativo algo decorativo o no totalmente reconciliado con la suma.
+- Puede resultar algo conservador de más para usuarios que busquen una postura más direccional.
+- La actualización bayesiana dice “subir” aunque el texto entero insiste en evidencia débil; está bien matizado, pero podría haberse expresado como “subir marginalmente”.
+
+Qué modelo usaría en producción y por qué
+Usaría el Modelo B en producción.
+
+Por qué:
+- Es más fiel al contexto y, sobre todo, más honesto sobre lo que no sabe.
+- Reduce el riesgo de alucinación, que en un sistema de vigilancia de mercados políticos es crítico.
+- Separa mejor señal de narrativa y evita inflar un movimiento pequeño en un mercado muy lejano.
+- Sus escenarios y watch triggers son bastante más útiles para un dashboard operacional.
+- Para RadarBallena, es preferible un modelo que pierda algo de “color” pero gane en trazabilidad, prudencia y capacidad de monitoreo.
+
+En resumen: A es legible, pero B es más confiable, más disciplinado y más accionable.

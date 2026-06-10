@@ -1,5 +1,6 @@
 # Core
 openai
+google-genai
 pydantic
 python-dotenv
 requests
