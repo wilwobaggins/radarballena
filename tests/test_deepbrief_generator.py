@@ -1,4 +1,4 @@
-from services.deepbrief_generator import build_deepbrief_prompt
+from services.deepbrief_generator import build_deepbrief_prompt, build_raw_market_input
 
 
 def test_build_deepbrief_prompt_uses_master_prompt_placeholders():
@@ -48,3 +48,32 @@ def test_build_deepbrief_prompt_uses_master_prompt_placeholders():
     assert "{{MERCADO}}" not in prompt
     assert "{{CONTEXTO}}" not in prompt
     assert "{{METRICAS}}" not in prompt
+
+
+def test_build_deepbrief_prompt_appends_anti_anchor_note():
+    prompt, _prompt_source = build_deepbrief_prompt(
+        market={"title": "Test market"},
+        context_sources=[],
+        anti_anchor_note="No copies el preliminary score.",
+    )
+
+    assert "VALIDACION SEMANTICA ANTI-ANCLAJE" in prompt
+    assert "No copies el preliminary score." in prompt
+
+
+def test_build_raw_market_input_keeps_relevance_metadata():
+    market = {
+        "title": "Test market",
+        "deepengine_category": "macro",
+        "relevance_reasons": ["strategic_context"],
+        "novelty_market": False,
+        "relevance_exclusion_reason": None,
+        "preliminary_radar_score": 43,
+    }
+
+    raw_market_input = build_raw_market_input(market)
+
+    assert raw_market_input["deepengine_category"] == "macro"
+    assert raw_market_input["relevance_reasons"] == ["strategic_context"]
+    assert raw_market_input["novelty_market"] is False
+    assert "relevance_exclusion_reason" in raw_market_input

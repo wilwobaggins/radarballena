@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from services.market_filter import (
+    assess_market_relevance,
     filter_relevant_markets_with_stats,
     is_market_open,
 )
@@ -67,3 +68,54 @@ def test_filter_relevant_markets_reports_closed_and_inactive_exclusions():
     assert stats["closed_by_flag"] == 1
     assert stats["inactive_market_excluded"] == 1
     assert stats["eligible_after_filters"] == 1
+
+
+def test_novelty_market_without_movement_is_excluded():
+    market = build_market(
+        title="Will LeBron James win the 2028 Democratic presidential nomination?",
+        category="politics",
+        probability_change_24h=0.005,
+        volume=20_000,
+        liquidity=10_000,
+    )
+
+    relevance = assess_market_relevance(market)
+
+    assert relevance["is_relevant"] is False
+    assert relevance["is_novelty"] is True
+    assert relevance["exclusion_reason"] == "novelty_without_catalyst"
+
+
+def test_strategic_market_with_catalyst_context_can_pass_without_big_move():
+    market = build_market(
+        title="Will the Fed cut rates after the next CPI report?",
+        description="Macro market tied to CPI and the next FOMC meeting.",
+        category="macro",
+        probability_change_24h=0.0,
+        volume=30_000,
+        liquidity=30_000,
+    )
+
+    relevance = assess_market_relevance(market)
+
+    assert relevance["is_relevant"] is True
+    assert "strategic_context" in relevance["reasons"]
+
+
+def test_filter_stats_report_novelty_exclusions():
+    markets = [
+        build_market(title="Strong BTC market"),
+        build_market(
+            title="Will MrBeast win the 2028 Democratic presidential nomination?",
+            category="politics",
+            probability_change_24h=0.0,
+            volume=15_000,
+            liquidity=8_000,
+        ),
+    ]
+
+    filtered, stats = filter_relevant_markets_with_stats(markets)
+
+    assert [market["title"] for market in filtered] == ["Strong BTC market"]
+    assert stats["novelty_market_excluded"] == 1
+    assert stats["relevance_exclusion_summary"]["novelty_without_catalyst"] == 1

@@ -38,6 +38,41 @@ Reglas estrictas:
 - No agregues markdown.
 - No agregues texto fuera del JSON.
 
+RADAR SCORE / AI INTERPRETIVE SCORE:
+- El campo "radar_score" representa el AI Interpretive Score independiente.
+- NO es el preliminary_radar_score.
+- NO debe copiar el preliminary_radar_score.
+- Usa el preliminary_radar_score solo como referencia tecnica inicial.
+- Tu trabajo es tomar postura analitica: separar senal de ruido y evitar neutralidad por defecto.
+
+El radar_score debe evaluar:
+- fuerza narrativa;
+- novedad de la senal;
+- catalizadores proximos;
+- asimetria entre precio, narrativa y contexto;
+- utilidad operativa;
+- claridad de resolucion;
+- liquidez util;
+- movimiento de probabilidad;
+- riesgo de ruido;
+- contexto externo disponible.
+
+Escala obligatoria:
+- 0-24 = Ignore. Mercado debil, trivial, meme, sin catalizador o muy contaminado por ruido.
+- 25-44 = Low Signal / Noise. Puede tener liquidez, pero no tiene profundidad estrategica.
+- 45-55 = Ambiguous. Usar SOLO cuando la evidencia este realmente balanceada.
+- 56-64 = Watchlist. Hay senal inicial, pero falta confirmacion.
+- 65-74 = Directional Edge. Hay catalizador, narrativa relevante o movimiento util.
+- 75-90 = High Conviction Signal. Senal fuerte, contexto solido y baja ambiguedad.
+- 91-100 = Exceptional. Usar rara vez.
+
+Reglas adicionales de scoring:
+- No concentres radar_score en 45-55.
+- Si el mercado es meme, celebrity, novelty market o candidatura improbable sin catalizador, el radar_score debe ser menor a 40 aunque tenga liquidez.
+- Si hay catalizador fuerte, movimiento reciente, contexto externo relevante o asimetria clara, puedes asignar 65-85 aunque el preliminary_radar_score sea bajo.
+- Si no hay fuentes externas verificadas y no hay movimiento relevante, castiga el score.
+- El motor debe ser versatil: politica, macro, geopolitica, tecnologia, ai, crypto, regulacion, cultura, ciencia y negocios. No debe sobreconcentrarse en politica electoral.
+
 MERCADO:
 {{MERCADO}}
 

@@ -194,6 +194,28 @@ def build_market_section(market: dict[str, Any]) -> str:
     return json.dumps(market_payload, ensure_ascii=False, indent=2)
 
 
+def build_raw_market_input(market: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "title": market.get("title"),
+        "description": market.get("description"),
+        "category": market.get("category"),
+        "deepengine_category": market.get("deepengine_category"),
+        "url": market.get("url"),
+        "close_date": market.get("close_date"),
+        "current_probability": market.get("current_probability"),
+        "previous_probability_24h": market.get("previous_probability_24h"),
+        "probability_change_24h": market.get("probability_change_24h"),
+        "volume": market.get("volume"),
+        "liquidity": market.get("liquidity"),
+        "outcomes": market.get("outcomes"),
+        "preliminary_radar_score": market.get("preliminary_radar_score"),
+        "score_breakdown": market.get("score_breakdown"),
+        "relevance_reasons": market.get("relevance_reasons"),
+        "novelty_market": market.get("novelty_market"),
+        "relevance_exclusion_reason": market.get("relevance_exclusion_reason"),
+    }
+
+
 def build_metrics_section(market: dict[str, Any]) -> str:
     metrics_payload = {
         "preliminary_radar_score": market.get("preliminary_radar_score"),
@@ -210,6 +232,7 @@ def build_deepbrief_prompt(
     market: dict[str, Any],
     context_sources: list[dict[str, Any]] | None = None,
     repair_note: str | None = None,
+    anti_anchor_note: str | None = None,
 ) -> tuple[str, str]:
     prompt_template, prompt_source = load_master_prompt()
     formatted_context = format_context_sources(context_sources)
@@ -224,6 +247,12 @@ def build_deepbrief_prompt(
         rendered_prompt = (
             f"{rendered_prompt}\n\n"
             f"MODO REPARACION:\n{repair_note}\n"
+        )
+
+    if anti_anchor_note:
+        rendered_prompt = (
+            f"{rendered_prompt}\n\n"
+            f"VALIDACION SEMANTICA ANTI-ANCLAJE:\n{anti_anchor_note}\n"
         )
 
     return rendered_prompt, prompt_source
@@ -255,7 +284,7 @@ def build_success_raw_output(
         "fallback_used": fallback_used,
         "primary_provider": primary_provider,
         "attempts": attempts,
-        "market_input": market,
+        "market_input": build_raw_market_input(market),
         "context_sources": context_sources or [],
         "prompt_source": prompt_source,
         "prompt": prompt,
@@ -313,6 +342,7 @@ def generate_with_openai(
     max_retries: int,
     primary_provider: str,
     fallback_used: bool,
+    anti_anchor_note: str | None = None,
     prior_attempts: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     model = get_provider_model("openai")
@@ -332,6 +362,7 @@ def generate_with_openai(
             market=market,
             context_sources=context_sources,
             repair_note=repair_note,
+            anti_anchor_note=anti_anchor_note,
         )
 
         try:
@@ -417,6 +448,7 @@ def generate_with_gemini(
     max_retries: int,
     primary_provider: str,
     fallback_used: bool,
+    anti_anchor_note: str | None = None,
     prior_attempts: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     model = get_provider_model("gemini")
@@ -436,6 +468,7 @@ def generate_with_gemini(
             market=market,
             context_sources=context_sources,
             repair_note=repair_note,
+            anti_anchor_note=anti_anchor_note,
         )
 
         try:
@@ -523,6 +556,7 @@ def generate_deepbrief_for_market(
     market: dict[str, Any],
     context_sources: list[dict[str, Any]] | None = None,
     max_retries: int | None = None,
+    anti_anchor_note: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     max_retries = max_retries or int(os.getenv("DEEPBRIEF_MAX_RETRIES", "2"))
     primary_provider, provider_sequence = get_provider_sequence()
@@ -570,6 +604,7 @@ def generate_deepbrief_for_market(
                     max_retries=max_retries,
                     primary_provider=primary_provider,
                     fallback_used=is_fallback,
+                    anti_anchor_note=anti_anchor_note,
                     prior_attempts=attempts,
                 )
             else:
@@ -579,6 +614,7 @@ def generate_deepbrief_for_market(
                     max_retries=max_retries,
                     primary_provider=primary_provider,
                     fallback_used=is_fallback,
+                    anti_anchor_note=anti_anchor_note,
                     prior_attempts=attempts,
                 )
 

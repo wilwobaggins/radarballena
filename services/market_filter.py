@@ -1,4 +1,5 @@
 import json
+import re
 from collections import Counter
 from datetime import datetime, timezone
 from typing import Any
@@ -7,6 +8,7 @@ from services.category_filter import (
     BLOCKED_DEEPENGINE_CATEGORIES,
     classify_deepengine_category,
     filter_deepengine_eligible_markets,
+    market_text,
     summarize_exclusions,
 )
 from services.scoring_service import (
@@ -29,6 +31,66 @@ CLOSE_DATE_KEYS = (
     "endDateIso",
     "end_date_iso",
 )
+
+NOVELTY_TITLE_PATTERNS = (
+    "lebron james",
+    "mrbeast",
+    "george clooney",
+    "barack obama",
+    "michelle obama",
+    "hillary clinton",
+    "celebrity",
+)
+
+NOVELTY_KEYWORDS = {
+    "celebrity",
+    "viral",
+    "meme",
+    "novelty",
+    "gimmick",
+    "influencer",
+    "actor",
+    "actress",
+    "youtube",
+}
+
+CATALYST_KEYWORDS = {
+    "earnings",
+    "debate",
+    "vote",
+    "hearing",
+    "approval",
+    "decision",
+    "deadline",
+    "launch",
+    "release",
+    "meeting",
+    "cpi",
+    "fed",
+    "fomc",
+    "inflation",
+    "tariff",
+    "treaty",
+    "ceasefire",
+    "summit",
+    "sanctions",
+    "lawsuit",
+    "ruling",
+    "guidance",
+    "upgrade",
+    "downgrade",
+    "etf",
+    "conference",
+    "report",
+    "jobs report",
+    "election",
+    "primary",
+    "nomination",
+    "referendum",
+    "regulation",
+    "bill",
+    "fda",
+}
 
 
 def get_market_outcomes(market: dict[str, Any]) -> list[Any]:
@@ -192,6 +254,125 @@ def passes_basic_market_quality(
     return True
 
 
+def get_market_text(market: dict[str, Any]) -> str:
+    return market_text(market)
+
+
+def is_novelty_market(market: dict[str, Any]) -> bool:
+    text = get_market_text(market)
+
+    if any(pattern in text for pattern in NOVELTY_TITLE_PATTERNS):
+        return True
+
+    return any(keyword in text for keyword in NOVELTY_KEYWORDS)
+
+
+def has_catalyst_context(market: dict[str, Any]) -> bool:
+    text = get_market_text(market)
+    return any(keyword in text for keyword in CATALYST_KEYWORDS)
+
+
+def has_strong_movement(
+    market: dict[str, Any],
+    min_probability_move: float,
+) -> bool:
+    probability_move = abs(safe_float(market.get("probability_change_24h")))
+    return probability_move >= max(min_probability_move * 2, 0.03)
+
+
+def assess_market_relevance(
+    market: dict[str, Any],
+    min_liquidity: float = 500,
+    min_volume: float = 1_000,
+    max_days_to_close: int = 1200,
+    min_probability_move: float = 0.01,
+) -> dict[str, Any]:
+    classification = classify_deepengine_category(market)
+
+    if not classification["eligible"]:
+        return {
+            "is_relevant": False,
+            "reasons": [],
+            "exclusion_reason": "ineligible_category",
+            "is_novelty": False,
+        }
+
+    if not passes_basic_market_quality(
+        market=market,
+        min_liquidity=min_liquidity,
+        min_volume=min_volume,
+        max_days_to_close=max_days_to_close,
+    ):
+        return {
+            "is_relevant": False,
+            "reasons": [],
+            "exclusion_reason": "basic_quality_failed",
+            "is_novelty": is_novelty_market(market),
+        }
+
+    volume = safe_float(market.get("volume"))
+    liquidity = safe_float(market.get("liquidity"))
+    probability_move = abs(safe_float(market.get("probability_change_24h")))
+    category = classification["category"]
+    novelty_market = is_novelty_market(market)
+    catalyst_context = has_catalyst_context(market)
+
+    reasons: list[str] = []
+
+    if probability_move >= min_probability_move:
+        reasons.append("probability_move")
+
+    if volume >= 100_000:
+        reasons.append("high_volume")
+
+    if liquidity >= 25_000 and volume >= 25_000:
+        reasons.append("liquidity_and_volume")
+
+    if category in {
+        "politics",
+        "macro",
+        "geopolitics",
+        "crypto",
+        "technology",
+        "ai",
+        "regulation",
+        "business",
+        "culture",
+        "science",
+        "world_events",
+        "economy",
+    } and catalyst_context:
+        reasons.append("strategic_context")
+
+    strong_movement = has_strong_movement(
+        market=market,
+        min_probability_move=min_probability_move,
+    )
+
+    if novelty_market and not strong_movement:
+        return {
+            "is_relevant": False,
+            "reasons": reasons,
+            "exclusion_reason": "novelty_without_catalyst",
+            "is_novelty": True,
+        }
+
+    if not reasons:
+        return {
+            "is_relevant": False,
+            "reasons": [],
+            "exclusion_reason": "no_real_interest_signal",
+            "is_novelty": novelty_market,
+        }
+
+    return {
+        "is_relevant": True,
+        "reasons": reasons,
+        "exclusion_reason": None,
+        "is_novelty": novelty_market,
+    }
+
+
 def is_relevant_market(
     market: dict[str, Any],
     min_liquidity: float = 500,
@@ -206,27 +387,14 @@ def is_relevant_market(
     El filtro de categorias se aplica antes en filter_relevant_markets().
     Esta funcion asume que el mercado ya es elegible para DeepEngine.
     """
-    classification = classify_deepengine_category(market)
-
-    if not classification["eligible"]:
-        return False
-
-    if not passes_basic_market_quality(
+    relevance = assess_market_relevance(
         market=market,
         min_liquidity=min_liquidity,
         min_volume=min_volume,
         max_days_to_close=max_days_to_close,
-    ):
-        return False
-
-    volume = safe_float(market.get("volume"))
-    probability_move = abs(safe_float(market.get("probability_change_24h")))
-
-    has_movement = probability_move >= min_probability_move
-    has_high_volume = volume >= 100_000
-    has_allowed_category = bool(market.get("deepengine_eligible"))
-
-    return has_movement or has_high_volume or has_allowed_category
+        min_probability_move=min_probability_move,
+    )
+    return bool(relevance["is_relevant"])
 
 
 def summarize_open_market_exclusions(
@@ -289,6 +457,8 @@ def filter_relevant_markets_with_stats(
 
     open_markets: list[dict[str, Any]] = []
     closed_or_inactive_markets: list[dict[str, Any]] = []
+    relevance_excluded_markets: list[dict[str, Any]] = []
+    relevant_markets: list[dict[str, Any]] = []
 
     for market in eligible_markets:
         open_status = get_market_open_status(market)
@@ -305,10 +475,35 @@ def filter_relevant_markets_with_stats(
             }
         )
 
-    relevant_markets = [market for market in open_markets if is_relevant_market(market)]
+    for market in open_markets:
+        relevance = assess_market_relevance(market)
+
+        if relevance["is_relevant"]:
+            relevant_markets.append(
+                {
+                    **market,
+                    "relevance_reasons": relevance["reasons"],
+                    "novelty_market": relevance["is_novelty"],
+                }
+            )
+            continue
+
+        relevance_excluded_markets.append(
+            {
+                **market,
+                "relevance_exclusion_reason": relevance["exclusion_reason"],
+                "relevance_reasons": relevance["reasons"],
+                "novelty_market": relevance["is_novelty"],
+            }
+        )
+
     open_market_summary = summarize_open_market_exclusions(closed_or_inactive_markets)
     category_bucket_summary = summarize_category_buckets(category_excluded_markets)
-    quality_excluded = len(open_markets) - len(relevant_markets)
+    relevance_exclusion_summary = Counter(
+        market.get("relevance_exclusion_reason") or "unknown"
+        for market in relevance_excluded_markets
+    )
+    quality_excluded = len(relevance_excluded_markets)
     stats = {
         "input_markets": len(markets),
         "category_eligible": len(eligible_markets),
@@ -316,11 +511,23 @@ def filter_relevant_markets_with_stats(
         **category_bucket_summary,
         **open_market_summary,
         "quality_market_excluded": quality_excluded,
+        "novelty_market_excluded": sum(
+            1 for market in relevance_excluded_markets if market.get("novelty_market")
+        ),
+        "relevance_exclusion_summary": dict(relevance_exclusion_summary),
         "eligible_after_filters": len(relevant_markets),
     }
 
     if closed_or_inactive_markets:
         print("DeepEngine open-market exclusions:", open_market_summary)
+
+    novelty_exclusions = [
+        market.get("title")
+        for market in relevance_excluded_markets
+        if market.get("novelty_market")
+    ]
+    if novelty_exclusions:
+        print("DeepEngine novelty exclusions:", novelty_exclusions[:10])
 
     print("DeepEngine filter:", stats)
 

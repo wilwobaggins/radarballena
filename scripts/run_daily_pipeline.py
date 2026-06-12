@@ -1,10 +1,15 @@
 import os
+import re
 import time
+from collections import Counter
 from typing import Any
 
 from services import supabase_service as db
 from services.context_client import search_context
-from services.deepbrief_generator import generate_deepbrief_for_market
+from services.deepbrief_generator import (
+    build_raw_market_input,
+    generate_deepbrief_for_market,
+)
 from services.error_types import build_error_record
 from services.logger_service import get_logger
 from services.market_filter import filter_relevant_markets_with_stats
@@ -19,6 +24,53 @@ from services.scoring_service import (
 
 
 logger = get_logger("run_daily_pipeline")
+
+ANTI_ANCHOR_NOTE = (
+    "REINTENTO OBLIGATORIO POR ANCLAJE DE SCORE:\n"
+    "Tu respuesta anterior copio el preliminary_radar_score.\n"
+    "Eso no esta permitido.\n"
+    "Debes generar un radar_score interpretativo independiente.\n"
+    "No uses el mismo numero que preliminary_radar_score salvo que justifiques explicitamente una ambiguedad real.\n"
+    "Si el mercado es debil, baja el score a 15-40.\n"
+    "Si hay senal real, sube a 60-80.\n"
+    "Evita 45-55 salvo evidencia balanceada.\n"
+    "Devuelve JSON valido."
+)
+
+THEME_VERBS = (
+    "win",
+    "be",
+    "become",
+    "reach",
+    "hit",
+    "pass",
+    "approve",
+    "launch",
+    "release",
+    "announce",
+)
+
+FAMILY_PATTERNS = (
+    "2028 democratic presidential nomination",
+    "2028 republican presidential nomination",
+    "fed rate",
+    "bitcoin",
+    "ethereum",
+    "openai",
+    "nvidia",
+    "tariff",
+    "ceasefire",
+)
+
+PRIORITY_BUCKETS = [
+    ["macro", "economy"],
+    ["geopolitics"],
+    ["crypto"],
+    ["technology", "ai"],
+    ["regulation", "business"],
+    ["politics"],
+    ["world_events", "science", "culture"],
+]
 
 
 def env_int(name: str, default: int) -> int:
@@ -158,6 +210,50 @@ def build_selection_reason(market: dict[str, Any]) -> str:
     return " | ".join(parts)
 
 
+def normalize_text(value: Any) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip().lower())
+
+
+def get_diversity_bucket(market: dict[str, Any]) -> str:
+    return str(
+        market.get("deepengine_category")
+        or market.get("category")
+        or "category_unknown"
+    )
+
+
+def get_theme_key(market: dict[str, Any]) -> str:
+    title = normalize_text(market.get("title"))
+
+    for verb in THEME_VERBS:
+        match = re.match(rf"^will\s+.+?\s+{verb}\s+(.+)$", title)
+        if match:
+            return f"{verb}:{match.group(1)}"
+
+    title = re.sub(r"\b\d{1,4}\b", "#", title)
+    return title
+
+
+def get_family_key(market: dict[str, Any]) -> str:
+    title = normalize_text(market.get("title"))
+
+    for pattern in FAMILY_PATTERNS:
+        if pattern in title:
+            return pattern
+
+    return get_diversity_bucket(market)
+
+
+def get_bucket_key(market: dict[str, Any]) -> str:
+    category = get_diversity_bucket(market)
+
+    for bucket in PRIORITY_BUCKETS:
+        if category in bucket:
+            return "/".join(bucket)
+
+    return category
+
+
 def select_top_markets(
     markets: list[dict[str, Any]],
     limit: int | None = None,
@@ -166,19 +262,160 @@ def select_top_markets(
     candidate_pool_size = env_int("DAILY_PIPELINE_CANDIDATE_POOL", top_n * 3)
 
     sorted_markets = sort_markets_by_score(markets)
-    selected = sorted_markets[:candidate_pool_size]
+    candidate_pool = sorted_markets[:candidate_pool_size]
+    selected: list[dict[str, Any]] = []
+    theme_counts: Counter[str] = Counter()
+    family_counts: Counter[str] = Counter()
+    bucket_counts: Counter[str] = Counter()
+    category_counts: Counter[str] = Counter()
+    skipped_by_bucket_limit: list[str] = []
+    skipped_by_family_limit: list[str] = []
+    skipped_by_theme_limit: list[str] = []
 
     logger.info(
         "Pool de candidatos seleccionado: %s | objetivo_deepbriefs=%s",
-        len(selected),
+        len(candidate_pool),
         top_n,
     )
 
-    for market in selected:
+    for market in candidate_pool:
         logger.info(
             "Candidate | title=%s | reason=%s",
             market.get("title"),
             build_selection_reason(market),
+        )
+
+    def can_select(market: dict[str, Any]) -> bool:
+        bucket_key = get_bucket_key(market)
+        category = get_diversity_bucket(market)
+        theme_key = get_theme_key(market)
+        family_key = get_family_key(market)
+
+        if bucket_counts[bucket_key] >= 1:
+            skipped_by_bucket_limit.append(
+                f"{market.get('title')} | bucket={bucket_key}"
+            )
+            return False
+
+        if category == "politics" and category_counts["politics"] >= 2:
+            skipped_by_bucket_limit.append(
+                f"{market.get('title')} | bucket=politics_max_2"
+            )
+            return False
+
+        if theme_counts[theme_key] >= 2:
+            skipped_by_theme_limit.append(
+                f"{market.get('title')} | repeated_theme={theme_key}"
+            )
+            return False
+
+        family_limit = 1 if family_key == "2028 democratic presidential nomination" else 2
+        if family_counts[family_key] >= family_limit:
+            skipped_by_family_limit.append(
+                f"{market.get('title')} | repeated_family={family_key}"
+            )
+            return False
+
+        return True
+
+    def can_select_fill(market: dict[str, Any]) -> bool:
+        category = get_diversity_bucket(market)
+        theme_key = get_theme_key(market)
+        family_key = get_family_key(market)
+
+        if category == "politics" and category_counts["politics"] >= 2:
+            skipped_by_bucket_limit.append(
+                f"{market.get('title')} | bucket=politics_max_2"
+            )
+            return False
+
+        if theme_counts[theme_key] >= 2:
+            skipped_by_theme_limit.append(
+                f"{market.get('title')} | repeated_theme={theme_key}"
+            )
+            return False
+
+        family_limit = 1 if family_key == "2028 democratic presidential nomination" else 2
+        if family_counts[family_key] >= family_limit:
+            skipped_by_family_limit.append(
+                f"{market.get('title')} | repeated_family={family_key}"
+            )
+            return False
+
+        return True
+
+    def register_selection(market: dict[str, Any], pass_name: str) -> None:
+        bucket_key = get_bucket_key(market)
+        category = get_diversity_bucket(market)
+        theme_key = get_theme_key(market)
+        family_key = get_family_key(market)
+
+        selected.append(market)
+        bucket_counts[bucket_key] += 1
+        category_counts[category] += 1
+        theme_counts[theme_key] += 1
+        family_counts[family_key] += 1
+        logger.info(
+            "Selection bucket chosen | pass=%s | bucket=%s | title=%s | preliminary_score=%s | relevance_reasons=%s | family_key=%s",
+            pass_name,
+            bucket_key,
+            market.get("title"),
+            market.get("preliminary_radar_score"),
+            market.get("relevance_reasons"),
+            family_key,
+        )
+
+    for bucket in PRIORITY_BUCKETS:
+        if len(selected) >= top_n:
+            break
+
+        for market in candidate_pool:
+            if market in selected or get_diversity_bucket(market) not in bucket:
+                continue
+
+            if not can_select(market):
+                continue
+
+            register_selection(market, pass_name="bucket_first_pass")
+            break
+
+    for market in candidate_pool:
+        if len(selected) >= top_n:
+            break
+
+        if market in selected:
+            continue
+
+        if not can_select_fill(market):
+            continue
+
+        register_selection(market, pass_name="fill_remaining")
+
+    logger.info(
+        "Selection diversity bucket | counts=%s",
+        dict(bucket_counts),
+    )
+    logger.info(
+        "Markets skipped by bucket limit | count=%s | samples=%s",
+        len(skipped_by_bucket_limit),
+        skipped_by_bucket_limit[:10],
+    )
+    logger.info(
+        "Markets skipped by family limit | count=%s | samples=%s",
+        len(skipped_by_family_limit),
+        skipped_by_family_limit[:10],
+    )
+    logger.info(
+        "Markets skipped by repeated theme | count=%s | samples=%s",
+        len(skipped_by_theme_limit),
+        skipped_by_theme_limit[:10],
+    )
+
+    if len(selected) < top_n:
+        logger.warning(
+            "Selection diversity warning | selected=%s | target=%s | reason=insufficient_variety",
+            len(selected),
+            top_n,
         )
 
     return selected
@@ -256,6 +493,14 @@ def generate_deepbrief(
     context_sources: list[dict[str, Any]],
 ) -> dict[str, Any]:
     logger.info("Generando DeepBrief | market=%s", market.get("title"))
+    logger.info(
+        "MARKET_METADATA_DEBUG | title=%s | novelty=%s | reasons=%s | category=%s | prelim=%s",
+        market.get("title"),
+        market.get("novelty_market"),
+        market.get("relevance_reasons"),
+        market.get("deepengine_category") or market.get("category"),
+        market.get("preliminary_radar_score"),
+    )
 
     deepbrief, raw_output = generate_deepbrief_for_market(
         market=market,
@@ -278,11 +523,97 @@ def generate_deepbrief(
     preliminary_radar_score = market.get("preliminary_radar_score")
     ai_interpretive_score = deepbrief.get("radar_score")
 
+    if ai_interpretive_score == preliminary_radar_score:
+        logger.warning(
+            "AI_SCORE_ANCHORING_WARNING | market=%s | preliminary=%s | ai=%s | action=semantic_retry",
+            market.get("title"),
+            preliminary_radar_score,
+            ai_interpretive_score,
+        )
+
+        deepbrief, raw_output = generate_deepbrief_for_market(
+            market=market,
+            context_sources=context_sources,
+            anti_anchor_note=ANTI_ANCHOR_NOTE,
+        )
+
+        logger.info(
+            "Prompt anti-anchor usado | market=%s | source=%s | provider=%s | fallback_used=%s",
+            market.get("title"),
+            raw_output.get("prompt_source", "unknown"),
+            raw_output.get("provider", "unknown"),
+            raw_output.get("fallback_used", False),
+        )
+
+        validate_output(
+            deepbrief=deepbrief,
+            raw_output=raw_output,
+        )
+
+        ai_interpretive_score = deepbrief.get("radar_score")
+
+    probability_move = abs(safe_float(market.get("probability_change_24h")))
+    relevance_reasons = market.get("relevance_reasons") or []
+    has_strong_context = "strategic_context" in relevance_reasons
+    has_real_movement_signal = "probability_move" in relevance_reasons
+    ai_original = int(safe_float(ai_interpretive_score))
+    ai_adjusted = ai_original
+    score_adjustment = {
+        "applied": False,
+        "reason": None,
+        "original_ai_score": ai_original,
+        "adjusted_ai_score": ai_original,
+    }
+
+    if ai_original == int(safe_float(preliminary_radar_score)):
+        if market.get("novelty_market") is True:
+            ai_adjusted = min(ai_adjusted, 35)
+
+        if probability_move == 0 and not has_strong_context:
+            ai_adjusted = min(ai_adjusted, 44)
+
+        if str(deepbrief.get("signal_label") or "").strip().lower() == "ignore":
+            ai_adjusted = min(ai_adjusted, 30)
+
+        if has_real_movement_signal or has_strong_context:
+            ai_adjusted = ai_original
+
+        if ai_adjusted != ai_original:
+            score_adjustment = {
+                "applied": True,
+                "reason": "anti_anchor_postprocess",
+                "original_ai_score": ai_original,
+                "adjusted_ai_score": ai_adjusted,
+            }
+
+    ai_interpretive_score = ai_adjusted
+
     hybrid_score = calculate_hybrid_radar_score(
         preliminary_radar_score=preliminary_radar_score,
         ai_interpretive_score=ai_interpretive_score,
     )
 
+    if score_adjustment["applied"]:
+        logger.info(
+            "AI_SCORE_POSTPROCESS_APPLIED | market=%s | preliminary=%s | original_ai=%s | adjusted_ai=%s | final=%s",
+            market.get("title"),
+            preliminary_radar_score,
+            ai_original,
+            ai_adjusted,
+            hybrid_score["final_radar_score"],
+        )
+
+    if hybrid_score["preliminary_radar_score"] == hybrid_score["ai_interpretive_score"]:
+        logger.warning(
+            "AI_SCORE_ANCHORING_PERSISTED | market=%s | preliminary=%s | ai=%s | final=%s",
+            market.get("title"),
+            hybrid_score["preliminary_radar_score"],
+            hybrid_score["ai_interpretive_score"],
+            hybrid_score["final_radar_score"],
+        )
+
+    raw_output["market_input"] = build_raw_market_input(market)
+    raw_output["score_adjustment"] = score_adjustment
     raw_output["hybrid_score"] = hybrid_score
 
     saved = save_results(
@@ -529,6 +860,11 @@ def main():
             filter_stats.get("unknown_market_excluded", 0),
             filter_stats.get("eligible_after_filters", markets_filtered),
         )
+        logger.info(
+            "Markets skipped by novelty filter: %s | relevance_exclusions=%s",
+            filter_stats.get("novelty_market_excluded", 0),
+            filter_stats.get("relevance_exclusion_summary", {}),
+        )
         logger.info("Markets filtered: %s", markets_filtered)
         logger.info("Markets analyzed: %s", markets_analyzed)
         logger.info("DeepBriefs generated: %s", deepbriefs_generated)
@@ -549,6 +885,10 @@ def main():
         print(
             "Eligible after filters:",
             filter_stats.get("eligible_after_filters", markets_filtered),
+        )
+        print(
+            "Markets skipped by novelty filter:",
+            filter_stats.get("novelty_market_excluded", 0),
         )
         print("Markets filtered:", markets_filtered)
         print("Markets analyzed:", markets_analyzed)
