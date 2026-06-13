@@ -4,8 +4,11 @@ from typing import Any
 
 import requests
 
+from services.logger_service import get_logger
+
 
 GAMMA_BASE_URL = "https://gamma-api.polymarket.com"
+logger = get_logger("polymarket_client")
 
 
 def safe_float(value: Any) -> float | None:
@@ -81,23 +84,77 @@ def derive_previous_probability_24h(
     return previous
 
 
+def get_market_dedupe_key(raw_market: dict[str, Any]) -> str | None:
+    for key in ("id", "conditionId", "questionID"):
+        value = raw_market.get(key)
+        if value not in (None, ""):
+            return str(value)
+
+    return None
+
+
 def fetch_active_markets(limit: int = 20) -> list[dict[str, Any]]:
-    response = requests.get(
-        f"{GAMMA_BASE_URL}/markets",
-        params={
-            "active": "true",
-            "closed": "false",
-            "limit": limit,
-        },
-        timeout=20,
+    requested_limit = max(limit, 0)
+    page_size = min(100, requested_limit or 100)
+    offset = 0
+    raw_markets: list[dict[str, Any]] = []
+
+    while len(raw_markets) < requested_limit or (requested_limit == 0 and offset == 0):
+        response = requests.get(
+            f"{GAMMA_BASE_URL}/markets",
+            params={
+                "active": "true",
+                "closed": "false",
+                "limit": page_size,
+                "offset": offset,
+            },
+            timeout=20,
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if not isinstance(data, list):
+            raise RuntimeError("Respuesta inesperada de Polymarket")
+
+        logger.info(
+            "POLYMARKET_FETCH_PAGE | offset=%s | requested=%s | returned=%s",
+            offset,
+            page_size,
+            len(data),
+        )
+
+        raw_markets.extend(data)
+
+        if len(data) < page_size or requested_limit == 0:
+            break
+
+        offset += page_size
+
+    unique_markets: list[dict[str, Any]] = []
+    seen_keys: set[str] = set()
+
+    for raw_market in raw_markets:
+        dedupe_key = get_market_dedupe_key(raw_market)
+
+        if dedupe_key and dedupe_key in seen_keys:
+            continue
+
+        if dedupe_key:
+            seen_keys.add(dedupe_key)
+
+        unique_markets.append(raw_market)
+
+        if requested_limit and len(unique_markets) >= requested_limit:
+            break
+
+    logger.info(
+        "POLYMARKET_FETCH_TOTAL | requested=%s | raw=%s | unique=%s",
+        requested_limit,
+        len(raw_markets),
+        len(unique_markets),
     )
-    response.raise_for_status()
-    data = response.json()
 
-    if not isinstance(data, list):
-        raise RuntimeError("Respuesta inesperada de Polymarket")
-
-    return data
+    return unique_markets
 
 
 def normalize_market(raw_market: dict[str, Any]) -> dict[str, Any]:
