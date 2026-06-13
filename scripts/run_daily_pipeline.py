@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
 import os
 import re
 import time
@@ -69,6 +73,15 @@ PRIORITY_BUCKETS = [
     ["technology", "ai"],
     ["regulation", "business"],
     ["politics"],
+    ["world_events", "science", "culture"],
+]
+
+CANDIDATE_POOL_BUCKET_PRIORITY = [
+    ["macro", "economy"],
+    ["geopolitics"],
+    ["crypto"],
+    ["technology", "ai"],
+    ["regulation", "business"],
     ["world_events", "science", "culture"],
 ]
 
@@ -254,6 +267,89 @@ def get_bucket_key(market: dict[str, Any]) -> str:
     return category
 
 
+def build_candidate_pool(
+    sorted_markets: list[dict[str, Any]],
+    candidate_pool_size: int,
+) -> list[dict[str, Any]]:
+    max_politics_per_run = env_int("DEEPENGINE_MAX_POLITICS_PER_RUN", 1)
+    selected: list[dict[str, Any]] = []
+    selected_ids: set[int] = set()
+    category_counts: Counter[str] = Counter()
+    family_counts: Counter[str] = Counter()
+    politics_cap_hits = 0
+
+    def try_add_market(market: dict[str, Any], allow_politics: bool) -> bool:
+        nonlocal politics_cap_hits
+
+        market_identity = id(market)
+        if market_identity in selected_ids or len(selected) >= candidate_pool_size:
+            return False
+
+        category = get_diversity_bucket(market)
+        family_key = get_family_key(market)
+
+        if family_key == "2028 democratic presidential nomination":
+            if family_counts[family_key] >= 1:
+                return False
+
+        if category == "politics":
+            if not allow_politics:
+                politics_cap_hits += 1
+                return False
+
+            if category_counts["politics"] >= max_politics_per_run:
+                politics_cap_hits += 1
+                return False
+
+        selected.append(market)
+        selected_ids.add(market_identity)
+        category_counts[category] += 1
+        family_counts[family_key] += 1
+        return True
+
+    for bucket in CANDIDATE_POOL_BUCKET_PRIORITY:
+        for market in sorted_markets:
+            if len(selected) >= candidate_pool_size:
+                break
+
+            if get_diversity_bucket(market) not in bucket:
+                continue
+
+            try_add_market(market, allow_politics=False)
+
+    for market in sorted_markets:
+        if len(selected) >= candidate_pool_size:
+            break
+
+        category = get_diversity_bucket(market)
+        if category == "politics":
+            continue
+
+        try_add_market(market, allow_politics=False)
+
+    if len(selected) < candidate_pool_size:
+        for market in sorted_markets:
+            if len(selected) >= candidate_pool_size:
+                break
+
+            if get_diversity_bucket(market) != "politics":
+                continue
+
+            try_add_market(market, allow_politics=True)
+
+    logger.info(
+        "CANDIDATE_POOL_CATEGORY_COUNTS | counts=%s",
+        dict(category_counts),
+    )
+    logger.info(
+        "POLITICS_CANDIDATE_CAP_APPLIED | max_politics=%s | skipped=%s",
+        max_politics_per_run,
+        politics_cap_hits,
+    )
+
+    return selected
+
+
 def select_top_markets(
     markets: list[dict[str, Any]],
     limit: int | None = None,
@@ -262,7 +358,10 @@ def select_top_markets(
     candidate_pool_size = env_int("DAILY_PIPELINE_CANDIDATE_POOL", top_n * 3)
 
     sorted_markets = sort_markets_by_score(markets)
-    candidate_pool = sorted_markets[:candidate_pool_size]
+    candidate_pool = build_candidate_pool(
+        sorted_markets=sorted_markets,
+        candidate_pool_size=candidate_pool_size,
+    )
     selected: list[dict[str, Any]] = []
     theme_counts: Counter[str] = Counter()
     family_counts: Counter[str] = Counter()
@@ -396,6 +495,10 @@ def select_top_markets(
         dict(bucket_counts),
     )
     logger.info(
+        "FINAL_SELECTION_CATEGORY_COUNTS | counts=%s",
+        dict(category_counts),
+    )
+    logger.info(
         "Markets skipped by bucket limit | count=%s | samples=%s",
         len(skipped_by_bucket_limit),
         skipped_by_bucket_limit[:10],
@@ -491,6 +594,7 @@ def fetch_context(
 def generate_deepbrief(
     market: dict[str, Any],
     context_sources: list[dict[str, Any]],
+    pipeline_run_id: str,
 ) -> dict[str, Any]:
     logger.info("Generando DeepBrief | market=%s", market.get("title"))
     logger.info(
@@ -613,6 +717,7 @@ def generate_deepbrief(
         )
 
     raw_output["market_input"] = build_raw_market_input(market)
+    raw_output["pipeline_run_id"] = pipeline_run_id
     raw_output["score_adjustment"] = score_adjustment
     raw_output["hybrid_score"] = hybrid_score
 
@@ -621,6 +726,7 @@ def generate_deepbrief(
         deepbrief=deepbrief,
         raw_output=raw_output,
         hybrid_score=hybrid_score,
+        pipeline_run_id=pipeline_run_id,
     )
 
     alerts = create_alerts(
@@ -684,6 +790,7 @@ def save_results(
     deepbrief: dict[str, Any],
     raw_output: dict[str, Any],
     hybrid_score: dict[str, Any],
+    pipeline_run_id: str,
 ) -> dict[str, Any]:
     """
     Guarda resultado final en Supabase.
@@ -693,9 +800,15 @@ def save_results(
         deepbrief=deepbrief,
         raw_output=raw_output,
         hybrid_score=hybrid_score,
+        pipeline_run_id=pipeline_run_id,
     )
 
     logger.info("Resultado guardado | deepbrief_id=%s", saved["id"])
+    logger.info(
+        "DEEPBRIEF_PIPELINE_LINKED | deepbrief_id=%s | pipeline_run_id=%s",
+        saved["id"],
+        pipeline_run_id,
+    )
 
     return saved
 
@@ -809,6 +922,7 @@ def main():
                 generate_deepbrief(
                     market=market,
                     context_sources=context_sources,
+                    pipeline_run_id=pipeline_run_id,
                 )
 
                 deepbriefs_generated += 1

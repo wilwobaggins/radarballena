@@ -85,7 +85,6 @@ CATALYST_KEYWORDS = {
     "jobs report",
     "election",
     "primary",
-    "nomination",
     "referendum",
     "regulation",
     "bill",

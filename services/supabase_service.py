@@ -149,6 +149,7 @@ def insert_deepbrief(
     deepbrief: dict[str, Any],
     raw_output: dict[str, Any] | None = None,
     hybrid_score: dict[str, Any] | None = None,
+    pipeline_run_id: str | None = None,
 ) -> dict[str, Any]:
     """
     Guarda DeepBrief asociado a un market.
@@ -178,6 +179,7 @@ def insert_deepbrief(
         "confidenceLevel": deepbrief.get("confidence_level"),
         "watchTriggers": deepbrief.get("watch_triggers"),
         "rawOutput": raw_output or deepbrief,
+        "pipelineRunId": pipeline_run_id,
 
         # Scores híbridos
         "preliminaryRadarScore": hybrid_score.get("preliminary_radar_score"),

@@ -7,7 +7,11 @@ fake_tavily.TavilyClient = object
 sys.modules.setdefault("tavily", fake_tavily)
 
 import scripts.run_daily_pipeline as run_daily_pipeline
-from scripts.run_daily_pipeline import generate_deepbrief, select_top_markets
+from scripts.run_daily_pipeline import (
+    build_candidate_pool,
+    generate_deepbrief,
+    select_top_markets,
+)
 
 
 def build_market(
@@ -93,6 +97,57 @@ def test_select_top_markets_prefers_vertical_buckets_before_global_fill(monkeypa
     assert "politics" not in selected_categories
 
 
+def test_build_candidate_pool_caps_politics_before_selection(monkeypatch):
+    monkeypatch.setenv("DEEPENGINE_MAX_POLITICS_PER_RUN", "1")
+
+    sorted_markets = [
+        build_market("Will Gretchen Whitmer win the election?", "politics", 99),
+        build_market("Will Gavin Newsom win the election?", "politics", 98),
+        build_market("Will the Fed cut rates in September?", "macro", 97),
+        build_market("Will Bitcoin hit 130k this quarter?", "crypto", 96),
+        build_market("Will OpenAI launch GPT-6 this year?", "ai", 95),
+        build_market("Will a ceasefire hold this month?", "geopolitics", 94),
+        build_market("Will a new FDA rule pass this quarter?", "regulation", 93),
+    ]
+
+    candidate_pool = build_candidate_pool(sorted_markets, candidate_pool_size=6)
+    categories = [market["deepengine_category"] for market in candidate_pool]
+
+    assert categories.count("politics") == 1
+    assert "macro" in categories
+    assert "crypto" in categories
+    assert "ai" in categories
+
+
+def test_build_candidate_pool_caps_2028_democratic_nomination_to_one(monkeypatch):
+    monkeypatch.setenv("DEEPENGINE_MAX_POLITICS_PER_RUN", "2")
+
+    sorted_markets = [
+        build_market(
+            "Will Jon Ossoff win the 2028 Democratic presidential nomination?",
+            "politics",
+            99,
+        ),
+        build_market(
+            "Will Gavin Newsom win the 2028 Democratic presidential nomination?",
+            "politics",
+            98,
+        ),
+        build_market("Will the Fed cut rates in September?", "macro", 97),
+        build_market("Will Bitcoin hit 130k this quarter?", "crypto", 96),
+        build_market("Will OpenAI launch GPT-6 this year?", "ai", 95),
+    ]
+
+    candidate_pool = build_candidate_pool(sorted_markets, candidate_pool_size=5)
+    nomination_titles = [
+        market["title"]
+        for market in candidate_pool
+        if "2028 Democratic presidential nomination" in market["title"]
+    ]
+
+    assert len(nomination_titles) == 1
+
+
 def test_generate_deepbrief_retries_when_ai_score_is_anchored(monkeypatch):
     market = build_market("Will BTC hit 130k this quarter?", "crypto", 43)
     market["relevance_reasons"] = ["probability_move"]
@@ -148,12 +203,15 @@ def test_generate_deepbrief_retries_when_ai_score_is_anchored(monkeypatch):
     saved = generate_deepbrief(
         market=market,
         context_sources=context_sources,
+        pipeline_run_id="pipeline-run-1",
     )
 
     assert saved["id"] == "deepbrief-1"
     assert len(calls) == 2
     assert calls[0].get("anti_anchor_note") is None
     assert calls[1]["anti_anchor_note"] == run_daily_pipeline.ANTI_ANCHOR_NOTE
+    assert saved_payloads[0]["pipeline_run_id"] == "pipeline-run-1"
+    assert saved_payloads[0]["raw_output"]["pipeline_run_id"] == "pipeline-run-1"
     assert saved_payloads[0]["raw_output"]["market_input"]["novelty_market"] is False
     assert saved_payloads[0]["raw_output"]["market_input"]["relevance_reasons"] == [
         "probability_move"
@@ -204,6 +262,7 @@ def test_generate_deepbrief_logs_persisted_when_retry_stays_anchored(monkeypatch
     generate_deepbrief(
         market=market,
         context_sources=context_sources,
+        pipeline_run_id="pipeline-run-2",
     )
 
     assert "MARKET_METADATA_DEBUG" in caplog.text
@@ -255,6 +314,7 @@ def test_generate_deepbrief_applies_postprocess_for_novelty_anchor(monkeypatch, 
     generate_deepbrief(
         market=market,
         context_sources=context_sources,
+        pipeline_run_id="pipeline-run-3",
     )
 
     assert "AI_SCORE_POSTPROCESS_APPLIED" in caplog.text
