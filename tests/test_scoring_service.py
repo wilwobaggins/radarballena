@@ -7,6 +7,7 @@ from services.scoring_service import (
     calculate_time_to_close_score,
     calculate_probability_movement_score,
     calculate_preliminary_radar_score,
+    get_signal_label_for_final_score,
     score_markets,
     sort_markets_by_score,
 )
@@ -89,3 +90,19 @@ def test_calculate_hybrid_radar_score_weights_ai_more():
     )
     assert result["score_breakdown"]["weights"]["preliminary_radar_score"] == 0.40
     assert result["score_breakdown"]["weights"]["ai_interpretive_score"] == 0.60
+
+
+def test_get_signal_label_for_final_score_uses_visible_score_bands():
+    assert get_signal_label_for_final_score(24) == "Ignore"
+    assert get_signal_label_for_final_score(25) == "Low Signal"
+    assert get_signal_label_for_final_score(44) == "Low Signal"
+    assert get_signal_label_for_final_score(45) == "Ambiguous"
+    assert get_signal_label_for_final_score(55) == "Ambiguous"
+    assert get_signal_label_for_final_score(56) == "Watchlist"
+    assert get_signal_label_for_final_score(64) == "Watchlist"
+    assert get_signal_label_for_final_score(65) == "Directional Edge"
+    assert get_signal_label_for_final_score(74) == "Directional Edge"
+    assert get_signal_label_for_final_score(75) == "High Conviction"
+    assert get_signal_label_for_final_score(90) == "High Conviction"
+    assert get_signal_label_for_final_score(91) == "Exceptional Signal"
+    assert get_signal_label_for_final_score(100) == "Exceptional Signal"

@@ -21,6 +21,7 @@ from services.polymarket_client import get_normalized_active_markets
 from services.scoring_service import (
     calculate_hybrid_radar_score,
     days_to_close,
+    get_signal_label_for_final_score,
     safe_float,
     score_markets,
     sort_markets_by_score,
@@ -726,10 +727,33 @@ def generate_deepbrief(
             hybrid_score["final_radar_score"],
         )
 
+    original_signal_label = deepbrief.get("signal_label")
+    normalized_signal_label = get_signal_label_for_final_score(
+        hybrid_score["final_radar_score"]
+    )
+
+    if original_signal_label != normalized_signal_label:
+        logger.info(
+            "SIGNAL_LABEL_NORMALIZED | market=%s | original=%s | normalized=%s | final=%s",
+            market.get("title"),
+            original_signal_label,
+            normalized_signal_label,
+            hybrid_score["final_radar_score"],
+        )
+
+    deepbrief["signal_label"] = normalized_signal_label
+
     raw_output["market_input"] = build_raw_market_input(market)
     raw_output["pipeline_run_id"] = pipeline_run_id
     raw_output["score_adjustment"] = score_adjustment
     raw_output["hybrid_score"] = hybrid_score
+    raw_output["model_signal_label"] = original_signal_label
+    raw_output["normalized_signal_label"] = normalized_signal_label
+
+    parsed_output = raw_output.get("parsed_output")
+    if isinstance(parsed_output, dict):
+        parsed_output["model_signal_label"] = original_signal_label
+        parsed_output["signal_label"] = normalized_signal_label
 
     saved = save_results(
         market=market,

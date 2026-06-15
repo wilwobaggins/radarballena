@@ -201,6 +201,7 @@ def test_generate_deepbrief_retries_when_ai_score_is_anchored(monkeypatch):
             "provider": "openai",
             "fallback_used": False,
             "market_input": kwargs["market"],
+            "parsed_output": deepbrief.copy(),
         }
         return deepbrief, raw_output
 
@@ -235,6 +236,10 @@ def test_generate_deepbrief_retries_when_ai_score_is_anchored(monkeypatch):
     assert saved_payloads[0]["pipeline_run_id"] == "pipeline-run-1"
     assert saved_payloads[0]["raw_output"]["pipeline_run_id"] == "pipeline-run-1"
     assert saved_payloads[0]["raw_output"]["market_input"]["novelty_market"] is False
+    assert saved_payloads[0]["deepbrief"]["signal_label"] == "Watchlist"
+    assert saved_payloads[0]["raw_output"]["model_signal_label"] == "Directional Edge"
+    assert saved_payloads[0]["raw_output"]["normalized_signal_label"] == "Watchlist"
+    assert saved_payloads[0]["raw_output"]["parsed_output"]["signal_label"] == "Watchlist"
     assert saved_payloads[0]["raw_output"]["market_input"]["relevance_reasons"] == [
         "probability_move"
     ]
@@ -262,6 +267,7 @@ def test_generate_deepbrief_logs_persisted_when_retry_stays_anchored(monkeypatch
             "provider": "openai",
             "fallback_used": False,
             "market_input": kwargs["market"],
+            "parsed_output": anchored_deepbrief.copy(),
         }
         return anchored_deepbrief, raw_output
 
@@ -314,6 +320,7 @@ def test_generate_deepbrief_applies_postprocess_for_novelty_anchor(monkeypatch, 
             "provider": "openai",
             "fallback_used": False,
             "market_input": kwargs["market"],
+            "parsed_output": anchored_deepbrief.copy(),
         }
         return anchored_deepbrief, raw_output
 
@@ -340,7 +347,11 @@ def test_generate_deepbrief_applies_postprocess_for_novelty_anchor(monkeypatch, 
     )
 
     assert "AI_SCORE_POSTPROCESS_APPLIED" in caplog.text
+    assert saved_payloads[0]["deepbrief"]["signal_label"] == "Low Signal"
     assert saved_payloads[0]["hybrid_score"]["ai_interpretive_score"] == 35
+    assert saved_payloads[0]["raw_output"]["model_signal_label"] == "Neutral"
+    assert saved_payloads[0]["raw_output"]["normalized_signal_label"] == "Low Signal"
+    assert saved_payloads[0]["raw_output"]["parsed_output"]["signal_label"] == "Low Signal"
     assert saved_payloads[0]["raw_output"]["score_adjustment"] == {
         "applied": True,
         "reason": "anti_anchor_postprocess",

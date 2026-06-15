@@ -268,3 +268,22 @@ def calculate_hybrid_radar_score(
             },
         },
     }
+
+
+def get_signal_label_for_final_score(final_radar_score: int | float | None) -> str:
+    score = int(clamp(safe_float(final_radar_score), 0, 100))
+
+    if score <= 24:
+        return "Ignore"
+    if score <= 44:
+        return "Low Signal"
+    if score <= 55:
+        return "Ambiguous"
+    if score <= 64:
+        return "Watchlist"
+    if score <= 74:
+        return "Directional Edge"
+    if score <= 90:
+        return "High Conviction"
+
+    return "Exceptional Signal"
