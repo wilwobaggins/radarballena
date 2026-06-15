@@ -59,11 +59,20 @@ FAMILY_PATTERNS = (
     "2028 republican presidential nomination",
     "fed rate",
     "bitcoin",
+    "bitcoin 150k",
     "ethereum",
     "openai",
+    "openai ipo",
+    "openai market cap",
     "nvidia",
     "tariff",
     "ceasefire",
+    "fannie mae",
+    "freddie mac",
+    "colombian presidential election",
+    "taiwan blockade",
+    "taiwan invasion",
+    "netanyahu",
 )
 
 PRIORITY_BUCKETS = [
