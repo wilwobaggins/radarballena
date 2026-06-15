@@ -97,6 +97,28 @@ def test_select_top_markets_prefers_vertical_buckets_before_global_fill(monkeypa
     assert "politics" not in selected_categories
 
 
+def test_select_top_markets_uses_env_politics_cap(monkeypatch):
+    monkeypatch.setenv("DAILY_PIPELINE_TOP_N", "5")
+    monkeypatch.setenv("DAILY_PIPELINE_CANDIDATE_POOL", "12")
+    monkeypatch.setenv("DEEPENGINE_MAX_POLITICS_PER_RUN", "1")
+
+    markets = [
+        build_market("Will Gretchen Whitmer win the election?", "politics", 99),
+        build_market("Will Gavin Newsom win the election?", "politics", 98),
+        build_market("Will the Fed cut rates in September?", "macro", 97),
+        build_market("Will Bitcoin hit 130k this quarter?", "crypto", 96),
+        build_market("Will OpenAI launch GPT-6 this year?", "ai", 95),
+        build_market("Will Nvidia beat earnings expectations?", "technology", 94),
+        build_market("Will a ceasefire hold this month?", "geopolitics", 93),
+    ]
+
+    selected = select_top_markets(markets)
+    selected_categories = [market["deepengine_category"] for market in selected]
+
+    assert len(selected) == 5
+    assert selected_categories.count("politics") == 1
+
+
 def test_build_candidate_pool_caps_politics_before_selection(monkeypatch):
     monkeypatch.setenv("DEEPENGINE_MAX_POLITICS_PER_RUN", "1")
 
@@ -325,3 +347,63 @@ def test_generate_deepbrief_applies_postprocess_for_novelty_anchor(monkeypatch, 
         "original_ai_score": 43,
         "adjusted_ai_score": 35,
     }
+
+
+def test_main_uses_attempt_pool_and_continues_after_skips(monkeypatch, caplog):
+    monkeypatch.setenv("DAILY_PIPELINE_TOP_N", "2")
+    monkeypatch.setenv("DAILY_PIPELINE_ATTEMPT_POOL", "4")
+    monkeypatch.setenv("DEEPBRIEF_FRESHNESS_HOURS", "12")
+
+    selected_markets = [
+        build_market("Recent market", "macro", 99),
+        build_market("Thin context market", "crypto", 98),
+        build_market("Good market 1", "ai", 97),
+        build_market("Good market 2", "geopolitics", 96),
+    ]
+    attempted_limits: list[int | None] = []
+    generated_titles: list[str] = []
+    finished_runs: list[dict] = []
+
+    class FakeDb:
+        def get_recent_deepbrief(self, market_db_id: str, hours: int):
+            if market_db_id == "Recent market":
+                return {"id": "deepbrief-recent"}
+            return None
+
+        def finish_pipeline_run(self, **kwargs):
+            finished_runs.append(kwargs)
+
+    monkeypatch.setattr(run_daily_pipeline, "start_pipeline_run", lambda: {"id": "pipeline-1"})
+    monkeypatch.setattr(run_daily_pipeline, "fetch_markets", lambda: selected_markets)
+    monkeypatch.setattr(run_daily_pipeline, "save_snapshots", lambda markets: markets)
+    monkeypatch.setattr(
+        run_daily_pipeline,
+        "filter_markets",
+        lambda markets: (markets, {"eligible_after_filters": len(markets)}),
+    )
+    monkeypatch.setattr(run_daily_pipeline, "score_market_batch", lambda markets: markets)
+
+    def fake_select_top_markets(markets, limit=None):
+        attempted_limits.append(limit)
+        return markets[:limit]
+
+    monkeypatch.setattr(run_daily_pipeline, "select_top_markets", fake_select_top_markets)
+    monkeypatch.setattr(run_daily_pipeline, "db", FakeDb())
+    monkeypatch.setattr(run_daily_pipeline, "fetch_context", lambda market, min_sources=3: [{"sourceTitle": "s1"}] * (2 if market["id"] == "Thin context market" else 3))
+    monkeypatch.setattr(
+        run_daily_pipeline,
+        "generate_deepbrief",
+        lambda market, context_sources, pipeline_run_id: generated_titles.append(market["title"]) or {"id": market["id"]},
+    )
+    monkeypatch.setattr(run_daily_pipeline, "register_pipeline_error", lambda **kwargs: None)
+
+    run_daily_pipeline.main()
+
+    assert attempted_limits == [4]
+    assert generated_titles == ["Good market 1", "Good market 2"]
+    assert finished_runs[0]["deepbriefs_generated"] == 2
+    assert finished_runs[0]["markets_analyzed"] == 2
+    assert "SELECTED_ATTEMPT_POOL_SIZE | selected=4 | requested=4 | target=2" in caplog.text
+    assert "SKIPPED_RECENT_DEEPBRIEF_COUNT | count=1" in caplog.text
+    assert "SKIPPED_CONTEXT_INSUFFICIENT_COUNT | count=1" in caplog.text
+    assert "TARGET_DEEPBRIEFS_GENERATED | generated=2 | target=2" in caplog.text

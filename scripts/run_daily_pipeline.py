@@ -354,8 +354,9 @@ def select_top_markets(
     markets: list[dict[str, Any]],
     limit: int | None = None,
 ) -> list[dict[str, Any]]:
-    top_n = limit or env_int("DAILY_PIPELINE_TOP_N", 10)
-    candidate_pool_size = env_int("DAILY_PIPELINE_CANDIDATE_POOL", top_n * 3)
+    selection_limit = limit or env_int("DAILY_PIPELINE_TOP_N", 10)
+    candidate_pool_size = env_int("DAILY_PIPELINE_CANDIDATE_POOL", selection_limit * 3)
+    max_politics_per_run = env_int("DEEPENGINE_MAX_POLITICS_PER_RUN", 1)
 
     sorted_markets = sort_markets_by_score(markets)
     candidate_pool = build_candidate_pool(
@@ -374,7 +375,7 @@ def select_top_markets(
     logger.info(
         "Pool de candidatos seleccionado: %s | objetivo_deepbriefs=%s",
         len(candidate_pool),
-        top_n,
+        selection_limit,
     )
 
     for market in candidate_pool:
@@ -396,9 +397,9 @@ def select_top_markets(
             )
             return False
 
-        if category == "politics" and category_counts["politics"] >= 2:
+        if category == "politics" and category_counts["politics"] >= max_politics_per_run:
             skipped_by_bucket_limit.append(
-                f"{market.get('title')} | bucket=politics_max_2"
+                f"{market.get('title')} | bucket=politics_max_{max_politics_per_run}"
             )
             return False
 
@@ -422,9 +423,9 @@ def select_top_markets(
         theme_key = get_theme_key(market)
         family_key = get_family_key(market)
 
-        if category == "politics" and category_counts["politics"] >= 2:
+        if category == "politics" and category_counts["politics"] >= max_politics_per_run:
             skipped_by_bucket_limit.append(
-                f"{market.get('title')} | bucket=politics_max_2"
+                f"{market.get('title')} | bucket=politics_max_{max_politics_per_run}"
             )
             return False
 
@@ -465,7 +466,7 @@ def select_top_markets(
         )
 
     for bucket in PRIORITY_BUCKETS:
-        if len(selected) >= top_n:
+        if len(selected) >= selection_limit:
             break
 
         for market in candidate_pool:
@@ -479,7 +480,7 @@ def select_top_markets(
             break
 
     for market in candidate_pool:
-        if len(selected) >= top_n:
+        if len(selected) >= selection_limit:
             break
 
         if market in selected:
@@ -514,11 +515,11 @@ def select_top_markets(
         skipped_by_theme_limit[:10],
     )
 
-    if len(selected) < top_n:
+    if len(selected) < selection_limit:
         logger.warning(
             "Selection diversity warning | selected=%s | target=%s | reason=insufficient_variety",
             len(selected),
-            top_n,
+            selection_limit,
         )
 
     return selected
@@ -858,6 +859,8 @@ def main():
     markets_filtered = 0
     markets_analyzed = 0
     deepbriefs_generated = 0
+    skipped_recent_deepbrief_count = 0
+    skipped_context_insufficient_count = 0
     errors_count = 0
     filter_stats: dict[str, Any] = {}
 
@@ -872,10 +875,24 @@ def main():
 
         scored_markets = score_market_batch(filtered_markets)
 
-        selected_markets = select_top_markets(scored_markets)
         target_deepbriefs = env_int("DAILY_PIPELINE_TOP_N", 10)
+        attempt_pool_size = env_int("DAILY_PIPELINE_ATTEMPT_POOL", 30)
+        selected_markets = select_top_markets(
+            scored_markets,
+            limit=attempt_pool_size,
+        )
+
+        logger.info(
+            "SELECTED_ATTEMPT_POOL_SIZE | selected=%s | requested=%s | target=%s",
+            len(selected_markets),
+            attempt_pool_size,
+            target_deepbriefs,
+        )
 
         for market in selected_markets:
+            if deepbriefs_generated >= target_deepbriefs:
+                break
+
             freshness_hours = env_int("DEEPBRIEF_FRESHNESS_HOURS", 12)
 
             recent_deepbrief = db.get_recent_deepbrief(
@@ -890,10 +907,8 @@ def main():
                     recent_deepbrief.get("id"),
                     freshness_hours,
                 )
+                skipped_recent_deepbrief_count += 1
                 continue
-
-            if deepbriefs_generated >= target_deepbriefs:
-                break
 
             try:
                 logger.info("Evaluando candidato: %s", market.get("title"))
@@ -911,6 +926,7 @@ def main():
                         market.get("title"),
                         len(context_sources),
                     )
+                    skipped_context_insufficient_count += 1
                     continue
 
                 logger.info(
@@ -943,6 +959,20 @@ def main():
                 )
 
                 continue
+
+        logger.info(
+            "SKIPPED_RECENT_DEEPBRIEF_COUNT | count=%s",
+            skipped_recent_deepbrief_count,
+        )
+        logger.info(
+            "SKIPPED_CONTEXT_INSUFFICIENT_COUNT | count=%s",
+            skipped_context_insufficient_count,
+        )
+        logger.info(
+            "TARGET_DEEPBRIEFS_GENERATED | generated=%s | target=%s",
+            deepbriefs_generated,
+            target_deepbriefs,
+        )
 
         duration_seconds = round(time.time() - started_at, 2)
         status = "completed" if errors_count == 0 else "completed_with_errors"
