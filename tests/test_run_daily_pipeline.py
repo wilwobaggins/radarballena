@@ -182,6 +182,13 @@ def test_generate_deepbrief_retries_when_ai_score_is_anchored(monkeypatch):
         "signal_label": "Neutral",
         "deepsignal_verdict": "Verdict 1",
         "confidence_level": "Medium",
+        "prediction_audit": {
+            "predicted_outcome": "no_call",
+            "predicted_probability": None,
+            "expected_direction": None,
+            "prediction_confidence": "low",
+            "prediction_reasoning_summary": "Sin postura clara en el primer intento.",
+        },
     }
     second_deepbrief = {
         "lectura_clave": "Lectura 2",
@@ -189,6 +196,13 @@ def test_generate_deepbrief_retries_when_ai_score_is_anchored(monkeypatch):
         "signal_label": "Directional Edge",
         "deepsignal_verdict": "Verdict 2",
         "confidence_level": "High",
+        "prediction_audit": {
+            "predicted_outcome": "yes",
+            "predicted_probability": 0.68,
+            "expected_direction": "yes_up",
+            "prediction_confidence": "high",
+            "prediction_reasoning_summary": "Catalizador y contexto favorecen el outcome principal.",
+        },
     }
 
     calls: list[dict] = []
@@ -259,6 +273,13 @@ def test_generate_deepbrief_logs_persisted_when_retry_stays_anchored(monkeypatch
         "signal_label": "Neutral",
         "deepsignal_verdict": "Verdict",
         "confidence_level": "Medium",
+        "prediction_audit": {
+            "predicted_outcome": "neutral",
+            "predicted_probability": None,
+            "expected_direction": "neutral",
+            "prediction_confidence": "medium",
+            "prediction_reasoning_summary": "El mercado sigue demasiado balanceado.",
+        },
     }
 
     def fake_generate_deepbrief_for_market(**kwargs):
@@ -310,6 +331,13 @@ def test_generate_deepbrief_applies_postprocess_for_novelty_anchor(monkeypatch, 
         "signal_label": "Neutral",
         "deepsignal_verdict": "Verdict",
         "confidence_level": "Medium",
+        "prediction_audit": {
+            "predicted_outcome": "no_call",
+            "predicted_probability": None,
+            "expected_direction": None,
+            "prediction_confidence": "low",
+            "prediction_reasoning_summary": "Novelty market sin suficiente calidad predictiva.",
+        },
     }
 
     saved_payloads: list[dict] = []
@@ -358,6 +386,84 @@ def test_generate_deepbrief_applies_postprocess_for_novelty_anchor(monkeypatch, 
         "original_ai_score": 43,
         "adjusted_ai_score": 35,
     }
+
+
+def test_save_results_persists_deepsignal_prediction(monkeypatch, caplog):
+    saved_predictions: list[dict] = []
+
+    class FakeDb:
+        def insert_deepbrief(self, **kwargs):
+            return {"id": "deepbrief-123"}
+
+        def insert_deepsignal_prediction(self, **kwargs):
+            saved_predictions.append(kwargs)
+            return {"id": "prediction-123"}
+
+    monkeypatch.setattr(run_daily_pipeline, "db", FakeDb())
+
+    saved = run_daily_pipeline.save_results(
+        market={
+            "id": "market-123",
+            "current_probability": 0.57,
+        },
+        deepbrief={
+            "lectura_clave": "Lectura",
+            "radar_score": 61,
+            "signal_label": "Watchlist",
+            "prediction_audit": {
+                "predicted_outcome": "yes",
+                "predicted_probability": 0.61,
+                "expected_direction": "yes_up",
+                "prediction_confidence": "medium",
+                "prediction_reasoning_summary": "Lectura direccional moderada.",
+            },
+        },
+        raw_output={"provider": "openai", "pipeline_run_id": "pipeline-123"},
+        hybrid_score={"final_radar_score": 64},
+        pipeline_run_id="pipeline-123",
+    )
+
+    assert saved["id"] == "deepbrief-123"
+    assert saved_predictions[0]["deepbrief_id"] == "deepbrief-123"
+    assert saved_predictions[0]["market_id"] == "market-123"
+    assert (
+        saved_predictions[0]["deepbrief_output"]["prediction_audit"]["predicted_outcome"]
+        == "yes"
+    )
+    assert "DEEPSIGNAL_PREDICTION_SAVED" in caplog.text
+
+
+def test_save_results_logs_prediction_error_without_raising(monkeypatch, caplog):
+    class FakeDb:
+        def insert_deepbrief(self, **kwargs):
+            return {"id": "deepbrief-456"}
+
+        def insert_deepsignal_prediction(self, **kwargs):
+            raise RuntimeError("prediction insert failed")
+
+    monkeypatch.setattr(run_daily_pipeline, "db", FakeDb())
+
+    saved = run_daily_pipeline.save_results(
+        market={"id": "market-456"},
+        deepbrief={
+            "lectura_clave": "Lectura",
+            "radar_score": 52,
+            "signal_label": "Watchlist",
+            "prediction_audit": {
+                "predicted_outcome": "no_call",
+                "predicted_probability": None,
+                "expected_direction": None,
+                "prediction_confidence": "low",
+                "prediction_reasoning_summary": "Ruido excesivo.",
+            },
+        },
+        raw_output={"provider": "openai", "pipeline_run_id": "pipeline-456"},
+        hybrid_score={"final_radar_score": 55},
+        pipeline_run_id="pipeline-456",
+    )
+
+    assert saved["id"] == "deepbrief-456"
+    assert "DEEPSIGNAL_PREDICTION_SAVE_ERROR" in caplog.text
 
 
 def test_main_uses_attempt_pool_and_continues_after_skips(monkeypatch, caplog):

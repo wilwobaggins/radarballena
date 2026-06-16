@@ -799,6 +799,7 @@ def validate_output(
         "signal_label",
         "deepsignal_verdict",
         "confidence_level",
+        "prediction_audit",
     ]
 
     for field in required_fields:
@@ -843,6 +844,36 @@ def save_results(
         saved["id"],
         pipeline_run_id,
     )
+
+    prediction_payload = {
+        **deepbrief,
+        "signalLabel": deepbrief.get("signal_label"),
+        "radarScore": deepbrief.get("radar_score"),
+        "finalRadarScore": hybrid_score.get("final_radar_score"),
+        "hybridScore": hybrid_score,
+        "rawOutput": raw_output,
+    }
+
+    try:
+        prediction_saved = db.insert_deepsignal_prediction(
+            deepbrief_id=saved["id"],
+            market_id=market["id"],
+            deepbrief_output=prediction_payload,
+            market_input=market,
+        )
+        logger.info(
+            "DEEPSIGNAL_PREDICTION_SAVED | deepbrief_id=%s | prediction_id=%s | market_id=%s",
+            saved["id"],
+            prediction_saved.get("id"),
+            market["id"],
+        )
+    except Exception as prediction_error:
+        logger.error(
+            "DEEPSIGNAL_PREDICTION_SAVE_ERROR | deepbrief_id=%s | market_id=%s | error=%s",
+            saved["id"],
+            market["id"],
+            prediction_error,
+        )
 
     return saved
 

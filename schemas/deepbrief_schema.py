@@ -14,6 +14,9 @@ SignalLabel = Literal[
 ConfidenceLevel = Literal["Low", "Medium", "High"]
 UpdateDirection = Literal["subir", "bajar", "mantener"]
 ScenarioName = Literal["Base", "Ruptura", "Contrario"]
+PredictedOutcome = Literal["yes", "no", "neutral", "no_call"]
+ExpectedDirection = Literal["yes_up", "yes_down", "neutral"]
+PredictionConfidence = Literal["low", "medium", "high"]
 
 
 class RadarScoreBreakdown(BaseModel):
@@ -71,6 +74,28 @@ class ActualizacionBayesiana(BaseModel):
     razon: str
 
 
+class PredictionAudit(BaseModel):
+    predicted_outcome: PredictedOutcome
+    predicted_probability: float | None = Field(default=None, ge=0, le=1)
+    expected_direction: ExpectedDirection | None = None
+    prediction_confidence: PredictionConfidence | None = None
+    prediction_reasoning_summary: str | None = None
+
+    @model_validator(mode="after")
+    def validate_prediction_consistency(self):
+        if self.predicted_outcome in {"yes", "no"} and self.predicted_probability is None:
+            raise ValueError(
+                "predicted_probability es obligatoria cuando predicted_outcome es yes o no"
+            )
+
+        if self.predicted_outcome == "no_call" and self.predicted_probability is not None:
+            raise ValueError(
+                "predicted_probability debe ser null cuando predicted_outcome es no_call"
+            )
+
+        return self
+
+
 class DeepBrief(BaseModel):
     lectura_clave: str
     radar_score: int = Field(ge=0, le=100)
@@ -87,6 +112,7 @@ class DeepBrief(BaseModel):
     deepsignal_verdict: str
     confidence_level: ConfidenceLevel
     watch_triggers: list[str]
+    prediction_audit: PredictionAudit
 
     @field_validator(
         "lectura_clave",

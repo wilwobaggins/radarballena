@@ -5,7 +5,7 @@ from schemas.deepbrief_schema import DeepBrief
 
 
 VALID_DEEPBRIEF_MOCK = {
-    "lectura_clave": "El mercado muestra una señal cuantitativa moderada.",
+    "lectura_clave": "El mercado muestra una senal cuantitativa moderada.",
     "radar_score": 66,
     "radar_score_breakdown": {
         "movimiento_probabilidad": 2,
@@ -20,34 +20,34 @@ VALID_DEEPBRIEF_MOCK = {
     "signal_label": "Watchlist",
     "estela_de_capital": "El volumen y la liquidez muestran actividad suficiente para seguimiento.",
     "entorno_de_senal": {
-        "steep_social": "No hay fuente externa verificada para evaluar conversación social.",
-        "steep_tecnologico": "No hay factor tecnológico confirmado en el contexto.",
-        "steep_economico": "El análisis económico se basa en volumen, liquidez y probabilidad.",
-        "steep_ecologico": "No hay factor ecológico relevante en el contexto disponible.",
+        "steep_social": "No hay fuente externa verificada para evaluar conversacion social.",
+        "steep_tecnologico": "No hay factor tecnologico confirmado en el contexto.",
+        "steep_economico": "El analisis economico se basa en volumen, liquidez y probabilidad.",
+        "steep_ecologico": "No hay factor ecologico relevante en el contexto disponible.",
         "steep_politico_regulatorio": "No hay cambio regulatorio confirmado en el contexto.",
-        "sintesis": "La señal depende principalmente de datos de mercado.",
+        "sintesis": "La senal depende principalmente de datos de mercado.",
     },
-    "corriente_narrativa": "La narrativa se limita a la dirección de probabilidad y actividad del mercado.",
+    "corriente_narrativa": "La narrativa se limita a la direccion de probabilidad y actividad del mercado.",
     "filtro_de_ruido": {
         "red_team": "El riesgo principal es extrapolar sin fuentes externas.",
         "sesgos_detectados": "Puede existir sesgo por movimiento reciente de precio.",
-        "riesgo_liquidez": "La liquidez debe compararse contra el tamaño del mercado.",
-        "riesgo_resolucion": "La resolución depende de las reglas descritas por el mercado.",
-        "informacion_ya_descontada": "No se puede confirmar información externa descontada.",
+        "riesgo_liquidez": "La liquidez debe compararse contra el tamano del mercado.",
+        "riesgo_resolucion": "La resolucion depende de las reglas descritas por el mercado.",
+        "informacion_ya_descontada": "No se puede confirmar informacion externa descontada.",
     },
     "premortem": {
         "si_la_tesis_falla_probablemente_seria_por": "La probabilidad cambia bruscamente contra la lectura inicial.",
         "senales_tempranas_de_invalidacion": [
             "Cambio fuerte de probabilidad",
-            "Caída relevante de liquidez",
+            "Caida relevante de liquidez",
         ],
     },
     "mapa_de_ruptura": {
         "confirmacion": "Movimiento sostenido de probabilidad con volumen suficiente.",
         "ruptura_alcista": "Aumento relevante de probabilidad.",
-        "ruptura_bajista": "Caída relevante de probabilidad.",
+        "ruptura_bajista": "Caida relevante de probabilidad.",
         "invalidacion": "Cambio contrario a la tesis inicial.",
-        "evento_detonador": "Actualización directa en la fuente de resolución.",
+        "evento_detonador": "Actualizacion directa en la fuente de resolucion.",
     },
     "mapa_de_escenarios": [
         {
@@ -75,12 +75,19 @@ VALID_DEEPBRIEF_MOCK = {
         "direccion_sugerida_del_update": "mantener",
         "razon": "El movimiento reciente no justifica una lectura fuerte.",
     },
-    "deepsignal_verdict": "Mercado en vigilancia con señal cuantitativa moderada.",
+    "deepsignal_verdict": "Mercado en vigilancia con senal cuantitativa moderada.",
     "confidence_level": "Medium",
     "watch_triggers": [
         "Cambio de probabilidad mayor a 3 puntos",
-        "Variación relevante en liquidez",
+        "Variacion relevante en liquidez",
     ],
+    "prediction_audit": {
+        "predicted_outcome": "yes",
+        "predicted_probability": 0.64,
+        "expected_direction": "yes_up",
+        "prediction_confidence": "medium",
+        "prediction_reasoning_summary": "La combinacion de contexto y mercado favorece el outcome principal.",
+    },
 }
 
 
@@ -90,6 +97,7 @@ def test_valid_deepbrief_schema():
     assert deepbrief.radar_score == 66
     assert deepbrief.signal_label == "Watchlist"
     assert len(deepbrief.mapa_de_escenarios) == 3
+    assert deepbrief.prediction_audit.predicted_outcome == "yes"
 
 
 def test_rejects_invalid_radar_score():
@@ -115,6 +123,20 @@ def test_rejects_wrong_scenario_order():
         VALID_DEEPBRIEF_MOCK["mapa_de_escenarios"][0],
         VALID_DEEPBRIEF_MOCK["mapa_de_escenarios"][2],
     ]
+
+    with pytest.raises(ValidationError):
+        DeepBrief.model_validate(invalid)
+
+
+def test_rejects_no_call_with_probability():
+    invalid = VALID_DEEPBRIEF_MOCK.copy()
+    invalid["prediction_audit"] = {
+        "predicted_outcome": "no_call",
+        "predicted_probability": 0.5,
+        "expected_direction": None,
+        "prediction_confidence": None,
+        "prediction_reasoning_summary": "No deberia traer probabilidad.",
+    }
 
     with pytest.raises(ValidationError):
         DeepBrief.model_validate(invalid)

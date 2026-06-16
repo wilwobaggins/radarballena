@@ -1,5 +1,6 @@
 from typing import Literal
-from pydantic import BaseModel, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class StrictBaseModel(BaseModel):
@@ -61,6 +62,28 @@ class ActualizacionBayesiana(StrictBaseModel):
     razon: str
 
 
+class PredictionAudit(StrictBaseModel):
+    predicted_outcome: Literal["yes", "no", "neutral", "no_call"]
+    predicted_probability: float | None = Field(default=None, ge=0, le=1)
+    expected_direction: Literal["yes_up", "yes_down", "neutral"] | None = None
+    prediction_confidence: Literal["low", "medium", "high"] | None = None
+    prediction_reasoning_summary: str | None = None
+
+    @model_validator(mode="after")
+    def validate_prediction_consistency(self):
+        if self.predicted_outcome in {"yes", "no"} and self.predicted_probability is None:
+            raise ValueError(
+                "predicted_probability es obligatoria cuando predicted_outcome es yes o no"
+            )
+
+        if self.predicted_outcome == "no_call" and self.predicted_probability is not None:
+            raise ValueError(
+                "predicted_probability debe ser null cuando predicted_outcome es no_call"
+            )
+
+        return self
+
+
 class DeepBriefSchema(StrictBaseModel):
     lectura_clave: str
     radar_score: float
@@ -77,3 +100,4 @@ class DeepBriefSchema(StrictBaseModel):
     deepsignal_verdict: str
     confidence_level: Literal["Low", "Medium", "High"]
     watch_triggers: list[str]
+    prediction_audit: PredictionAudit

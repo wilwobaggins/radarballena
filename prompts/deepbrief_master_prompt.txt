@@ -73,6 +73,19 @@ Reglas adicionales de scoring:
 - Si no hay fuentes externas verificadas y no hay movimiento relevante, castiga el score.
 - El motor debe ser versatil: politica, macro, geopolitica, tecnologia, ai, crypto, regulacion, cultura, ciencia y negocios. No debe sobreconcentrarse en politica electoral.
 
+PREDICCION AUDITABLE INTERNA:
+- Debes incluir un bloque "prediction_audit" para uso interno y auditable.
+- Esto NO es copywriting para usuario final.
+- "predicted_probability" NO es radar_score.
+- "predicted_probability" debe representar la probabilidad estimada del outcome principal del mercado.
+- "radar_score" sigue siendo una senal interpretativa de calidad/utilidad, no una probabilidad de ocurrencia.
+- Si el outcome principal esperado es YES, usa "predicted_outcome": "yes".
+- Si el outcome principal esperado es NO, usa "predicted_outcome": "no".
+- Si el analisis sugiere estabilidad sin sesgo direccional claro, puedes usar "predicted_outcome": "neutral".
+- Si el mercado es demasiado ruidoso, ambiguo o insuficiente para tomar postura, usa "predicted_outcome": "no_call" y "predicted_probability": null.
+- Si usas "predicted_outcome" = "yes" o "no", "predicted_probability" debe estar entre 0 y 1.
+- No inventes una prediccion si la evidencia no alcanza.
+
 MERCADO:
 {{MERCADO}}
 
@@ -154,5 +167,12 @@ Devuelve exactamente este JSON:
   },
   "deepsignal_verdict": "",
   "confidence_level": "Medium",
-  "watch_triggers": []
+  "watch_triggers": [],
+  "prediction_audit": {
+    "predicted_outcome": "no_call",
+    "predicted_probability": null,
+    "expected_direction": null,
+    "prediction_confidence": null,
+    "prediction_reasoning_summary": ""
+  }
 }

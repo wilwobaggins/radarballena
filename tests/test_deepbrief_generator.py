@@ -42,6 +42,8 @@ def test_build_deepbrief_prompt_uses_master_prompt_placeholders():
     assert prompt_source == "deepbrief_master_prompt.txt"
     assert "STEEP Analysis" in prompt
     assert "Premortem Analysis" in prompt
+    assert "prediction_audit" in prompt
+    assert "predicted_probability" in prompt
     assert '"title": "Will BTC close above 100k this month?"' in prompt
     assert "Macro note" in prompt
     assert '"preliminary_radar_score": 43' in prompt

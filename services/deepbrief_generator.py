@@ -65,6 +65,9 @@ Reglas estrictas:
 - Devuelve exclusivamente JSON valido.
 - No agregues markdown.
 - No agregues texto fuera del JSON.
+- Incluye un bloque prediction_audit interno y auditable.
+- predicted_probability no es radar_score.
+- Si no puedes tomar postura clara, usa predicted_outcome=no_call y predicted_probability=null.
 
 MERCADO:
 {{MERCADO}}

@@ -8,6 +8,44 @@ from datetime import datetime, timezone
 load_dotenv()
 
 
+def _coalesce(*values: Any) -> Any:
+    for value in values:
+        if value is not None:
+            return value
+    return None
+
+
+def _extract_market_probability_at_generation(market_input: dict[str, Any]) -> Any:
+    return _coalesce(
+        market_input.get("current_probability"),
+        market_input.get("currentProbability"),
+        market_input.get("probability"),
+    )
+
+
+def _extract_radar_score_at_generation(
+    deepbrief_output: dict[str, Any],
+    market_input: dict[str, Any],
+) -> Any:
+    raw_output = deepbrief_output.get("rawOutput") or {}
+    hybrid_score = (
+        deepbrief_output.get("hybridScore")
+        or raw_output.get("hybrid_score")
+        or {}
+    )
+
+    return _coalesce(
+        deepbrief_output.get("finalRadarScore"),
+        deepbrief_output.get("final_radar_score"),
+        hybrid_score.get("finalRadarScore"),
+        hybrid_score.get("final_radar_score"),
+        deepbrief_output.get("radarScore"),
+        deepbrief_output.get("radar_score"),
+        market_input.get("finalRadarScore"),
+        market_input.get("radarScore"),
+    )
+
+
 def required_env(name: str) -> str:
     value = os.getenv(name)
 
@@ -199,6 +237,61 @@ def insert_deepbrief(
         raise RuntimeError("No se pudo guardar deepbrief")
 
     return response.data[0]
+
+
+def insert_deepsignal_prediction(
+    deepbrief_id: str,
+    market_id: str,
+    deepbrief_output: dict[str, Any],
+    market_input: dict[str, Any],
+) -> dict[str, Any]:
+    supabase = get_supabase_client()
+
+    prediction_audit = deepbrief_output.get("prediction_audit") or {}
+    raw_output = deepbrief_output.get("rawOutput") or {}
+    market_probability = _extract_market_probability_at_generation(market_input)
+    radar_score_at_generation = _extract_radar_score_at_generation(
+        deepbrief_output=deepbrief_output,
+        market_input=market_input,
+    )
+    signal_label = _coalesce(
+        deepbrief_output.get("signalLabel"),
+        deepbrief_output.get("signal_label"),
+    )
+
+    payload = {
+        "deepbriefId": deepbrief_id,
+        "marketId": market_id,
+        "predictedOutcome": prediction_audit.get("predicted_outcome"),
+        "predictedProbability": prediction_audit.get("predicted_probability"),
+        "expectedDirection": prediction_audit.get("expected_direction"),
+        "predictionConfidence": prediction_audit.get("prediction_confidence"),
+        "marketProbabilityAtGeneration": market_probability,
+        "radarScoreAtGeneration": radar_score_at_generation,
+        "signalLabel": signal_label,
+        "reasoningSummary": prediction_audit.get("prediction_reasoning_summary"),
+        "rawPrediction": {
+            "prediction_audit": prediction_audit,
+            "market_probability_at_generation": market_probability,
+            "radar_score_at_generation": radar_score_at_generation,
+            "signal_label": signal_label,
+            "market_input": market_input,
+            "raw_output_metadata": {
+                "provider": raw_output.get("provider"),
+                "model": raw_output.get("model"),
+                "pipeline_run_id": raw_output.get("pipeline_run_id"),
+            },
+        },
+    }
+
+    response = (
+        supabase
+        .table("deepsignal_predictions")
+        .upsert(payload, on_conflict="deepbriefId")
+        .execute()
+    )
+
+    return _first_row(response)
 
 def insert_market_context(
     market_db_id: str,
