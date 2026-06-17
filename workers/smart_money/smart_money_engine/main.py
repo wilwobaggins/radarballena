@@ -13,6 +13,13 @@ from market_trail import (
 )
 from related_markets import build_estela_capital_by_market
 from storage import save_json
+from supabase_writer import (
+    fail_engine_run,
+    finish_engine_run,
+    start_engine_run,
+    upsert_capital_trails,
+    upsert_wallet_scores,
+)
 from wallet_classifier import (
     INSUFFICIENT_HISTORY,
     SIGNAL_WALLET,
@@ -258,12 +265,8 @@ def dedupe_trades(trades: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return clean
 
 
-async def run() -> list[dict]:
-    trades = await fetch_recent_activity()
-    deduped_trades = dedupe_trades(trades)
-    wallet_scores = compute_wallet_scores(deduped_trades)
-    save_json("wallet_scores.json", wallet_scores)
-    noise_scores = [
+def build_noise_scores(wallet_scores: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
         {
             "wallet": score["wallet"],
             "noiseScore": score.get("noiseScore", 0),
@@ -273,19 +276,65 @@ async def run() -> list[dict]:
         }
         for score in wallet_scores
     ]
+
+
+def build_run_summary(
+    *,
+    trades_fetched: int,
+    trades_deduped: int,
+    wallet_scores: list[dict[str, Any]],
+    market_trails: list[dict[str, Any]],
+) -> dict[str, Any]:
+    summary = {
+        "tradesFetched": trades_fetched,
+        "tradesDeduped": trades_deduped,
+        "walletsScored": len(wallet_scores),
+        "marketsScored": len(market_trails),
+    }
+    summary["rawSummary"] = {
+        "walletsScored": len(wallet_scores),
+        "marketsScored": len(market_trails),
+        "walletClassificationCounts": dict(Counter(score["classification"] for score in wallet_scores)),
+        "marketStatusCounts": dict(Counter(item["status"] for item in market_trails)),
+    }
+    return summary
+
+
+async def execute_engine() -> dict[str, Any]:
+    trades = await fetch_recent_activity()
+    deduped_trades = dedupe_trades(trades)
+    wallet_scores = compute_wallet_scores(deduped_trades)
+    save_json("wallet_scores.json", wallet_scores)
+
+    noise_scores = build_noise_scores(wallet_scores)
     save_json("noise_scores.json", noise_scores)
+
     market_trails = build_market_capital_trails(
         trades=deduped_trades,
         wallet_scores=wallet_scores,
     )
     save_json("market_capital_trails.json", market_trails)
+
     estela_capital = build_estela_capital_by_market(
         trades=deduped_trades,
         market_trails=market_trails,
         wallet_scores=wallet_scores,
     )
     save_json("estela_capital_by_market.json", estela_capital)
-    return wallet_scores
+
+    return {
+        "trades": trades,
+        "deduped_trades": deduped_trades,
+        "wallet_scores": wallet_scores,
+        "noise_scores": noise_scores,
+        "market_trails": market_trails,
+        "estela_capital": estela_capital,
+    }
+
+
+async def run() -> list[dict]:
+    result = await execute_engine()
+    return result["wallet_scores"]
 
 
 def log_summary(wallet_scores: list[dict]) -> None:
@@ -311,34 +360,26 @@ def log_market_trail_summary(market_trails: list[dict]) -> None:
 
 
 async def main() -> None:
-    trades = await fetch_recent_activity()
-    deduped_trades = dedupe_trades(trades)
-    wallet_scores = compute_wallet_scores(deduped_trades)
-    save_json("wallet_scores.json", wallet_scores)
-    noise_scores = [
-        {
-            "wallet": score["wallet"],
-            "noiseScore": score.get("noiseScore", 0),
-            "noiseLevel": score.get("noiseLevel", "LOW_NOISE"),
-            "riskFlags": score.get("riskFlags", []),
-            "generatedAt": score.get("generatedAt"),
-        }
-        for score in wallet_scores
-    ]
-    save_json("noise_scores.json", noise_scores)
-    market_trails = build_market_capital_trails(
-        trades=deduped_trades,
-        wallet_scores=wallet_scores,
-    )
-    save_json("market_capital_trails.json", market_trails)
-    estela_capital = build_estela_capital_by_market(
-        trades=deduped_trades,
-        market_trails=market_trails,
-        wallet_scores=wallet_scores,
-    )
-    save_json("estela_capital_by_market.json", estela_capital)
-    log_summary(wallet_scores)
-    log_market_trail_summary(market_trails)
+    run_id = start_engine_run()
+
+    try:
+        result = await execute_engine()
+        wallet_scores = result["wallet_scores"]
+        market_trails = result["market_trails"]
+        summary = build_run_summary(
+            trades_fetched=len(result["trades"]),
+            trades_deduped=len(result["deduped_trades"]),
+            wallet_scores=wallet_scores,
+            market_trails=market_trails,
+        )
+        upsert_wallet_scores(run_id, wallet_scores)
+        upsert_capital_trails(run_id, result["estela_capital"])
+        finish_engine_run(run_id, summary)
+        log_summary(wallet_scores)
+        log_market_trail_summary(market_trails)
+    except Exception as exc:
+        fail_engine_run(run_id, str(exc))
+        raise
 
 
 if __name__ == "__main__":
