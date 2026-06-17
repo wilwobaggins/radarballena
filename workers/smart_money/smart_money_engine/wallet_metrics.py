@@ -3,8 +3,8 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
-from workers.smart_money.smart_money_engine.noise_filter import build_noise_profile
-from workers.smart_money.smart_money_engine.wallet_classifier import classify_wallet
+from noise_filter import build_noise_profile
+from wallet_classifier import classify_wallet
 
 
 def clamp(value: float, lower: float = 0.0, upper: float = 100.0) -> float:

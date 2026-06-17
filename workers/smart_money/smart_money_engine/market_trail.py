@@ -2,7 +2,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
-from workers.smart_money.smart_money_engine.wallet_classifier import (
+from wallet_classifier import (
     SIGNAL_WALLET,
     SPECIALIST_WALLET,
     WHALE_BUT_NOISY,

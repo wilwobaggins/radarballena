@@ -1,11 +1,22 @@
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 
 BASE_DIR = Path(__file__).resolve().parent
-OUTPUT_DIR = BASE_DIR / "outputs"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_output_dir() -> Path:
+    configured = os.getenv("SMART_MONEY_ENGINE_OUTPUT_DIR", "outputs")
+    output_dir = Path(configured)
+    if not output_dir.is_absolute():
+        output_dir = Path.cwd() / output_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir
+
+
+OUTPUT_DIR = _resolve_output_dir()
 
 
 def save_json(filename: str, data: Any) -> Path:

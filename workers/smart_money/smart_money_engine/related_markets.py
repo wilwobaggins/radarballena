@@ -2,7 +2,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
-from workers.smart_money.smart_money_engine.market_trail import build_wallet_score_map
+from market_trail import build_wallet_score_map
 
 
 STOPWORDS = {

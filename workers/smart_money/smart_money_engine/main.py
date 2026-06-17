@@ -7,18 +7,18 @@ from typing import Any, Optional
 import httpx
 from dotenv import load_dotenv
 
-from workers.smart_money.smart_money_engine.market_trail import (
+from market_trail import (
     build_market_capital_trails,
     summarize_market_trails,
 )
-from workers.smart_money.smart_money_engine.related_markets import build_estela_capital_by_market
-from workers.smart_money.smart_money_engine.storage import save_json
-from workers.smart_money.smart_money_engine.wallet_classifier import (
+from related_markets import build_estela_capital_by_market
+from storage import save_json
+from wallet_classifier import (
     INSUFFICIENT_HISTORY,
     SIGNAL_WALLET,
     WHALE_BUT_NOISY,
 )
-from workers.smart_money.smart_money_engine.wallet_metrics import compute_wallet_scores
+from wallet_metrics import compute_wallet_scores
 
 
 load_dotenv()
