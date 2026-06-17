@@ -11,6 +11,7 @@ from workers.smart_money.smart_money_engine.market_trail import (
     build_market_capital_trails,
     summarize_market_trails,
 )
+from workers.smart_money.smart_money_engine.related_markets import build_estela_capital_by_market
 from workers.smart_money.smart_money_engine.storage import save_json
 from workers.smart_money.smart_money_engine.wallet_classifier import (
     INSUFFICIENT_HISTORY,
@@ -189,13 +190,21 @@ async def fetch_recent_activity() -> list[dict[str, Any]]:
                 "takerOnly": False,
             }
 
-            response = await http.get(f"{DATA_API}/trades", params=params)
+            try:
+                response = await http.get(f"{DATA_API}/trades", params=params)
+            except httpx.HTTPError as exc:
+                print(f"Stopping pagination: request error at offset={offset}: {exc}")
+                break
 
             if response.status_code == 400:
                 print(f"Stopping pagination: 400 at offset={offset}")
                 break
 
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except httpx.HTTPError as exc:
+                print(f"Stopping pagination: response error at offset={offset}: {exc}")
+                break
             data = response.json()
 
             if isinstance(data, dict):
@@ -254,17 +263,39 @@ async def run() -> list[dict]:
     deduped_trades = dedupe_trades(trades)
     wallet_scores = compute_wallet_scores(deduped_trades)
     save_json("wallet_scores.json", wallet_scores)
+    noise_scores = [
+        {
+            "wallet": score["wallet"],
+            "noiseScore": score.get("noiseScore", 0),
+            "noiseLevel": score.get("noiseLevel", "LOW_NOISE"),
+            "riskFlags": score.get("riskFlags", []),
+            "generatedAt": score.get("generatedAt"),
+        }
+        for score in wallet_scores
+    ]
+    save_json("noise_scores.json", noise_scores)
     market_trails = build_market_capital_trails(
         trades=deduped_trades,
         wallet_scores=wallet_scores,
     )
     save_json("market_capital_trails.json", market_trails)
+    estela_capital = build_estela_capital_by_market(
+        trades=deduped_trades,
+        market_trails=market_trails,
+        wallet_scores=wallet_scores,
+    )
+    save_json("estela_capital_by_market.json", estela_capital)
     return wallet_scores
 
 
 def log_summary(wallet_scores: list[dict]) -> None:
     counts = Counter(score["classification"] for score in wallet_scores)
+    noise_counts = Counter(score.get("noiseLevel", "LOW_NOISE") for score in wallet_scores)
     print("wallets_scored:", len(wallet_scores))
+    print("wallets_noise_scored:", len(wallet_scores))
+    print("low_noise:", noise_counts.get("LOW_NOISE", 0))
+    print("medium_noise:", noise_counts.get("MEDIUM_NOISE", 0))
+    print("high_noise:", noise_counts.get("HIGH_NOISE", 0))
     print("signal_wallets:", counts.get(SIGNAL_WALLET, 0))
     print("noisy_wallets:", counts.get(WHALE_BUT_NOISY, 0))
     print("insufficient_history:", counts.get(INSUFFICIENT_HISTORY, 0))
@@ -284,11 +315,28 @@ async def main() -> None:
     deduped_trades = dedupe_trades(trades)
     wallet_scores = compute_wallet_scores(deduped_trades)
     save_json("wallet_scores.json", wallet_scores)
+    noise_scores = [
+        {
+            "wallet": score["wallet"],
+            "noiseScore": score.get("noiseScore", 0),
+            "noiseLevel": score.get("noiseLevel", "LOW_NOISE"),
+            "riskFlags": score.get("riskFlags", []),
+            "generatedAt": score.get("generatedAt"),
+        }
+        for score in wallet_scores
+    ]
+    save_json("noise_scores.json", noise_scores)
     market_trails = build_market_capital_trails(
         trades=deduped_trades,
         wallet_scores=wallet_scores,
     )
     save_json("market_capital_trails.json", market_trails)
+    estela_capital = build_estela_capital_by_market(
+        trades=deduped_trades,
+        market_trails=market_trails,
+        wallet_scores=wallet_scores,
+    )
+    save_json("estela_capital_by_market.json", estela_capital)
     log_summary(wallet_scores)
     log_market_trail_summary(market_trails)
 

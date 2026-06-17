@@ -3,6 +3,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
+from workers.smart_money.smart_money_engine.noise_filter import build_noise_profile
 from workers.smart_money.smart_money_engine.wallet_classifier import classify_wallet
 
 
@@ -68,29 +69,6 @@ def count_opposing_outcome_markets(trades: list[dict[str, Any]]) -> tuple[int, f
     opposing_markets = sum(1 for outcomes in by_market.values() if len(outcomes) >= 2)
     unique_markets = len(by_market)
     return opposing_markets, normalize_metric(safe_ratio(opposing_markets, unique_markets))
-
-
-def build_risk_flags(metrics: dict[str, Any], sub_scores: dict[str, int]) -> list[str]:
-    flags: list[str] = []
-
-    if metrics["tradeCount"] < 6:
-        flags.append("low_trade_count")
-    if metrics["uniqueMarkets"] < 3:
-        flags.append("low_market_diversity")
-    if metrics["opposingOutcomeRatio"] >= 0.2:
-        flags.append("opposing_outcomes")
-    if metrics["lateEntryRatio"] >= 0.45:
-        flags.append("late_entry_heavy")
-    if metrics["extremePriceRatio"] >= 0.35:
-        flags.append("extreme_price_trading")
-    if metrics["sellRatio"] >= 0.55:
-        flags.append("sell_heavy")
-    if metrics["concentrationRisk"] >= 0.65:
-        flags.append("concentration_risk")
-    if sub_scores["antiNoiseScore"] < 45:
-        flags.append("high_noise_profile")
-
-    return flags
 
 
 def performance_score(_metrics: dict[str, Any]) -> int:
@@ -243,17 +221,35 @@ def compute_wallet_scores(trades: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         sub_scores = compute_sub_scores(metrics)
         wallet_score = compute_wallet_quality_score(sub_scores)
+        noise_profile = build_noise_profile(wallet_trades, metrics)
         record = {
             "wallet": wallet,
             "walletQualityScore": wallet_score,
             "classification": "INSUFFICIENT_HISTORY",
             "metrics": metrics,
             "subScores": sub_scores,
+            "noiseScore": noise_profile["noiseScore"],
+            "noiseLevel": noise_profile["noiseLevel"],
             "riskFlags": [],
             "generatedAt": generated_at,
             "opposingMarketCount": opposing_count,
         }
-        record["riskFlags"] = build_risk_flags(metrics, sub_scores)
+        legacy_flags: list[str] = []
+        if metrics["tradeCount"] < 6:
+            legacy_flags.append("low_trade_count")
+        if metrics["uniqueMarkets"] < 3:
+            legacy_flags.append("low_market_diversity")
+        if metrics["sellRatio"] >= 0.55:
+            legacy_flags.append("sell_heavy")
+        if sub_scores["antiNoiseScore"] < 45:
+            legacy_flags.append("high_noise_profile")
+
+        combined_flags: list[str] = []
+        for flag in [*legacy_flags, *noise_profile["riskFlags"]]:
+            if flag not in combined_flags:
+                combined_flags.append(flag)
+
+        record["riskFlags"] = combined_flags
         record["classification"] = classify_wallet(record)
         scored_wallets.append(record)
 
@@ -266,6 +262,8 @@ def compute_wallet_scores(trades: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "classification": record["classification"],
                 "metrics": record["metrics"],
                 "subScores": record["subScores"],
+                "noiseScore": record["noiseScore"],
+                "noiseLevel": record["noiseLevel"],
                 "riskFlags": record["riskFlags"],
                 "generatedAt": record["generatedAt"],
             }
