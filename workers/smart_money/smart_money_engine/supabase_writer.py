@@ -15,6 +15,8 @@ except Exception:  # pragma: no cover - optional dependency for local mode
 _CLIENT = None
 _WARNED_DISABLED = False
 _WARNED_INIT = False
+_MARKETS_CACHE: list[dict[str, Any]] | None = None
+_CAPITAL_TRAIL_CACHE: dict[str, dict[str, Any] | None] = {}
 _MARKET_RESOLUTION_CACHE: dict[str, dict[str, Any]] = {}
 
 
@@ -86,44 +88,123 @@ def _update_by_id(table: str, row_id: str, payload: dict[str, Any]):
         return None
 
 
-def _resolve_market_binding(source_market_id: str) -> tuple[str | None, str]:
-    if not source_market_id:
-        return None, source_market_id
+def _normalize_market_title(value: Any) -> str:
+    return str(value or "").strip().lower()
 
-    cached = _MARKET_RESOLUTION_CACHE.get(source_market_id)
-    if cached is not None:
-        return cached.get("marketId"), cached.get("externalMarketId") or source_market_id
+
+def _market_external_id(row: dict[str, Any]) -> str:
+    return str(row.get("external_market_id") or row.get("externalMarketId") or "").strip()
+
+
+def _load_markets() -> list[dict[str, Any]]:
+    global _MARKETS_CACHE
+
+    if _MARKETS_CACHE is not None:
+        return _MARKETS_CACHE
 
     client = _get_client()
     if client is None:
-        return None, source_market_id
+        _MARKETS_CACHE = []
+        return _MARKETS_CACHE
+
+    last_error: Exception | None = None
+    for select_fields in (
+        "id, title, external_market_id",
+        "id, title, externalMarketId",
+        "id, title",
+    ):
+        try:
+            response = client.table("markets").select(select_fields).execute()
+            _MARKETS_CACHE = getattr(response, "data", None) or []
+            return _MARKETS_CACHE
+        except Exception as exc:
+            last_error = exc
+
+    if last_error is not None:
+        _warn(f"market load failed: {last_error}")
+
+    _MARKETS_CACHE = []
+    return _MARKETS_CACHE
+
+
+def _resolve_market_binding(source_market_id: str, market_title: str) -> tuple[str | None, str | None, str | None]:
+    source_market_id = str(source_market_id or "").strip()
+    market_title = str(market_title or "").strip()
+
+    if not source_market_id:
+        return None, None, None
+
+    cached = _MARKET_RESOLUTION_CACHE.get(source_market_id)
+    if cached is not None:
+        return (
+            cached.get("marketId"),
+            cached.get("externalMarketId"),
+            cached.get("strategy"),
+        )
+
+    markets = _load_markets()
+    normalized_title = _normalize_market_title(market_title)
+
+    for row in markets:
+        if _market_external_id(row) == source_market_id:
+            market_id = row.get("id")
+            external_market_id = _market_external_id(row) or source_market_id
+            _MARKET_RESOLUTION_CACHE[source_market_id] = {
+                "marketId": market_id,
+                "externalMarketId": external_market_id,
+                "strategy": "id_exact",
+            }
+            return market_id, external_market_id, "id_exact"
+
+    if normalized_title:
+        for row in markets:
+            if _normalize_market_title(row.get("title")) == normalized_title:
+                market_id = row.get("id")
+                external_market_id = _market_external_id(row) or source_market_id
+                _MARKET_RESOLUTION_CACHE[source_market_id] = {
+                    "marketId": market_id,
+                    "externalMarketId": external_market_id,
+                    "strategy": "title_exact",
+                }
+                return market_id, external_market_id, "title_exact"
+
+    _MARKET_RESOLUTION_CACHE[source_market_id] = {
+        "marketId": None,
+        "externalMarketId": None,
+        "strategy": None,
+    }
+    return None, None, None
+
+
+def _get_existing_capital_trail(source_market_id: str) -> dict[str, Any] | None:
+    source_market_id = str(source_market_id or "").strip()
+    if not source_market_id:
+        return None
+
+    if source_market_id in _CAPITAL_TRAIL_CACHE:
+        return _CAPITAL_TRAIL_CACHE[source_market_id]
+
+    client = _get_client()
+    if client is None:
+        _CAPITAL_TRAIL_CACHE[source_market_id] = None
+        return None
 
     try:
         response = (
-            client.table("markets")
-            .select("id, external_market_id")
-            .eq("external_market_id", source_market_id)
+            client.table("smart_money_capital_trails")
+            .select("id, sourceMarketId, marketId, externalMarketId")
+            .eq("sourceMarketId", source_market_id)
             .limit(1)
             .execute()
         )
         rows = getattr(response, "data", None) or []
-        if rows:
-            row = rows[0]
-            market_id = row.get("id")
-            external_market_id = row.get("external_market_id") or source_market_id
-            _MARKET_RESOLUTION_CACHE[source_market_id] = {
-                "marketId": market_id,
-                "externalMarketId": external_market_id,
-            }
-            return market_id, external_market_id
+        existing_row = rows[0] if rows else None
+        _CAPITAL_TRAIL_CACHE[source_market_id] = existing_row
+        return existing_row
     except Exception as exc:
-        _warn(f"market resolution failed for {source_market_id}: {exc}")
-
-    _MARKET_RESOLUTION_CACHE[source_market_id] = {
-        "marketId": None,
-        "externalMarketId": source_market_id,
-    }
-    return None, source_market_id
+        _warn(f"capital trail lookup failed for {source_market_id}: {exc}")
+        _CAPITAL_TRAIL_CACHE[source_market_id] = None
+        return None
 
 
 def start_engine_run() -> str:
@@ -218,8 +299,42 @@ def upsert_capital_trails(run_id: str, estela_capital: list[dict[str, Any]]) -> 
 
     payload: list[dict[str, Any]] = []
     for trail in estela_capital:
-        source_market_id = str(trail.get("marketId") or "")
-        market_id, external_market_id = _resolve_market_binding(source_market_id)
+        source_market_id = str(trail.get("marketId") or "").strip()
+        market_title = str(trail.get("title") or "").strip()
+        resolved_market_id, resolved_external_market_id, strategy = _resolve_market_binding(
+            source_market_id,
+            market_title,
+        )
+        existing_row = _get_existing_capital_trail(source_market_id)
+
+        if resolved_market_id is not None:
+            market_id = resolved_market_id
+            external_market_id = resolved_external_market_id or source_market_id
+            print(
+                "SMART_MONEY_MARKET_MAPPED "
+                f"sourceMarketId={source_market_id} "
+                f"marketId={market_id} "
+                f"externalMarketId={external_market_id} "
+                f"strategy={strategy}"
+            )
+        elif existing_row and existing_row.get("marketId") is not None:
+            market_id = existing_row.get("marketId")
+            external_market_id = existing_row.get("externalMarketId")
+            print(
+                "SMART_MONEY_MARKET_MAPPING_PRESERVED "
+                f"sourceMarketId={source_market_id} "
+                f"marketId={market_id} "
+                f"externalMarketId={external_market_id}"
+            )
+        else:
+            market_id = None
+            external_market_id = source_market_id
+            print(
+                "SMART_MONEY_MARKET_UNMAPPED "
+                f"sourceMarketId={source_market_id} "
+                f"title={market_title}"
+            )
+
         payload.append(
             {
                 "sourceMarketId": source_market_id,

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from workers.smart_money.smart_money_engine import main as smart_money_main
+from workers.smart_money.smart_money_engine import supabase_writer
 from workers.smart_money.smart_money_engine.market_trail import build_market_capital_trails
 from workers.smart_money.smart_money_engine.related_markets import build_related_market_inferences
 from workers.smart_money.smart_money_engine.wallet_classifier import (
@@ -242,3 +243,164 @@ def test_build_market_capital_trails_generates_strong_and_no_reliable_statuses()
     assert by_market["m1"]["status"] == "DIRECT_STRONG"
     assert by_market["m10"]["qualifiedWalletCount"] == 0
     assert by_market["m10"]["status"] == "NO_RELIABLE_TRAIL"
+
+
+def test_upsert_capital_trails_preserves_existing_mapping_and_resolves_market_matches(monkeypatch):
+    class FakeResult:
+        def __init__(self, data):
+            self.data = data
+
+    class FakeQuery:
+        def __init__(self, client, table_name):
+            self.client = client
+            self.table_name = table_name
+            self.operation = "select"
+            self.filters = {}
+            self.payload = None
+
+        def select(self, *_args, **_kwargs):
+            self.operation = "select"
+            return self
+
+        def eq(self, field, value):
+            self.filters[field] = value
+            return self
+
+        def limit(self, *_args, **_kwargs):
+            return self
+
+        def upsert(self, payload, **_kwargs):
+            self.operation = "upsert"
+            self.payload = payload
+            self.client.last_upsert_payload = payload
+            return self
+
+        def execute(self):
+            if self.table_name == "markets":
+                return FakeResult(self.client.markets_rows)
+
+            if self.table_name == "smart_money_capital_trails" and self.operation == "select":
+                source_market_id = self.filters.get("sourceMarketId")
+                rows = [
+                    row
+                    for row in self.client.existing_trails
+                    if row.get("sourceMarketId") == source_market_id
+                ]
+                return FakeResult(rows[:1])
+
+            return FakeResult([])
+
+    class FakeClient:
+        def __init__(self):
+            self.markets_rows = [
+                {
+                    "id": "market-1",
+                    "title": "Crypto Market 1",
+                    "external_market_id": "source-1",
+                },
+                {
+                    "id": "market-2",
+                    "title": "Title Match Market",
+                    "externalMarketId": "source-2",
+                },
+            ]
+            self.existing_trails = [
+                {
+                    "sourceMarketId": "source-3",
+                    "marketId": "market-existing",
+                    "externalMarketId": "source-3-existing",
+                },
+                {
+                    "sourceMarketId": "source-4",
+                    "marketId": None,
+                    "externalMarketId": "source-4-old",
+                },
+            ]
+            self.last_upsert_payload = None
+
+        def table(self, table_name):
+            return FakeQuery(self, table_name)
+
+    fake_client = FakeClient()
+
+    monkeypatch.setattr(supabase_writer, "_get_client", lambda: fake_client)
+    supabase_writer._MARKETS_CACHE = None
+    supabase_writer._CAPITAL_TRAIL_CACHE.clear()
+    supabase_writer._MARKET_RESOLUTION_CACHE.clear()
+
+    trails = [
+        {
+            "marketId": "source-1",
+            "title": "Some unrelated title",
+            "status": "DIRECT_WEAK",
+            "headline": "Matched by id",
+            "interpretation": "id",
+            "confidence": 10,
+            "smartBias": 0.1,
+            "qualifiedWalletCount": 1,
+            "smartMoneyVolume": 100,
+            "riskFlags": [],
+            "events": [],
+            "relatedMarkets": [],
+            "generatedAt": "2026-06-18T00:00:00Z",
+        },
+        {
+            "marketId": "source-2",
+            "title": "title match market",
+            "status": "DIRECT_WEAK",
+            "headline": "Matched by title",
+            "interpretation": "title",
+            "confidence": 20,
+            "smartBias": 0.2,
+            "qualifiedWalletCount": 2,
+            "smartMoneyVolume": 200,
+            "riskFlags": [],
+            "events": [],
+            "relatedMarkets": [],
+            "generatedAt": "2026-06-18T00:00:00Z",
+        },
+        {
+            "marketId": "source-3",
+            "title": "No match but preserve",
+            "status": "DIRECT_WEAK",
+            "headline": "Preserve",
+            "interpretation": "preserve",
+            "confidence": 30,
+            "smartBias": 0.3,
+            "qualifiedWalletCount": 3,
+            "smartMoneyVolume": 300,
+            "riskFlags": [],
+            "events": [],
+            "relatedMarkets": [],
+            "generatedAt": "2026-06-18T00:00:00Z",
+        },
+        {
+            "marketId": "source-4",
+            "title": "Still unmapped",
+            "status": "DIRECT_WEAK",
+            "headline": "Unmapped",
+            "interpretation": "unmapped",
+            "confidence": 40,
+            "smartBias": 0.4,
+            "qualifiedWalletCount": 4,
+            "smartMoneyVolume": 400,
+            "riskFlags": [],
+            "events": [],
+            "relatedMarkets": [],
+            "generatedAt": "2026-06-18T00:00:00Z",
+        },
+    ]
+
+    supabase_writer.upsert_capital_trails("run-1", trails)
+
+    payload = fake_client.last_upsert_payload
+    by_source = {row["sourceMarketId"]: row for row in payload}
+
+    assert by_source["source-1"]["marketId"] == "market-1"
+    assert by_source["source-1"]["externalMarketId"] == "source-1"
+    assert by_source["source-2"]["marketId"] == "market-2"
+    assert by_source["source-2"]["externalMarketId"] == "source-2"
+    assert by_source["source-3"]["marketId"] == "market-existing"
+    assert by_source["source-3"]["externalMarketId"] == "source-3-existing"
+    assert by_source["source-4"]["marketId"] is None
+    assert by_source["source-4"]["externalMarketId"] == "source-4"
