@@ -21,6 +21,10 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from schemas.closing_recheck_schema import ClosingRecheckResult
+from services.closing_recheck_repository import (
+    compute_prompt_hash,
+    save_closing_recheck_result,
+)
 from services.closing_recheck_prompt_builder import build_closing_recheck_prompt
 from services.deepbrief_generator import (
     SYSTEM_INSTRUCTION,
@@ -356,6 +360,47 @@ def call_model_with_provider_sequence(
     )
 
 
+def persist_result_from_file(input_path: Path) -> dict[str, Any]:
+    print(f"[CLOSING_RECHECK_PERSIST_ONLY] reading path={input_path}")
+
+    if not input_path.exists():
+        raise SystemExit(f"No existe el archivo indicado en --from-file: {input_path}")
+
+    raw_text = input_path.read_text(encoding="utf-8")
+
+    try:
+        loaded_payload = json.loads(raw_text)
+    except json.JSONDecodeError as error:
+        raise SystemExit(f"El JSON de --from-file no es valido: {error}") from error
+
+    validated = ClosingRecheckResult.model_validate(loaded_payload)
+    result = validated.model_dump()
+
+    print(
+        "[CLOSING_RECHECK_PERSIST_ONLY] schema_validated "
+        f"status={result['recheckStatus']} "
+        f"newRadarScore={result['reevaluation']['newRadarScore']}"
+    )
+
+    prompt_hash = compute_prompt_hash(raw_text)
+
+    print(
+        f"[CLOSING_RECHECK_PERSIST] saving marketId={result['marketId']} "
+        f"source=manual_debug"
+    )
+
+    saved_row = save_closing_recheck_result(
+        validated,
+        provider=None,
+        model=None,
+        fallback_used=False,
+        prompt_hash=prompt_hash,
+        source="manual_debug",
+    )
+    print(f"[CLOSING_RECHECK_PERSIST] saved id={saved_row.get('id')}")
+    return saved_row
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run a manual closing recheck model call without persistence."
@@ -376,8 +421,36 @@ def main() -> None:
         default=1,
         help="Numero de reintentos de reparacion JSON por proveedor.",
     )
+    parser.add_argument(
+        "--persist",
+        action="store_true",
+        help="Si se incluye, tambien persiste el resultado en Supabase.",
+    )
+    parser.add_argument(
+        "--persist-only",
+        action="store_true",
+        help="Si se incluye, no llama al modelo y solo persiste un resultado desde archivo.",
+    )
+    parser.add_argument(
+        "--from-file",
+        dest="from_file",
+        default=None,
+        help="Ruta al JSON ya validado que se usara con --persist-only.",
+    )
 
     args = parser.parse_args()
+
+    if args.persist_only and not args.from_file:
+        raise SystemExit("--persist-only requiere --from-file <ruta>")
+
+    if args.persist_only:
+        try:
+            persist_result_from_file(Path(args.from_file))
+        except Exception as error:
+            print(f"[CLOSING_RECHECK_PERSIST] error={error}")
+            raise SystemExit(1) from error
+
+        return
 
     input_data = build_debug_input(args.market_id)
     prompt, prompt_source = build_closing_recheck_prompt(
@@ -415,6 +488,27 @@ def main() -> None:
     )
 
     print(f"[CLOSING_RECHECK_DEBUG] result_written path={output_path}")
+
+    if args.persist:
+        prompt_hash = compute_prompt_hash(prompt)
+        print(
+            f"[CLOSING_RECHECK_PERSIST] saving marketId={result['marketId']} "
+            f"source=manual_debug"
+        )
+
+        try:
+            saved_row = save_closing_recheck_result(
+                validated,
+                provider=model_meta.get("provider"),
+                model=model_meta.get("model"),
+                fallback_used=bool(model_meta.get("fallback_used", False)),
+                prompt_hash=prompt_hash,
+                source="manual_debug",
+            )
+            print(f"[CLOSING_RECHECK_PERSIST] saved id={saved_row.get('id')}")
+        except Exception as error:
+            print(f"[CLOSING_RECHECK_PERSIST] error={error}")
+            raise SystemExit(1) from error
 
 
 if __name__ == "__main__":

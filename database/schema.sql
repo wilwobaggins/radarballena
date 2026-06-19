@@ -349,6 +349,49 @@ create index if not exists deepbriefs_marketId_idx on public.deepbriefs ("market
 create index if not exists deepbriefs_pipelineRunId_idx on public.deepbriefs ("pipelineRunId");
 create index if not exists deepbriefs_radarScore_idx on public.deepbriefs ("radarScore");
 create index if not exists deepbriefs_signalLabel_idx on public.deepbriefs ("signalLabel");
+
+create table if not exists public.closing_recheck_results (
+  id uuid primary key default gen_random_uuid(),
+
+  market_id uuid,
+  previous_analysis_id uuid,
+  latest_analysis_id uuid,
+
+  analysis_mode text not null default 'closing_recheck',
+  recheck_status text not null,
+  importance text,
+  recommendation text,
+  thesis text,
+  confidence numeric,
+
+  previous_radar_score numeric,
+  new_radar_score numeric,
+  radar_score_delta numeric,
+  score_direction text,
+  score_change_magnitude text,
+
+  provider text,
+  model text,
+  fallback_used boolean default false,
+
+  result jsonb not null,
+  prompt_hash text,
+
+  source text not null default 'manual_debug',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_closing_recheck_results_market_id
+  on public.closing_recheck_results (market_id);
+
+create index if not exists idx_closing_recheck_results_latest_analysis_id
+  on public.closing_recheck_results (latest_analysis_id);
+
+create index if not exists idx_closing_recheck_results_created_at
+  on public.closing_recheck_results (created_at desc);
+
+create index if not exists idx_closing_recheck_results_status
+  on public.closing_recheck_results (recheck_status);
 create index if not exists deepbriefs_createdAt_idx on public.deepbriefs ("createdAt");
 
 
