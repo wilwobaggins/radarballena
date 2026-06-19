@@ -119,3 +119,6 @@ class ClosingRecheckSchema(BaseModel):
             )
 
         return self
+
+
+ClosingRecheckResult = ClosingRecheckSchema
