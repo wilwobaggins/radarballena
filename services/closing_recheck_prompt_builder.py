@@ -37,7 +37,6 @@ def build_closing_recheck_prompt(
 
     rendered = (
         template
-        .replace("{{SHARED_CRITERIA}}", shared_criteria)
         .replace("{{CRITERIA_BLOCK}}", shared_criteria)
         .replace("{{MERCADO}}", _format_json(market))
         .replace("{{PREVIOUS_ANALYSIS}}", _format_json(previous_analysis))

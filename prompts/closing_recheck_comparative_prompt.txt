@@ -10,12 +10,11 @@ OBJETIVO
 - Explicar por que el score subio, bajo o se mantuvo.
 - Detectar contradiccion, debilitamiento, cambio radical o vigencia de la tesis anterior.
 
-{{SHARED_CRITERIA}}
-
 REGLAS ESPECIFICAS DEL MODO CLOSING_RECHECK
 - Usa analysisMode = "closing_recheck" como marco mental.
 - Relee el mercado desde cero con el contexto actual y el snapshot previo.
 - No copies automaticamente el score anterior.
+- Las probabilidades del input vienen expresadas en puntos porcentuales de 0 a 100.
 - No promedies por inercia.
 - Si el snapshot previo es insuficiente, marca INSUFFICIENT_SNAPSHOT.
 - Si el nuevo contexto y la tesis anterior apuntan en direcciones opuestas, marca CONTRADICTED.

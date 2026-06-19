@@ -20,75 +20,81 @@ def build_debug_input(market_id: str) -> dict[str, Any]:
     Local debug fixture that mirrors the structure expected from
     /api/deepsignal/closing-recheck-candidates.
     """
-    title = "Will the Fed cut rates before the September close?"
+    title = "Will Abelardo de la Espriella win the 2026 Colombian presidential election?"
 
     market = {
         "marketId": market_id,
         "title": title,
-        "category": "macro",
-        "closingTime": "2026-06-22T18:00:00Z",
-        "daysToClose": 3,
+        "category": "politica",
+        "closingTime": "2026-06-21T14:00:00.000Z",
+        "closingLabel": "2d",
+        "daysToClose": 2,
     }
 
     previous_analysis = {
-        "analysisId": "deepbrief-prev-20260617",
-        "generatedAt": "2026-06-17T14:20:00Z",
+        "analysisId": "fdf72f74-d135-43ce-821f-87951d167fec",
+        "generatedAt": "2026-06-14T18:04:33.61033+00:00",
         "thesis": (
-            "The market was still noisy, but the odds of a near-term policy move "
-            "were beginning to matter more than background macro chatter."
+            "La señal favorece a Abelardo de la Espriella con ventaja alta en el mercado y "
+            "una suba reciente de probabilidad, pero la evidencia externa incluida sigue siendo "
+            "limitada y no totalmente verificable. La lectura es de continuidad alcista moderada, "
+            "con riesgo de que parte del movimiento ya esté descontado."
         ),
-        "signalLabel": "Watchlist",
-        "radarScore": 61,
-        "probability": 0.54,
+        "signalLabel": "Strong Watch",
+        "radarScore": 68,
+        "probability": 89.5,
         "modules": {
-            "lectura_clave": "Weak but improving setup near the close.",
-            "deepsignal_verdict": "Monitor rather than act aggressively.",
+            "lectura_clave": "La ventaja seguia alta, pero sin confirmacion fuerte de cierre.",
+            "deepsignal_verdict": "Continuidad alcista moderada con riesgo de descuento parcial.",
         },
         "radarBreakdown": {
-            "movimiento_probabilidad": 7,
+            "movimiento_probabilidad": 8,
             "volumen": 8,
-            "liquidez": 10,
-            "cercania_cierre": 7,
+            "liquidez": 9,
+            "cercania_cierre": 8,
             "claridad_resolucion": 8,
             "fuerza_narrativa": 9,
-            "asimetria_detectada": 8,
+            "asimetria_detectada": 9,
             "riesgo_ruido": 4,
         },
         "hybridScoreBreakdown": {
-            "preliminary_radar_score": 58,
-            "ai_interpretive_score": 61,
-            "final_radar_score": 60,
+            "preliminary_radar_score": 67,
+            "ai_interpretive_score": 68,
+            "final_radar_score": 68,
         },
     }
 
     latest_analysis = {
-        "analysisId": "deepbrief-latest-20260619",
-        "generatedAt": "2026-06-19T11:05:00Z",
+        "analysisId": "4819fa5f-ab9c-4840-b21d-15a78ce1eccc",
+        "generatedAt": "2026-06-15T08:00:05.458637+00:00",
         "thesis": (
-            "The latest snapshot suggests the market has become cleaner: the near-term "
-            "close matters more, and probability movement is now directionally consistent."
+            "La señal favorece a Abelardo de la Espriella con ventaja de mercado alta, pero con "
+            "ruido no trivial: la probabilidad cayó levemente en 24h y la evidencia externa incluida "
+            "es limitada y parcialmente indirecta. El mercado ya parece haber incorporado una narrativa "
+            "favorable de derecha/populismo, pero aún no hay confirmación suficiente para tratarlo como "
+            "cierre de tesis."
         ),
-        "signalLabel": "Directional Edge",
-        "radarScore": 69,
-        "probability": 0.63,
+        "signalLabel": "Strong Watch",
+        "radarScore": 68,
+        "probability": 87.5,
         "modules": {
-            "lectura_clave": "Better defined setup with less noise than the prior pass.",
-            "deepsignal_verdict": "The thesis is still alive and modestly stronger.",
+            "lectura_clave": "La ventaja seguia alta, pero la lectura ya mostraba ruido de cierre.",
+            "deepsignal_verdict": "La tesis sigue viva, aunque no cierra con confirmacion plena.",
         },
         "radarBreakdown": {
-            "movimiento_probabilidad": 10,
+            "movimiento_probabilidad": 8,
             "volumen": 8,
-            "liquidez": 10,
+            "liquidez": 9,
             "cercania_cierre": 8,
-            "claridad_resolucion": 9,
-            "fuerza_narrativa": 10,
+            "claridad_resolucion": 8,
+            "fuerza_narrativa": 9,
             "asimetria_detectada": 9,
-            "riesgo_ruido": 5,
+            "riesgo_ruido": 4,
         },
         "hybridScoreBreakdown": {
-            "preliminary_radar_score": 62,
-            "ai_interpretive_score": 69,
-            "final_radar_score": 66,
+            "preliminary_radar_score": 67,
+            "ai_interpretive_score": 68,
+            "final_radar_score": 68,
         },
     }
 
@@ -97,30 +103,32 @@ def build_debug_input(market_id: str) -> dict[str, Any]:
         "previousAnalysis": previous_analysis,
         "latestAnalysis": latest_analysis,
         "deltas": {
-            "probabilityChangeSincePreviousAnalysis": 0.09,
-            "radarScoreChangeSincePreviousAnalysis": 8,
-            "probabilityChange24h": 0.04,
+            "probabilityChangeSincePreviousAnalysis": -2,
+            "radarScoreChangeSincePreviousAnalysis": 0,
+            "probabilityChange24h": -2,
         },
         "recheckCandidate": {
             "recheckStatus": "STILL_VALID",
-            "recheckPriority": "HIGH",
+            "recheckPriority": "MEDIUM",
             "recheckReasons": [
-                "The market is inside the closing window.",
-                "The latest analysis shows cleaner signal quality.",
-                "Probability moved in the same direction as the thesis.",
+                "closes_in_2d",
+                "probability_delta_-2.0pts",
+                "radar_delta_0.0pts",
+                "high_radar_score",
+                "thesis_still_valid",
             ],
         },
         "capitalTrail": {
             "status": "strong",
-            "summary": "Capital trail remains present and supportive, but not decisive.",
-            "lastObservedAt": "2026-06-19T10:50:00Z",
+            "summary": "Capital trail remains supportive but not decisive.",
+            "lastObservedAt": "2026-06-15T07:45:00+00:00",
         },
         "marketSnapshot": {
             "marketId": market_id,
             "title": title,
-            "current_probability": 0.63,
-            "previous_probability_24h": 0.59,
-            "probability_change_24h": 0.04,
+            "current_probability": 87.5,
+            "previous_probability_24h": 89.5,
+            "probability_change_24h": -2,
             "volume": 1845000,
             "liquidity": 412300,
             "outcomes": ["Yes", "No"],
@@ -128,9 +136,9 @@ def build_debug_input(market_id: str) -> dict[str, Any]:
                 "volume_score": 8,
                 "liquidity_score": 10,
                 "time_to_close_score": 8,
-                "probability_movement_score": 9,
-                "resolution_score": 9,
-                "narrative_score": 10,
+                "probability_movement_score": 8,
+                "resolution_score": 8,
+                "narrative_score": 9,
             },
         },
     }
@@ -138,12 +146,18 @@ def build_debug_input(market_id: str) -> dict[str, Any]:
 
 def validate_rendered_prompt(prompt: str) -> None:
     required_phrases = [
-        "Will the Fed cut rates before the September close?",
-        "The market was still noisy",
-        "The latest snapshot suggests the market has become cleaner",
-        "61",
-        "69",
+        "Will Abelardo de la Espriella win the 2026 Colombian presidential election?",
+        "La señal favorece a Abelardo de la Espriella con ventaja alta en el mercado",
+        "La señal favorece a Abelardo de la Espriella con ventaja de mercado alta",
+        "68",
+        "87.5",
+        "89.5",
+        "-2",
+        "2d",
+        "STILL_VALID",
+        "MEDIUM",
         "Metodologias internas obligatorias",
+        "Las probabilidades del input vienen expresadas en puntos porcentuales de 0 a 100.",
         "probabilityChangeSincePreviousAnalysis",
         "radarScoreChangeSincePreviousAnalysis",
         "daysToClose",
@@ -155,6 +169,9 @@ def validate_rendered_prompt(prompt: str) -> None:
     ]
 
     missing = [phrase for phrase in required_phrases if phrase not in prompt]
+
+    if prompt.count("Metodologias internas obligatorias") != 1:
+        raise RuntimeError("Los criterios DeepEngine aparecen duplicados o ausentes.")
 
     if missing:
         raise RuntimeError(
