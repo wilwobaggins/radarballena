@@ -26,6 +26,9 @@ from services.closing_recheck_repository import (
     save_closing_recheck_result,
 )
 from services.closing_recheck_prompt_builder import build_closing_recheck_prompt
+from services.closing_recheck_service import (
+    call_closing_recheck_model_with_provider_sequence,
+)
 from services.deepbrief_generator import (
     SYSTEM_INSTRUCTION,
     get_provider_model,
@@ -41,6 +44,7 @@ load_dotenv()
 DEFAULT_MARKET_ID = "e4fdcd9b-12e8-457f-9617-6f9b062c305b"
 DEFAULT_OUTPUT_PATH = Path("output") / "debug_closing_recheck_result.json"
 DEFAULT_GEMINI_MODEL = "gemini-2.5-pro"
+CURRENT_MARKET_ID = DEFAULT_MARKET_ID
 
 
 def build_debug_input(market_id: str) -> dict[str, Any]:
@@ -311,53 +315,24 @@ def call_model_with_provider_sequence(
     prompt: str,
     max_retries: int,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    primary_provider, provider_sequence = get_provider_sequence()
-    provider_errors: list[str] = []
-
-    for index, provider in enumerate(provider_sequence):
-        configured, reason = is_provider_configured(provider)
-        is_fallback = index > 0
-        provider_model = normalize_debug_model_name(
-            provider,
-            get_provider_model(provider),
-        )
-
-        if not configured:
-            provider_errors.append(f"{provider}: {reason}")
-            continue
-
-        print(
-            f"[CLOSING_RECHECK_DEBUG] model_called provider={provider} "
-            f"model={provider_model} fallback_used={is_fallback}"
-        )
-
-        try:
-            if provider == "gemini":
-                payload, response_id = call_gemini_model(
-                    prompt=prompt,
-                    model=provider_model,
-                    max_retries=max_retries,
-                )
-            else:
-                payload, response_id = call_openai_model(
-                    prompt=prompt,
-                    model=provider_model,
-                    max_retries=max_retries,
-                )
-
-            return payload, {
-                "provider": provider,
-                "model": provider_model,
-                "response_id": response_id,
-                "fallback_used": is_fallback,
-                "primary_provider": primary_provider,
-            }
-        except Exception as error:
-            provider_errors.append(f"{provider}: {error}")
-
-    raise RuntimeError(
-        "Todos los proveedores fallaron: " + " | ".join(provider_errors)
+    candidate = build_debug_input(CURRENT_MARKET_ID)
+    payload, raw_output, provider, model = call_closing_recheck_model_with_provider_sequence(
+        candidate=candidate,
+        max_retries=max_retries,
     )
+
+    print(
+        f"[CLOSING_RECHECK_DEBUG] model_called provider={provider} "
+        f"model={model} fallback_used={bool(raw_output.get('fallback_used', False))}"
+    )
+
+    return payload, {
+        "provider": provider,
+        "model": model,
+        "response_id": raw_output.get("response_id", ""),
+        "fallback_used": bool(raw_output.get("fallback_used", False)),
+        "primary_provider": raw_output.get("primary_provider"),
+    }
 
 
 def persist_result_from_file(input_path: Path) -> dict[str, Any]:
@@ -402,6 +377,7 @@ def persist_result_from_file(input_path: Path) -> dict[str, Any]:
 
 
 def main() -> None:
+    global CURRENT_MARKET_ID
     parser = argparse.ArgumentParser(
         description="Run a manual closing recheck model call without persistence."
     )
@@ -439,6 +415,7 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    CURRENT_MARKET_ID = args.market_id
 
     if args.persist_only and not args.from_file:
         raise SystemExit("--persist-only requiere --from-file <ruta>")
