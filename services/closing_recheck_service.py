@@ -22,6 +22,9 @@ from services.closing_recheck_repository import (
     get_recent_closing_recheck_for_market,
     save_closing_recheck_result,
 )
+from services.closing_recheck_candidate_normalizer import (
+    normalize_closing_recheck_candidate,
+)
 from services.deepbrief_generator import (
     SYSTEM_INSTRUCTION,
     ProviderGenerationError,
@@ -179,85 +182,7 @@ def _normalize_analysis(analysis: Any) -> dict[str, Any]:
 
 
 def _normalize_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
-    market = _normalize_market(
-        _coalesce(candidate.get("market"), candidate.get("marketSnapshot"))
-    )
-    if not market:
-        market = _normalize_market(candidate)
-
-    previous_analysis = _normalize_analysis(
-        _coalesce(candidate.get("previousAnalysis"), candidate.get("previous_analysis"))
-    )
-    latest_analysis = _normalize_analysis(
-        _coalesce(candidate.get("latestAnalysis"), candidate.get("latest_analysis"))
-    )
-
-    recheck_candidate = candidate.get("recheckCandidate")
-    if not isinstance(recheck_candidate, dict):
-        recheck_candidate = {}
-
-    deltas = candidate.get("deltas")
-    if not isinstance(deltas, dict):
-        deltas = {}
-
-    market_snapshot = candidate.get("marketSnapshot")
-    if not isinstance(market_snapshot, dict):
-        market_snapshot = market or {}
-
-    capital_trail = candidate.get("capitalTrail")
-
-    recheck_priority = _clean_text(
-        _coalesce(
-            candidate.get("recheckPriority"),
-            recheck_candidate.get("recheckPriority"),
-            candidate.get("priority"),
-        )
-    )
-    recheck_status = _clean_text(
-        _coalesce(
-            candidate.get("recheckStatus"),
-            recheck_candidate.get("recheckStatus"),
-        )
-    )
-    recheck_score = _coalesce(
-        candidate.get("recheckScore"),
-        recheck_candidate.get("recheckScore"),
-    )
-
-    return {
-        **candidate,
-        "marketId": _coalesce(
-            candidate.get("marketId"),
-            candidate.get("market_id"),
-            market.get("marketId"),
-            latest_analysis.get("analysisId"),
-        ),
-        "previousAnalysisId": _coalesce(
-            candidate.get("previousAnalysisId"),
-            candidate.get("previous_analysis_id"),
-            previous_analysis.get("analysisId"),
-        ),
-        "latestAnalysisId": _coalesce(
-            candidate.get("latestAnalysisId"),
-            candidate.get("latest_analysis_id"),
-            latest_analysis.get("analysisId"),
-        ),
-        "market": market,
-        "previousAnalysis": previous_analysis,
-        "latestAnalysis": latest_analysis,
-        "deltas": deltas,
-        "recheckCandidate": {
-            **recheck_candidate,
-            "recheckPriority": recheck_priority,
-            "recheckStatus": recheck_status,
-            "recheckScore": _as_float(recheck_score),
-        },
-        "capitalTrail": capital_trail,
-        "marketSnapshot": market_snapshot,
-        "recheckPriority": recheck_priority,
-        "recheckStatus": recheck_status,
-        "recheckScore": _as_float(recheck_score),
-    }
+    return normalize_closing_recheck_candidate(candidate)
 
 
 def _build_deltas(candidate: dict[str, Any]) -> dict[str, Any]:

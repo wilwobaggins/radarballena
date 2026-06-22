@@ -5,6 +5,10 @@ from typing import Any
 
 import requests
 
+from services.closing_recheck_candidate_normalizer import (
+    normalize_closing_recheck_candidate,
+)
+
 
 DEFAULT_BACKEND_URL = "https://app.radarballena.com"
 
@@ -275,7 +279,7 @@ def _normalize_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
 
 
 def normalize_closing_recheck_candidates(payload: Any) -> list[dict[str, Any]]:
-    return [_normalize_candidate(item) for item in _extract_payload_list(payload)]
+    return [normalize_closing_recheck_candidate(item) for item in _extract_payload_list(payload)]
 
 
 def fetch_closing_recheck_candidates(
