@@ -108,6 +108,17 @@ def test_close_to_closing_generates_trigger():
     assert any("24 horas" in trigger for trigger in deepbrief.watch_triggers)
 
 
+def test_probability_change_is_expressed_as_percentage_points():
+    deepbrief = generate_deterministic_deepbrief(
+        market=base_market(probability_change_24h=-0.04),
+        preliminary_score=52,
+        score_breakdown={},
+    )
+
+    assert "-4.0 puntos porcentuales" in deepbrief.lectura_clave
+    assert "-4.0 puntos porcentuales" in deepbrief.filtro_de_ruido.informacion_ya_descontada
+
+
 def test_handles_null_volume_and_liquidity():
     deepbrief = generate_deterministic_deepbrief(
         market=base_market(volume=None, liquidity=None),
@@ -117,6 +128,17 @@ def test_handles_null_volume_and_liquidity():
 
     assert "dato no disponible" in deepbrief.lectura_clave.lower()
     assert deepbrief.radar_score == 36
+
+
+def test_zero_values_are_treated_as_present():
+    deepbrief = generate_deterministic_deepbrief(
+        market=base_market(current_probability=0.0, volume=0, liquidity=0),
+        preliminary_score=30,
+        score_breakdown={},
+    )
+
+    assert "dato no disponible" not in deepbrief.lectura_clave.lower()
+    assert "0.0" in deepbrief.lectura_clave or "0" in deepbrief.lectura_clave
 
 
 def test_handles_missing_description():
@@ -139,6 +161,7 @@ def test_handles_missing_close_date():
 
     assert deepbrief.mapa_de_ruptura.evento_detonador
     assert deepbrief.actualizacion_bayesiana.razon.startswith("No existe actualización")
+    assert "fecha de cierre no disponible" in deepbrief.entorno_de_senal.sintesis.lower()
 
 
 def test_raw_output_metadata_shape():

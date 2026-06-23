@@ -29,6 +29,24 @@ def _number_text(value: Any, *, decimals: int = 1) -> str:
     return f"{number:.{decimals}f}".rstrip("0").rstrip(".")
 
 
+def _percentage_points_text(value: Any, *, decimals: int = 1) -> str:
+    if value in (None, ""):
+        return "dato no disponible"
+
+    number = safe_float(value, default=float("nan"))
+    if number != number:
+        return "dato no disponible"
+
+    return f"{number * 100:.{decimals}f}"
+
+
+def _closing_date_text(market: dict[str, Any]) -> str:
+    closing_date = market.get("close_date") or market.get("closingTime") or market.get("closeDate")
+    if closing_date:
+        return _text_or(closing_date, "fecha de cierre no disponible")
+    return "fecha de cierre no disponible"
+
+
 def _build_signal_label(score: float) -> str:
     if score < 30:
         return "Ignore"
@@ -70,12 +88,12 @@ def _build_environment_section(market: dict[str, Any]) -> dict[str, str]:
         "steep_tecnologico": "No evaluado sin IA.",
         "steep_economico": (
             f"Resumen cuantitativo basado en volumen {_number_text(volume, decimals=0)}, "
-            f"liquidez {_number_text(liquidity, decimals=0)} y cambio de probabilidad {_number_text(movement, decimals=1)} puntos."
+            f"liquidez {_number_text(liquidity, decimals=0)} y cambio de probabilidad {_percentage_points_text(movement, decimals=1)} puntos porcentuales."
         ),
         "steep_ecologico": "No evaluado sin IA.",
         "steep_politico_regulatorio": "No evaluado sin IA.",
         "sintesis": (
-            f"Mercado con actividad {volume_band}, liquidez {_number_text(liquidity, decimals=0)} y cierre en {close_days} días."
+            f"Mercado con actividad {volume_band}, liquidez {_number_text(liquidity, decimals=0)} y {_closing_date_text(market)}."
         ),
     }
 
@@ -83,7 +101,7 @@ def _build_environment_section(market: dict[str, Any]) -> dict[str, str]:
 def _build_noise_filter(market: dict[str, Any]) -> dict[str, str]:
     volume = safe_float(market.get("volume"), default=0.0)
     liquidity = safe_float(market.get("liquidity"), default=0.0)
-    movement = abs(safe_float(market.get("probability_change_24h"), default=0.0))
+    movement = safe_float(market.get("probability_change_24h"), default=0.0)
     close_days = days_to_close(market)
 
     return {
@@ -96,7 +114,7 @@ def _build_noise_filter(market: dict[str, Any]) -> dict[str, str]:
             else "Resolución relativamente clara por los datos disponibles"
         ),
         "informacion_ya_descontada": (
-            f"Movimiento de probabilidad de {_number_text(movement, decimals=1)} puntos, "
+            f"Movimiento de probabilidad de {_percentage_points_text(movement, decimals=1)} puntos porcentuales, "
             f"volumen {_number_text(volume, decimals=0)}, liquidez {_number_text(liquidity, decimals=0)} y cierre cercano: {'sí' if close_days <= 1 else 'no'}."
         ),
     }
@@ -127,7 +145,7 @@ def _build_breakout_map(market: dict[str, Any]) -> dict[str, str]:
         "evento_detonador": (
             "Últimas 24 horas antes del cierre si close_date está disponible"
             if close_days <= 1
-            else f"Variación de volumen superior a 50% o cambio de probabilidad de {max(5.0, round(movement or 5.0, 1))} puntos"
+            else f"Variación de volumen superior a 50% o cambio de probabilidad de {max(5.0, round(movement or 5.0, 1))} puntos porcentuales"
         ),
     }
 
@@ -141,13 +159,13 @@ def _build_scenarios(market: dict[str, Any]) -> list[dict[str, str]]:
         {
             "escenario": "Base",
             "probabilidad_interna": "50%",
-            "descripcion": f"El mercado mantiene un comportamiento estable con movimiento limitado ({movement:.1f} puntos si aplica).",
+            "descripcion": f"El mercado mantiene un comportamiento estable con movimiento limitado ({movement * 100:.1f} puntos porcentuales si aplica).",
             "impacto_en_mercado": "No hay ruptura cuantitativa clara.",
         },
         {
             "escenario": "Ruptura",
             "probabilidad_interna": "65%",
-            "descripcion": f"Se activa si la probabilidad cambia más de {max(5.0, round(movement or 5.0, 1))} puntos y el volumen supera {_number_text(volume * 1.5 if volume else 0, decimals=0)}.",
+            "descripcion": f"Se activa si la probabilidad cambia más de {max(5.0, round((movement or 0) * 100, 1))} puntos porcentuales y el volumen supera {_number_text(volume * 1.5 if volume else 0, decimals=0)}.",
             "impacto_en_mercado": "La lectura cuantitativa se fortalece sin necesidad de narrativa externa.",
         },
         {
@@ -207,6 +225,7 @@ def build_deterministic_raw_output(
     score_breakdown: dict[str, Any],
     fallback_reason: str,
 ) -> dict[str, Any]:
+    close_date = market.get("close_date") or market.get("closingTime") or market.get("closeDate")
     return {
         "provider": "deterministic",
         "model": "none",
@@ -224,8 +243,8 @@ def build_deterministic_raw_output(
             "probability_change_24h": market.get("probability_change_24h"),
             "volume": market.get("volume"),
             "liquidity": market.get("liquidity"),
-            "close_date": market.get("close_date"),
-            "days_to_close": days_to_close(market),
+            "close_date": close_date,
+            "days_to_close": None if not close_date else days_to_close(market),
             "outcomes": market.get("outcomes"),
             "selection_reason": market.get("selection_reason"),
         },
@@ -250,12 +269,12 @@ def generate_deterministic_deepbrief(
     normalized_breakdown = _normalize_breakdown(score_breakdown or {})
     volume_text = _number_text(market.get("volume"), decimals=0)
     liquidity_text = _number_text(market.get("liquidity"), decimals=0)
-    movement_text = _number_text(market.get("probability_change_24h"), decimals=1)
+    movement_text = _percentage_points_text(market.get("probability_change_24h"), decimals=1)
     selection_text = selection_reason or market.get("selection_reason") or "Sin razón de selección específica."
 
     deepbrief_payload = {
         "lectura_clave": (
-            f"El mercado presenta un Radar Score preliminar de {score}, volumen {volume_text}, liquidez {liquidity_text} y cambio de probabilidad de {movement_text} puntos en 24 horas. "
+            f"El mercado presenta un Radar Score preliminar de {score}, volumen {volume_text}, liquidez {liquidity_text} y cambio de probabilidad de {movement_text} puntos porcentuales en 24 horas. "
             "Este resultado no incluye interpretación mediante IA."
         ),
         "radar_score": score,
