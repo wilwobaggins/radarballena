@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+import json
 import os
 from typing import Any
 
@@ -484,9 +486,85 @@ def _provider_error_is_quota_related(error: ProviderGenerationError) -> bool:
     return False
 
 
+def classify_closing_recheck_provider_errors(provider_errors: list[str]) -> str:
+    normalized = [str(item).lower() for item in provider_errors if item]
+    if not normalized:
+        return "all_providers_failed"
+
+    quota_count = sum(
+        1
+        for item in normalized
+        if "quota" in item or "insufficient_quota" in item or "rate limit" in item or "too many requests" in item
+    )
+    schema_count = sum(
+        1
+        for item in normalized
+        if "schema" in item or "additional_properties" in item or "invalid_argument" in item
+    )
+    auth_count = sum(
+        1
+        for item in normalized
+        if "auth" in item or "unauthorized" in item or "api key" in item or "permission" in item
+    )
+    transient_count = sum(
+        1
+        for item in normalized
+        if "timeout" in item or "network" in item or "connection" in item or "temporary" in item
+    )
+
+    if quota_count and quota_count == len(normalized):
+        return "all_providers_quota_exhausted"
+    if schema_count:
+        return "provider_schema_error"
+    if auth_count:
+        return "provider_auth_error"
+    if transient_count:
+        return "provider_transient_error"
+    return "all_providers_failed"
+
+
 def _is_json_repair_needed(error: Exception) -> bool:
     message = summarize_exception(error).lower()
     return "json" in message or "schema" in message or "parse" in message
+
+
+def build_gemini_response_schema(model_type: type[Any]) -> dict[str, Any]:
+    schema = copy.deepcopy(model_type.model_json_schema(mode="validation"))
+
+    def _clean(node: Any) -> Any:
+        if isinstance(node, dict):
+            cleaned: dict[str, Any] = {}
+            for key, value in node.items():
+                if key in {"additionalProperties", "additional_properties", "title", "default", "examples", "unevaluatedProperties"}:
+                    continue
+                if key == "propertyOrdering":
+                    continue
+                if key == "$defs":
+                    cleaned[key] = {name: _clean(definition) for name, definition in value.items()}
+                    continue
+                if key == "$ref":
+                    cleaned[key] = value
+                    continue
+                cleaned[key] = _clean(value)
+            return cleaned
+        if isinstance(node, list):
+            return [_clean(item) for item in node]
+        return node
+
+    return _clean(schema)
+
+
+def _is_gemini_schema_compatibility_error(error: Exception) -> bool:
+    message = summarize_exception(error).lower()
+    markers = (
+        "invalid_argument",
+        "unknown name",
+        "additional_properties",
+        "additionalproperties",
+        "response_schema",
+        "schema",
+    )
+    return any(marker in message for marker in markers)
 
 
 def _build_model_prompt(
@@ -697,6 +775,8 @@ def _call_gemini_model(
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     attempts = list(prior_attempts or [])
     last_error = None
+    schema = build_gemini_response_schema(ClosingRecheckModelOutput)
+    structured_schema_rejected = False
 
     for attempt in range(1, max_retries + 2):
         repair_note = None
@@ -714,14 +794,17 @@ def _call_gemini_model(
         )
 
         try:
+            config_kwargs: dict[str, Any] = {
+                "system_instruction": SYSTEM_INSTRUCTION,
+                "response_mime_type": "application/json",
+            }
+            if not structured_schema_rejected:
+                config_kwargs["response_schema"] = schema
+
             response = client.models.generate_content(
                 model=model,
                 contents=prompt,
-                config=genai_types.GenerateContentConfig(
-                    system_instruction=SYSTEM_INSTRUCTION,
-                    response_mime_type="application/json",
-                    response_schema=ClosingRecheckModelOutput,
-                ),
+                config=genai_types.GenerateContentConfig(**config_kwargs),
             )
 
             parsed_candidate = getattr(response, "parsed", None)
@@ -763,6 +846,13 @@ def _call_gemini_model(
 
             return validated.model_dump(), raw_output
         except Exception as error:
+            if not structured_schema_rejected and _is_gemini_schema_compatibility_error(error):
+                structured_schema_rejected = True
+                logger.warning(
+                    "[CLOSING_RECHECK_GEMINI_SCHEMA] structured_schema_rejected=true retrying_without_response_schema=true"
+                )
+                continue
+
             last_error = summarize_exception(error)
             attempts.append(
                 {

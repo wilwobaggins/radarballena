@@ -18,6 +18,7 @@ load_dotenv(override=True)
 from services.closing_recheck_candidates_client import fetch_closing_recheck_candidates
 from services.closing_recheck_service import (
     ClosingRecheckQuotaExceeded,
+    classify_closing_recheck_provider_errors,
     run_closing_recheck_for_candidate,
     should_skip_due_to_open_market,
 )
@@ -312,7 +313,8 @@ def run_closing_rechecks_cycle(*, dry_run: bool = False) -> dict[str, Any]:
         except Exception as error:
             errors += 1
             print(f"[CLOSING_RECHECK_ERROR] marketId={market_id} error={error}")
-            logger.error("Candidate failed but cycle continues: %s", error)
+            classification = classify_closing_recheck_provider_errors([str(error)])
+            logger.error("Candidate failed but cycle continues | classification=%s | error=%s", classification, error)
             continue
 
     print(
