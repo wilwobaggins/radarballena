@@ -189,7 +189,7 @@ def _normalize_market(market: Any) -> dict[str, Any]:
 
 def _normalize_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     market = _normalize_market(
-        _coalesce(candidate.get("market"), candidate.get("marketSnapshot"))
+        _coalesce(candidate.get("marketCurrent"), candidate.get("market"), candidate.get("marketSnapshot"))
         if isinstance(candidate, dict)
         else {}
     )
@@ -261,6 +261,11 @@ def _normalize_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
             latest_analysis.get("analysisId"),
         ),
         "market": market,
+        "marketCurrent": candidate.get("marketCurrent") if isinstance(candidate.get("marketCurrent"), dict) else market,
+        "probabilityScale": _coalesce(
+            candidate.get("probabilityScale"),
+            market.get("probabilityScale"),
+        ),
         "previousAnalysis": previous_analysis,
         "latestAnalysis": latest_analysis,
         "deltas": deltas,

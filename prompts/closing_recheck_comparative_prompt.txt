@@ -5,7 +5,7 @@ No reemplaza el prompt maestro normal de DeepEngine.
 
 OBJETIVO
 - Reevaluar el mercado con los mismos criterios del DeepEngine original.
-- Generar un nuevo radarScore.
+- Generar un nuevo AI Interpretive Score independiente.
 - Comparar el nuevo analisis contra el analisis previo.
 - Explicar por que el score subio, bajo o se mantuvo.
 - Detectar contradiccion, debilitamiento, cambio radical o vigencia de la tesis anterior.
@@ -16,6 +16,10 @@ REGLAS ESPECIFICAS DEL MODO CLOSING_RECHECK
 - No copies automaticamente el score anterior.
 - Las probabilidades del input vienen expresadas en puntos porcentuales de 0 a 100.
 - No promedies por inercia.
+- No calcules el finalRadarScore.
+- No apliques la formula 40/60.
+- No copies el preliminaryRadarScore.
+- Devuelve un AI Interpretive Score independiente de 0 a 100.
 - Si el snapshot previo es insuficiente, marca INSUFFICIENT_SNAPSHOT.
 - Si el nuevo contexto y la tesis anterior apuntan en direcciones opuestas, marca CONTRADICTED.
 - Si la probabilidad, el radarScore o la evidencia cambian fuerte, marca RADICAL_CHANGE.
@@ -40,6 +44,12 @@ INPUT DEL CIERRE
 MERCADO:
 {{MERCADO}}
 
+NEW_PRELIMINARY_RADAR_SCORE:
+{{NEW_PRELIMINARY_RADAR_SCORE}}
+
+NEW_PRELIMINARY_SCORE_BREAKDOWN:
+{{NEW_PRELIMINARY_SCORE_BREAKDOWN}}
+
 PREVIOUS_ANALYSIS:
 {{PREVIOUS_ANALYSIS}}
 
@@ -58,6 +68,12 @@ CAPITAL_TRAIL:
 MARKET_SNAPSHOT:
 {{MARKET_SNAPSHOT}}
 
+SCORE_PARITY:
+{{SCORE_PARITY}}
+
+CONTEXT_SOURCE:
+{{CONTEXT_SOURCE}}
+
 REGLAS DE SALIDA
 - Devuelve exclusivamente JSON valido.
 - No agregues markdown.
@@ -67,54 +83,15 @@ REGLAS DE SALIDA
 - Si el cambio no es material, manten la lectura compacta.
 - Si hay conflicto entre tesis antigua y contexto actual, dilo explicitamente.
 - Si hay poca evidencia, reduce la confianza.
+- No calcules el finalRadarScore.
+- No apliques la formula 40/60.
+- No copies el preliminaryRadarScore.
+- Devuelve solo el AI Interpretive Score independiente y la comparacion.
 
 Devuelve exactamente este JSON:
 
 {
-  "analysisMode": "closing_recheck",
-  "marketId": "",
-  "previousAnalysisId": null,
-  "latestAnalysisId": "",
-  "closingContext": {
-    "daysToClose": null,
-    "closingTime": null
-  },
-  "reevaluation": {
-    "previousRadarScore": null,
-    "newRadarScore": 0,
-    "radarScoreDelta": null,
-    "previousSignalLabel": null,
-    "newSignalLabel": "",
-    "scoreDirection": "UNCHANGED",
-    "scoreChangeMagnitude": "LOW",
-    "scoreChangeReasons": []
-  },
-  "metricBreakdown": {
-    "signalStrength": {
-      "score": 0,
-      "reason": ""
-    },
-    "informationQuality": {
-      "score": 0,
-      "reason": ""
-    },
-    "marketConsistency": {
-      "score": 0,
-      "reason": ""
-    },
-    "timingAndClosureRisk": {
-      "score": 0,
-      "reason": ""
-    },
-    "noiseRisk": {
-      "score": 0,
-      "reason": ""
-    },
-    "capitalTrailImpact": {
-      "score": null,
-      "reason": ""
-    }
-  },
+  "newAiInterpretiveScore": 0,
   "comparison": {
     "previousThesis": null,
     "latestThesis": null,
@@ -126,10 +103,11 @@ Devuelve exactamente este JSON:
     "probabilityChangeSincePreviousAnalysis": null,
     "radarScoreChangeSincePreviousAnalysis": null
   },
-  "recheckStatus": "INSUFFICIENT_SNAPSHOT",
-  "importance": "LOW",
+  "updatedThesis": "",
   "recommendation": "",
-  "thesis": "",
+  "recheckStatus": "INSUFFICIENT_SNAPSHOT",
   "confidence": 0,
-  "riskFlags": []
+  "riskFlags": [],
+  "whatChanged": [],
+  "whatStayedTheSame": []
 }

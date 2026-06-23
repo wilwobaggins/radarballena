@@ -269,6 +269,9 @@ def _build_deltas(candidate: dict[str, Any]) -> dict[str, Any]:
 
 def normalize_closing_recheck_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     market = _build_market(candidate)
+    market_current = candidate.get("marketCurrent")
+    if not isinstance(market_current, dict):
+        market_current = {}
     previous_analysis = _build_previous_analysis(candidate)
     latest_analysis = _build_latest_analysis(candidate)
 
@@ -299,6 +302,15 @@ def normalize_closing_recheck_candidate(candidate: dict[str, Any]) -> dict[str, 
             candidate.get("latestAnalysisId"), latest_analysis.get("analysisId")
         ),
         "market": market,
+        "marketCurrent": market_current,
+        "probabilityScale": _coalesce(
+            candidate.get("probabilityScale"),
+            market_current.get("probabilityScale"),
+            market.get("probabilityScale"),
+            candidate.get("marketSnapshot", {}).get("probabilityScale")
+            if isinstance(candidate.get("marketSnapshot"), dict)
+            else None,
+        ),
         "previousAnalysis": previous_analysis,
         "latestAnalysis": latest_analysis,
         "deltas": _build_deltas(candidate),

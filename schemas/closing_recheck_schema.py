@@ -76,6 +76,46 @@ class Comparison(BaseModel):
     radarScoreChangeSincePreviousAnalysis: float | None = None
 
 
+class ScoreParity(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    formula: str
+    baselineAnalysisId: str | None = None
+    previousPreliminaryRadarScore: float | None = None
+    newPreliminaryRadarScore: float | None = None
+    preliminaryRadarScoreDelta: float | None = None
+    previousAiInterpretiveScore: float | None = None
+    newAiInterpretiveScore: float | None = None
+    aiInterpretiveScoreDelta: float | None = None
+    previousFinalRadarScore: float | None = None
+    newFinalRadarScore: float | None = None
+    finalRadarScoreDelta: float | None = None
+    previousScoreBreakdown: dict | None = None
+    newScoreBreakdown: dict | None = None
+    hybridScoreBreakdown: dict | None = None
+
+
+class ClosingRecheckModelOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    newAiInterpretiveScore: int = Field(ge=0, le=100)
+    comparison: Comparison
+    updatedThesis: str
+    recommendation: str
+    recheckStatus: RecheckStatus
+    confidence: int = Field(ge=0, le=100)
+    riskFlags: list[str]
+    whatChanged: list[str]
+    whatStayedTheSame: list[str]
+
+    @field_validator("recommendation", "updatedThesis")
+    @classmethod
+    def validate_non_empty_text(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("Campo obligatorio vacio")
+        return value.strip()
+
+
 class ClosingRecheckSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -93,6 +133,7 @@ class ClosingRecheckSchema(BaseModel):
     thesis: str
     confidence: int = Field(ge=0, le=100)
     riskFlags: list[str]
+    scoreParity: ScoreParity | None = None
 
     @field_validator("recommendation", "thesis")
     @classmethod

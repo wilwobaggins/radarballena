@@ -13,7 +13,7 @@ except ImportError:  # pragma: no cover - optional dependency
     genai = None
     genai_types = None
 
-from schemas.closing_recheck_schema import ClosingRecheckResult
+from schemas.closing_recheck_schema import ClosingRecheckModelOutput, ClosingRecheckResult
 from services.closing_recheck_prompt_builder import build_closing_recheck_prompt
 from services.closing_recheck_repository import (
     compute_prompt_hash,
@@ -24,6 +24,11 @@ from services.closing_recheck_repository import (
 )
 from services.closing_recheck_candidate_normalizer import (
     normalize_closing_recheck_candidate,
+)
+from services.closing_recheck_scoring import (
+    build_current_market_for_scoring,
+    calculate_current_hybrid_score,
+    calculate_current_preliminary_score,
 )
 from services.deepbrief_generator import (
     SYSTEM_INSTRUCTION,
@@ -37,6 +42,7 @@ from services.deepbrief_generator import (
 from services.logger_service import get_logger
 from services.market_filter import get_market_open_status
 from services.scoring_service import days_to_close
+from services.scoring_service import get_signal_label_for_final_score, safe_float
 
 
 load_dotenv()
@@ -268,11 +274,13 @@ def _build_recheck_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
 
 def _build_prompt_inputs(candidate: dict[str, Any]) -> dict[str, Any]:
     market = candidate.get("market") or {}
+    market_current = candidate.get("marketCurrent") or {}
     previous_analysis = candidate.get("previousAnalysis") or {}
     latest_analysis = candidate.get("latestAnalysis") or {}
 
     return {
         "market": market,
+        "market_current": market_current,
         "previous_analysis": previous_analysis,
         "latest_analysis": latest_analysis,
         "deltas": _build_deltas(candidate),
@@ -280,6 +288,122 @@ def _build_prompt_inputs(candidate: dict[str, Any]) -> dict[str, Any]:
         "capital_trail": candidate.get("capitalTrail"),
         "market_snapshot": _build_market_snapshot(candidate),
     }
+
+
+def _probability_scale_status(candidate: dict[str, Any]) -> str:
+    market_current = candidate.get("marketCurrent") or {}
+    market_snapshot = candidate.get("marketSnapshot") or {}
+    market = candidate.get("market") or {}
+    for source in (market_current, market_snapshot, market):
+        if not isinstance(source, dict):
+            continue
+        scale = source.get("probabilityScale")
+        if scale:
+            return str(scale)
+    return "unknown"
+
+
+def _current_market_source_label(candidate: dict[str, Any]) -> str:
+    market_current = candidate.get("marketCurrent")
+    if isinstance(market_current, dict) and market_current:
+        freshness = market_current.get("freshness") or {}
+        status = freshness.get("status") if isinstance(freshness, dict) else None
+        if status:
+            return str(status)
+        return "current"
+
+    market_snapshot = candidate.get("marketSnapshot")
+    if isinstance(market_snapshot, dict) and market_snapshot:
+        return "historical_fallback"
+
+    return "unknown"
+
+
+def _normalize_importance(value: Any, confidence: int | None) -> str:
+    normalized = str(value or "").strip().upper()
+    if normalized in {"LOW", "MEDIUM", "HIGH", "CRITICAL"}:
+        return normalized
+
+    if confidence is None:
+        return "LOW"
+    return "LOW" if confidence < 50 else "MEDIUM"
+
+
+def _fetch_updated_context(candidate: dict[str, Any], market_current: dict[str, Any]) -> tuple[list[dict[str, Any]], str]:
+    market_id = candidate.get("marketId") or (candidate.get("marketCurrent") or {}).get("marketId")
+    if market_id:
+        try:
+            from services.context_client import search_context
+
+            sources = search_context(
+                market={
+                    **market_current,
+                    "id": market_id,
+                },
+                max_results=3,
+            )
+            if sources:
+                return sources, "fresh_context"
+        except Exception as error:
+            logger.warning("Could not fetch fresh context | marketId=%s | error=%s", market_id, error)
+
+    latest_analysis = candidate.get("latestAnalysis") or {}
+    fallback_sources = latest_analysis.get("contextSources")
+    if isinstance(fallback_sources, list) and fallback_sources:
+        return fallback_sources, "latest_analysis_context_fallback"
+
+    return [], "no_context"
+
+
+def _build_score_parity(
+    *,
+    baseline_analysis: dict[str, Any],
+    previous_analysis: dict[str, Any],
+    previous_preliminary: float | None,
+    new_preliminary: float | None,
+    previous_ai: float | None,
+    new_ai: float | None,
+    previous_final: float | None,
+    new_final: float | None,
+    previous_breakdown: dict[str, Any] | None,
+    new_breakdown: dict[str, Any] | None,
+    hybrid_breakdown: dict[str, Any] | None,
+) -> dict[str, Any]:
+    return {
+        "formula": "final_radar_score = 0.40 preliminary_radar_score + 0.60 ai_interpretive_score",
+        "baselineAnalysisId": baseline_analysis.get("analysisId"),
+        "previousPreliminaryRadarScore": previous_preliminary,
+        "newPreliminaryRadarScore": new_preliminary,
+        "preliminaryRadarScoreDelta": None if previous_preliminary is None or new_preliminary is None else new_preliminary - previous_preliminary,
+        "previousAiInterpretiveScore": previous_ai,
+        "newAiInterpretiveScore": new_ai,
+        "aiInterpretiveScoreDelta": None if previous_ai is None or new_ai is None else new_ai - previous_ai,
+        "previousFinalRadarScore": previous_final,
+        "newFinalRadarScore": new_final,
+        "finalRadarScoreDelta": None if previous_final is None or new_final is None else new_final - previous_final,
+        "previousScoreBreakdown": previous_breakdown,
+        "newScoreBreakdown": new_breakdown,
+        "hybridScoreBreakdown": hybrid_breakdown,
+    }
+
+
+def _score_change_magnitude(delta: float | None) -> str:
+    if delta is None:
+        return "LOW"
+    magnitude = abs(delta)
+    if magnitude >= 20:
+        return "CRITICAL"
+    if magnitude >= 10:
+        return "HIGH"
+    if magnitude >= 5:
+        return "MEDIUM"
+    return "LOW"
+
+
+def _score_direction(delta: float | None) -> str:
+    if delta is None or delta == 0:
+        return "UNCHANGED"
+    return "UP" if delta > 0 else "DOWN"
 
 
 def _validate_candidate(candidate: dict[str, Any]) -> None:
@@ -368,17 +492,24 @@ def _is_json_repair_needed(error: Exception) -> bool:
 def _build_model_prompt(
     candidate: dict[str, Any],
     *,
+    new_preliminary: dict[str, Any],
+    score_parity: dict[str, Any] | None = None,
+    context_source: str | None = None,
     repair_note: str | None = None,
 ) -> tuple[str, str]:
     prompt_input = _build_prompt_inputs(candidate)
     prompt, prompt_source = build_closing_recheck_prompt(
-        market=prompt_input["market"],
+        market_current=prompt_input["market_current"] or build_current_market_for_scoring(candidate),
+        new_preliminary_radar_score=new_preliminary["preliminary_radar_score"],
+        new_preliminary_score_breakdown=new_preliminary["score_breakdown"],
         previous_analysis=prompt_input["previous_analysis"],
         latest_analysis=prompt_input["latest_analysis"],
         deltas=prompt_input["deltas"],
         recheck_candidate=prompt_input["recheck_candidate"],
         capital_trail=prompt_input["capital_trail"],
         market_snapshot=prompt_input["market_snapshot"],
+        score_parity=score_parity,
+        context_source=context_source,
         repair_note=repair_note,
     )
     return prompt, prompt_source
@@ -387,6 +518,9 @@ def _build_model_prompt(
 def call_closing_recheck_model_with_provider_sequence(
     *,
     candidate: dict[str, Any],
+    new_preliminary: dict[str, Any],
+    score_parity: dict[str, Any] | None,
+    context_source: str | None,
     max_retries: int,
 ) -> tuple[dict[str, Any], dict[str, Any], str, str]:
     primary_provider, provider_sequence = get_provider_sequence()
@@ -410,6 +544,9 @@ def call_closing_recheck_model_with_provider_sequence(
             if provider == "gemini":
                 deepbrief, raw_output = _call_gemini_model(
                     candidate=candidate,
+                    new_preliminary=new_preliminary,
+                    score_parity=score_parity,
+                    context_source=context_source,
                     max_retries=max_retries,
                     primary_provider=primary_provider,
                     fallback_used=is_fallback,
@@ -418,6 +555,9 @@ def call_closing_recheck_model_with_provider_sequence(
             else:
                 deepbrief, raw_output = _call_openai_model(
                     candidate=candidate,
+                    new_preliminary=new_preliminary,
+                    score_parity=score_parity,
+                    context_source=context_source,
                     max_retries=max_retries,
                     primary_provider=primary_provider,
                     fallback_used=is_fallback,
@@ -445,6 +585,9 @@ def call_closing_recheck_model_with_provider_sequence(
 def _call_openai_model(
     *,
     candidate: dict[str, Any],
+    new_preliminary: dict[str, Any],
+    score_parity: dict[str, Any] | None,
+    context_source: str | None,
     max_retries: int,
     primary_provider: str,
     fallback_used: bool,
@@ -462,7 +605,13 @@ def _call_openai_model(
             if last_error:
                 repair_note += f"\n\nError anterior:\n{last_error}"
 
-        prompt, prompt_source = _build_model_prompt(candidate, repair_note=repair_note)
+        prompt, prompt_source = _build_model_prompt(
+            candidate,
+            new_preliminary=new_preliminary,
+            score_parity=score_parity,
+            context_source=context_source,
+            repair_note=repair_note,
+        )
 
         try:
             response = client.responses.parse(
@@ -471,14 +620,14 @@ def _call_openai_model(
                     {"role": "system", "content": SYSTEM_INSTRUCTION},
                     {"role": "user", "content": prompt},
                 ],
-                text_format=ClosingRecheckResult,
+                text_format=ClosingRecheckModelOutput,
             )
 
             parsed = response.output_parsed
             if parsed is None:
-                raise RuntimeError("El modelo no devolvio un ClosingRecheckResult valido")
+                raise RuntimeError("El modelo no devolvio un ClosingRecheckModelOutput valido")
 
-            validated = ClosingRecheckResult.model_validate(parsed.model_dump())
+            validated = ClosingRecheckModelOutput.model_validate(parsed.model_dump())
             attempts.append(
                 {
                     "provider": "openai",
@@ -533,6 +682,9 @@ def _call_openai_model(
 def _call_gemini_model(
     *,
     candidate: dict[str, Any],
+    new_preliminary: dict[str, Any],
+    score_parity: dict[str, Any] | None,
+    context_source: str | None,
     max_retries: int,
     primary_provider: str,
     fallback_used: bool,
@@ -553,7 +705,13 @@ def _call_gemini_model(
             if last_error:
                 repair_note += f"\n\nError anterior:\n{last_error}"
 
-        prompt, prompt_source = _build_model_prompt(candidate, repair_note=repair_note)
+        prompt, prompt_source = _build_model_prompt(
+            candidate,
+            new_preliminary=new_preliminary,
+            score_parity=score_parity,
+            context_source=context_source,
+            repair_note=repair_note,
+        )
 
         try:
             response = client.models.generate_content(
@@ -562,7 +720,7 @@ def _call_gemini_model(
                 config=genai_types.GenerateContentConfig(
                     system_instruction=SYSTEM_INSTRUCTION,
                     response_mime_type="application/json",
-                    response_schema=ClosingRecheckResult,
+                    response_schema=ClosingRecheckModelOutput,
                 ),
             )
 
@@ -580,7 +738,7 @@ def _call_gemini_model(
 
                 payload = json.loads(response_text)
 
-            validated = ClosingRecheckResult.model_validate(payload)
+            validated = ClosingRecheckModelOutput.model_validate(payload)
             attempts.append(
                 {
                     "provider": "gemini",
@@ -649,6 +807,46 @@ def run_closing_recheck_for_candidate(
 
     market_id = normalized["marketId"]
     latest_analysis_id = normalized["latestAnalysisId"]
+    current_market = build_current_market_for_scoring(normalized)
+    probability_scale = _probability_scale_status(normalized)
+    freshness_status = _current_market_source_label(normalized)
+    logger.info(
+        "[CLOSING_RECHECK_SCORING] marketId=%s freshness=%s probabilityScale=%s",
+        market_id,
+        freshness_status,
+        probability_scale,
+    )
+    new_preliminary = calculate_current_preliminary_score(normalized)
+
+    latest_analysis = normalized.get("latestAnalysis") or {}
+    previous_analysis = normalized.get("previousAnalysis") or {}
+    latest_preliminary = _as_float(latest_analysis.get("preliminaryRadarScore"))
+    if latest_preliminary is None:
+        latest_preliminary = _as_float(latest_analysis.get("preliminary_radar_score"))
+    latest_ai = _as_float(latest_analysis.get("aiInterpretiveScore"))
+    if latest_ai is None:
+        latest_ai = _as_float(latest_analysis.get("ai_interpretive_score"))
+    latest_final = _as_float(latest_analysis.get("finalRadarScore"))
+    if latest_final is None:
+        latest_final = _as_float(latest_analysis.get("radarScore"))
+    if latest_final is None:
+        latest_final = _as_float(latest_analysis.get("final_radar_score"))
+
+    previous_preliminary = _as_float(previous_analysis.get("preliminaryRadarScore"))
+    if previous_preliminary is None:
+        previous_preliminary = _as_float(previous_analysis.get("preliminary_radar_score"))
+    previous_ai = _as_float(previous_analysis.get("aiInterpretiveScore"))
+    if previous_ai is None:
+        previous_ai = _as_float(previous_analysis.get("ai_interpretive_score"))
+    previous_final = _as_float(previous_analysis.get("finalRadarScore"))
+    if previous_final is None:
+        previous_final = _as_float(previous_analysis.get("radarScore"))
+    if previous_final is None:
+        previous_final = _as_float(previous_analysis.get("final_radar_score"))
+
+    context_sources, context_source_label = _fetch_updated_context(normalized, current_market)
+    if not context_sources and context_source_label == "no_context":
+        context_sources = []
 
     existing_same_analysis = get_closing_recheck_by_market_and_latest_analysis(
         market_id=market_id,
@@ -676,7 +874,26 @@ def run_closing_recheck_for_candidate(
             "existing": recent_recheck,
         }
 
-    prompt, prompt_source = _build_model_prompt(normalized)
+    score_parity_preview = _build_score_parity(
+        baseline_analysis=latest_analysis or previous_analysis,
+        previous_analysis=previous_analysis,
+        previous_preliminary=latest_preliminary,
+        new_preliminary=new_preliminary.get("preliminary_radar_score"),
+        previous_ai=latest_ai,
+        new_ai=None,
+        previous_final=latest_final,
+        new_final=None,
+        previous_breakdown=latest_analysis.get("score_breakdown"),
+        new_breakdown=new_preliminary.get("score_breakdown"),
+        hybrid_breakdown=None,
+    )
+
+    prompt, prompt_source = _build_model_prompt(
+        normalized,
+        new_preliminary=new_preliminary,
+        score_parity=score_parity_preview,
+        context_source=context_source_label,
+    )
     prompt_hash = _build_prompt_hash(prompt)
 
     existing_same_prompt = get_closing_recheck_by_prompt_hash_for_market(
@@ -697,12 +914,117 @@ def run_closing_recheck_for_candidate(
     try:
         result_payload, raw_output, provider, model = call_closing_recheck_model_with_provider_sequence(
             candidate=normalized,
+            new_preliminary=new_preliminary,
+            score_parity=score_parity_preview,
+            context_source=context_source_label,
             max_retries=max_retries,
         )
     except ClosingRecheckQuotaExceeded:
         raise
 
-    validated = ClosingRecheckResult.model_validate(result_payload)
+    model_output = ClosingRecheckModelOutput.model_validate(result_payload)
+
+    new_hybrid = calculate_current_hybrid_score(
+        preliminary_radar_score=new_preliminary.get("preliminary_radar_score"),
+        ai_interpretive_score=model_output.newAiInterpretiveScore,
+    )
+    new_final = new_hybrid["final_radar_score"]
+    score_parity = _build_score_parity(
+        baseline_analysis=latest_analysis or previous_analysis,
+        previous_analysis=previous_analysis,
+        previous_preliminary=latest_preliminary,
+        new_preliminary=new_preliminary.get("preliminary_radar_score"),
+        previous_ai=latest_ai,
+        new_ai=model_output.newAiInterpretiveScore,
+        previous_final=latest_final,
+        new_final=new_final,
+        previous_breakdown=latest_analysis.get("score_breakdown"),
+        new_breakdown=new_preliminary.get("score_breakdown"),
+        hybrid_breakdown=new_hybrid["score_breakdown"],
+    )
+
+    previous_radar_score = latest_final
+    radar_score_delta = None if previous_radar_score is None else new_final - previous_radar_score
+    score_direction = _score_direction(radar_score_delta)
+    score_change_magnitude = _score_change_magnitude(radar_score_delta)
+    new_signal_label = get_signal_label_for_final_score(new_final)
+
+    reevaluation = {
+        "previousRadarScore": previous_radar_score,
+        "newRadarScore": new_final,
+        "radarScoreDelta": radar_score_delta,
+        "previousSignalLabel": latest_analysis.get("signalLabel") or previous_analysis.get("signalLabel"),
+        "newSignalLabel": new_signal_label,
+        "scoreDirection": score_direction,
+        "scoreChangeMagnitude": score_change_magnitude,
+        "scoreChangeReasons": model_output.whatChanged or [model_output.recommendation],
+    }
+
+    comparison = {
+        "previousThesis": latest_analysis.get("thesis") or previous_analysis.get("thesis"),
+        "latestThesis": latest_analysis.get("thesis"),
+        "newThesis": model_output.updatedThesis,
+        "whatChanged": model_output.whatChanged,
+        "whatStayedTheSame": model_output.whatStayedTheSame,
+        "contradictionDetected": model_output.recheckStatus == "CONTRADICTED",
+        "contradictionExplanation": next((flag for flag in model_output.riskFlags if "contrad" in flag.lower()), None),
+        "probabilityChangeSincePreviousAnalysis": _as_float(
+            (normalized.get("deltas") or {}).get("probabilityChangeSincePreviousAnalysis")
+        ),
+        "radarScoreChangeSincePreviousAnalysis": _as_float(
+            (normalized.get("deltas") or {}).get("radarScoreChangeSincePreviousAnalysis")
+        ),
+    }
+
+    metric_breakdown = {
+        "signalStrength": {
+            "score": new_hybrid["ai_interpretive_score"],
+            "reason": "Derived from the model AI interpretive score.",
+        },
+        "informationQuality": {
+            "score": new_preliminary["score_breakdown"].get("resolution_score"),
+            "reason": "Derived from code using resolution score.",
+        },
+        "marketConsistency": {
+            "score": new_preliminary["score_breakdown"].get("narrative_score"),
+            "reason": "Derived from code using narrative score.",
+        },
+        "timingAndClosureRisk": {
+            "score": new_preliminary["score_breakdown"].get("time_to_close_score"),
+            "reason": "Derived from code using time-to-close score.",
+        },
+        "noiseRisk": {
+            "score": new_preliminary["score_breakdown"].get("liquidity_score"),
+            "reason": "Derived from code using liquidity score as a noise proxy.",
+        },
+        "capitalTrailImpact": {
+            "score": None,
+            "reason": "No capital trail score computed.",
+        },
+    }
+
+    validated = ClosingRecheckResult.model_validate(
+        {
+            "analysisMode": "closing_recheck",
+            "marketId": market_id,
+            "previousAnalysisId": normalized["previousAnalysisId"],
+            "latestAnalysisId": latest_analysis_id,
+            "closingContext": {
+                "daysToClose": current_market.get("daysToClose"),
+                "closingTime": current_market.get("close_date") or current_market.get("closeDate") or current_market.get("closingTime"),
+            },
+            "reevaluation": reevaluation,
+            "metricBreakdown": metric_breakdown,
+            "comparison": comparison,
+            "recheckStatus": model_output.recheckStatus,
+            "importance": _normalize_importance(normalized.get("recheckPriority"), model_output.confidence),
+            "recommendation": model_output.recommendation,
+            "thesis": model_output.updatedThesis,
+            "confidence": model_output.confidence,
+            "riskFlags": model_output.riskFlags,
+            "scoreParity": score_parity,
+        }
+    )
 
     saved_row = None
     if persist:
