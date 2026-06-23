@@ -8,6 +8,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from services.closing_recheck_scoring import calculate_current_preliminary_score
 from services.closing_recheck_prompt_builder import build_closing_recheck_prompt
 
 
@@ -99,7 +100,16 @@ def build_debug_input(market_id: str) -> dict[str, Any]:
     }
 
     return {
-        "market": market,
+        "market_current": {
+            **market,
+            "probabilityScale": "percent_0_100",
+            "current_probability": 87.5,
+            "previous_probability_24h": 89.5,
+            "probability_change_24h": -2,
+            "volume": 1845000,
+            "liquidity": 412300,
+            "outcomes": ["Yes", "No"],
+        },
         "previousAnalysis": previous_analysis,
         "latestAnalysis": latest_analysis,
         "deltas": {
@@ -158,13 +168,15 @@ def validate_rendered_prompt(prompt: str) -> None:
         "MEDIUM",
         "Metodologias internas obligatorias",
         "Las probabilidades del input vienen expresadas en puntos porcentuales de 0 a 100.",
+        "newAiInterpretiveScore",
+        "new preliminary radar score",
+        "score breakdown actual",
         "probabilityChangeSincePreviousAnalysis",
         "radarScoreChangeSincePreviousAnalysis",
         "daysToClose",
         "recheckStatus",
         "recheckPriority",
         "recheckReasons",
-        "newRadarScore",
         "scoreChangeReasons",
     ]
 
@@ -172,6 +184,9 @@ def validate_rendered_prompt(prompt: str) -> None:
 
     if prompt.count("Metodologias internas obligatorias") != 1:
         raise RuntimeError("Los criterios DeepEngine aparecen duplicados o ausentes.")
+
+    if "finalRadarScore" in prompt or "calcular el score final" in prompt.lower():
+        raise RuntimeError("El prompt no debe pedir al modelo calcular el score final.")
 
     if missing:
         raise RuntimeError(
@@ -198,14 +213,22 @@ def main() -> None:
     args = parser.parse_args()
 
     input_data = build_debug_input(args.market_id)
+    new_preliminary = calculate_current_preliminary_score(input_data)
     prompt, prompt_source = build_closing_recheck_prompt(
-        market=input_data["market"],
+        market_current=input_data["market_current"],
+        new_preliminary_radar_score=new_preliminary["preliminary_radar_score"],
+        new_preliminary_score_breakdown=new_preliminary["score_breakdown"],
         previous_analysis=input_data["previousAnalysis"],
         latest_analysis=input_data["latestAnalysis"],
         deltas=input_data["deltas"],
         recheck_candidate=input_data["recheckCandidate"],
         capital_trail=input_data["capitalTrail"],
         market_snapshot=input_data["marketSnapshot"],
+        score_parity={
+            "formula": "final_radar_score = 0.40 preliminary_radar_score + 0.60 ai_interpretive_score",
+            "baselineAnalysisId": input_data["latestAnalysis"]["analysisId"],
+        },
+        context_source="fresh_context",
     )
 
     validate_rendered_prompt(prompt)

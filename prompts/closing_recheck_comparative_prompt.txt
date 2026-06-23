@@ -14,6 +14,7 @@ REGLAS ESPECIFICAS DEL MODO CLOSING_RECHECK
 - Usa analysisMode = "closing_recheck" como marco mental.
 - Relee el mercado desde cero con el contexto actual y el snapshot previo.
 - No copies automaticamente el score anterior.
+- Usa el new preliminary radar score calculado en codigo y revisa el score breakdown actual.
 - Las probabilidades del input vienen expresadas en puntos porcentuales de 0 a 100.
 - No promedies por inercia.
 - No calcules el finalRadarScore.
