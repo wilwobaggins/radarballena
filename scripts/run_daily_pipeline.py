@@ -10,7 +10,12 @@ from typing import Any
 
 from services import supabase_service as db
 from services.context_client import search_context
+from services.deterministic_deepbrief_persistence import (
+    has_recent_deterministic_fallback,
+    persist_deterministic_deepbrief,
+)
 from services.deepbrief_generator import (
+    AllDeepBriefProvidersFailedError,
     build_raw_market_input,
     generate_deepbrief_for_market,
 )
@@ -106,6 +111,108 @@ def env_int(name: str, default: int) -> int:
         return int(value)
     except ValueError:
         return default
+
+
+def env_positive_int(name: str, default: int) -> int:
+    value = env_int(name, default)
+    return value if value > 0 else default
+
+
+def env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+
+    if value is None or value == "":
+        return default
+
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+
+    return default
+
+
+def deterministic_fallback_enabled() -> bool:
+    return env_bool("DETERMINISTIC_FALLBACK_ENABLED", False)
+
+
+def deterministic_fallback_freshness_hours() -> int:
+    return env_positive_int("DETERMINISTIC_FALLBACK_FRESHNESS_HOURS", 24)
+
+
+def maybe_persist_deterministic_fallback(
+    *,
+    market: dict[str, Any],
+    pipeline_run_id: str,
+    provider_attempts: list[dict[str, Any]] | None,
+    fallback_reason: str,
+) -> dict[str, Any]:
+    market_id = market.get("id")
+    enabled = deterministic_fallback_enabled()
+    freshness_hours = deterministic_fallback_freshness_hours()
+
+    logger.info(
+        "[DETERMINISTIC_FALLBACK] marketId=%s enabled=%s trigger=%s",
+        market_id,
+        enabled,
+        fallback_reason,
+    )
+
+    if not enabled:
+        return {"status": "disabled", "reason": "deterministic_fallback_disabled"}
+
+    if market_id and has_recent_deterministic_fallback(
+        db=db,
+        market_db_id=market_id,
+        hours=freshness_hours,
+    ):
+        logger.info(
+            "[DETERMINISTIC_FALLBACK] marketId=%s action=skipped_recent freshnessHours=%s",
+            market_id,
+            freshness_hours,
+        )
+        return {
+            "status": "skipped",
+            "reason": "skipped_recent_deterministic",
+            "marketId": market_id,
+        }
+
+    try:
+        saved_row = persist_deterministic_deepbrief(
+            db=db,
+            market_db_id=market_id,
+            market=market,
+            preliminary_score=market.get("preliminary_radar_score"),
+            score_breakdown=market.get("score_breakdown") or {},
+            selection_reason=market.get("selection_reason"),
+            fallback_reason=fallback_reason,
+            pipeline_run_id=pipeline_run_id,
+            provider_attempts=provider_attempts or [],
+        )
+        logger.info(
+            "[DETERMINISTIC_FALLBACK] marketId=%s action=persisted deepbriefId=%s",
+            market_id,
+            saved_row.get("id"),
+        )
+        return {
+            "status": "saved",
+            "saved_row": saved_row,
+            "deepbrief": saved_row,
+            "marketId": market_id,
+        }
+    except Exception as error:
+        logger.error(
+            "[DETERMINISTIC_FALLBACK] marketId=%s action=failed errorType=persistence_error error=%s",
+            market_id,
+            error,
+        )
+        register_pipeline_error(
+            error=error,
+            market=market,
+            stage="deterministic_fallback_persist",
+        )
+        raise
 
 
 def register_pipeline_error(
@@ -617,10 +724,26 @@ def generate_deepbrief(
         market.get("preliminary_radar_score"),
     )
 
-    deepbrief, raw_output = generate_deepbrief_for_market(
-        market=market,
-        context_sources=context_sources,
-    )
+    try:
+        deepbrief, raw_output = generate_deepbrief_for_market(
+            market=market,
+            context_sources=context_sources,
+        )
+    except AllDeepBriefProvidersFailedError as error:
+        fallback_result = maybe_persist_deterministic_fallback(
+            market=market,
+            pipeline_run_id=pipeline_run_id,
+            provider_attempts=getattr(error, "attempts", []),
+            fallback_reason=getattr(error, "classification", "all_llm_providers_unavailable"),
+        )
+
+        if fallback_result.get("status") == "saved":
+            return fallback_result["saved_row"]
+
+        if fallback_result.get("status") == "skipped":
+            return fallback_result
+
+        raise
 
     logger.info(
         "Prompt usado | market=%s | source=%s | provider=%s | fallback_used=%s",
@@ -999,11 +1122,15 @@ def main():
                     len(context_sources),
                 )
 
-                generate_deepbrief(
+                result = generate_deepbrief(
                     market=market,
                     context_sources=context_sources,
                     pipeline_run_id=pipeline_run_id,
                 )
+
+                if isinstance(result, dict) and result.get("status") == "skipped":
+                    skipped_recent_deepbrief_count += 1
+                    continue
 
                 deepbriefs_generated += 1
                 markets_analyzed += 1

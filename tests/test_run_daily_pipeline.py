@@ -388,6 +388,82 @@ def test_generate_deepbrief_applies_postprocess_for_novelty_anchor(monkeypatch, 
     }
 
 
+def test_generate_deepbrief_uses_deterministic_fallback_when_all_llm_providers_fail(monkeypatch):
+    market = build_market("Will BTC hit 130k this quarter?", "crypto", 43)
+    context_sources = [{"sourceTitle": "source"}] * 3
+
+    monkeypatch.setenv("DETERMINISTIC_FALLBACK_ENABLED", "true")
+    monkeypatch.setenv("DETERMINISTIC_FALLBACK_FRESHNESS_HOURS", "24")
+
+    def fake_generate_deepbrief_for_market(**kwargs):
+        raise run_daily_pipeline.AllDeepBriefProvidersFailedError(
+            "Todos los proveedores LLM fallaron: openai, gemini",
+            attempts=[
+                {"provider": "openai", "status": "failed", "message": "openai"},
+                {"provider": "gemini", "status": "failed", "message": "gemini"},
+            ],
+            classification="all_llm_providers_unavailable",
+        )
+
+    saved_payloads: list[dict] = []
+
+    monkeypatch.setattr(
+        run_daily_pipeline,
+        "generate_deepbrief_for_market",
+        fake_generate_deepbrief_for_market,
+    )
+    monkeypatch.setattr(run_daily_pipeline, "has_recent_deterministic_fallback", lambda **kwargs: False)
+    monkeypatch.setattr(
+        run_daily_pipeline,
+        "persist_deterministic_deepbrief",
+        lambda **kwargs: saved_payloads.append(kwargs) or {
+            "id": "deepbrief-deterministic",
+            "rawOutput": {"provider": "deterministic", "generation_mode": "deterministic_fallback"},
+            "aiInterpretiveScore": None,
+            "finalRadarScore": 43,
+        },
+    )
+
+    result = run_daily_pipeline.generate_deepbrief(
+        market=market,
+        context_sources=context_sources,
+        pipeline_run_id="pipeline-run-4",
+    )
+
+    assert result["id"] == "deepbrief-deterministic"
+    assert saved_payloads[0]["fallback_reason"] == "all_llm_providers_unavailable"
+    assert saved_payloads[0]["pipeline_run_id"] == "pipeline-run-4"
+
+
+def test_generate_deepbrief_skips_recent_deterministic_fallback(monkeypatch):
+    market = build_market("Will BTC hit 130k this quarter?", "crypto", 43)
+    context_sources = [{"sourceTitle": "source"}] * 3
+
+    monkeypatch.setenv("DETERMINISTIC_FALLBACK_ENABLED", "true")
+    monkeypatch.setattr(
+        run_daily_pipeline,
+        "generate_deepbrief_for_market",
+        lambda **kwargs: (_ for _ in ()).throw(
+            run_daily_pipeline.AllDeepBriefProvidersFailedError(
+                "Todos los proveedores LLM fallaron: openai, gemini",
+                attempts=[],
+                classification="all_llm_providers_unavailable",
+            )
+        ),
+    )
+    monkeypatch.setattr(run_daily_pipeline, "has_recent_deterministic_fallback", lambda **kwargs: True)
+    monkeypatch.setattr(run_daily_pipeline, "persist_deterministic_deepbrief", lambda **kwargs: (_ for _ in ()).throw(AssertionError("no deberia persistir")))
+
+    result = run_daily_pipeline.generate_deepbrief(
+        market=market,
+        context_sources=context_sources,
+        pipeline_run_id="pipeline-run-5",
+    )
+
+    assert result["status"] == "skipped"
+    assert result["reason"] == "skipped_recent_deterministic"
+
+
 def test_save_results_persists_deepsignal_prediction(monkeypatch, caplog):
     saved_predictions: list[dict] = []
 
@@ -524,3 +600,57 @@ def test_main_uses_attempt_pool_and_continues_after_skips(monkeypatch, caplog):
     assert "SKIPPED_RECENT_DEEPBRIEF_COUNT | count=1" in caplog.text
     assert "SKIPPED_CONTEXT_INSUFFICIENT_COUNT | count=1" in caplog.text
     assert "TARGET_DEEPBRIEFS_GENERATED | generated=2 | target=2" in caplog.text
+
+
+def test_main_counts_deterministic_fallback_as_generated(monkeypatch):
+    monkeypatch.setenv("DAILY_PIPELINE_TOP_N", "1")
+    monkeypatch.setenv("DAILY_PIPELINE_ATTEMPT_POOL", "1")
+    monkeypatch.setenv("DETERMINISTIC_FALLBACK_ENABLED", "true")
+
+    selected_markets = [build_market("Fallback market", "crypto", 99)]
+    finished_runs: list[dict] = []
+
+    class FakeDb:
+        def get_recent_deepbrief(self, market_db_id: str, hours: int):
+            return None
+
+        def finish_pipeline_run(self, **kwargs):
+            finished_runs.append(kwargs)
+
+    def fake_generate_deepbrief_for_market(**kwargs):
+        raise run_daily_pipeline.AllDeepBriefProvidersFailedError(
+            "Todos los proveedores LLM fallaron: openai, gemini",
+            attempts=[],
+            classification="all_llm_providers_unavailable",
+        )
+
+    monkeypatch.setattr(run_daily_pipeline, "start_pipeline_run", lambda: {"id": "pipeline-2"})
+    monkeypatch.setattr(run_daily_pipeline, "fetch_markets", lambda: selected_markets)
+    monkeypatch.setattr(run_daily_pipeline, "save_snapshots", lambda markets: markets)
+    monkeypatch.setattr(
+        run_daily_pipeline,
+        "filter_markets",
+        lambda markets: (markets, {"eligible_after_filters": len(markets)}),
+    )
+    monkeypatch.setattr(run_daily_pipeline, "score_market_batch", lambda markets: markets)
+    monkeypatch.setattr(run_daily_pipeline, "select_top_markets", lambda markets, limit=None: markets)
+    monkeypatch.setattr(run_daily_pipeline, "db", FakeDb())
+    monkeypatch.setattr(run_daily_pipeline, "fetch_context", lambda market, min_sources=3: [{"sourceTitle": "s1"}] * 3)
+    monkeypatch.setattr(run_daily_pipeline, "generate_deepbrief_for_market", fake_generate_deepbrief_for_market)
+    monkeypatch.setattr(run_daily_pipeline, "has_recent_deterministic_fallback", lambda **kwargs: False)
+    monkeypatch.setattr(
+        run_daily_pipeline,
+        "persist_deterministic_deepbrief",
+        lambda **kwargs: {
+            "id": "deepbrief-deterministic",
+            "rawOutput": {"provider": "deterministic", "generation_mode": "deterministic_fallback"},
+            "aiInterpretiveScore": None,
+            "finalRadarScore": 99,
+        },
+    )
+    monkeypatch.setattr(run_daily_pipeline, "register_pipeline_error", lambda **kwargs: None)
+
+    run_daily_pipeline.main()
+
+    assert finished_runs[0]["deepbriefs_generated"] == 1
+    assert finished_runs[0]["markets_analyzed"] == 1

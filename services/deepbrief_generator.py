@@ -1,4 +1,5 @@
 import json
+import copy
 import os
 from pathlib import Path
 from typing import Any
@@ -35,7 +36,7 @@ SYSTEM_INSTRUCTION = (
     "Distingue informacion nueva, informacion ya descontada y ruido."
 )
 
-SUPPORTED_PROVIDERS = {"openai", "gemini"}
+SUPPORTED_PROVIDERS = {"openai", "gemini", "groq"}
 
 FALLBACK_MASTER_PROMPT = """
 Eres DeepSignal Engine, un sistema de inteligencia estrategica para mercados de prediccion.
@@ -95,6 +96,55 @@ class ProviderGenerationError(RuntimeError):
         self.message = message
 
 
+class AllDeepBriefProvidersFailedError(RuntimeError):
+    def __init__(
+        self,
+        message: str,
+        *,
+        attempts: list[dict[str, Any]] | None = None,
+        classification: str = "all_llm_providers_failed",
+    ) -> None:
+        super().__init__(message)
+        self.attempts = attempts or []
+        self.classification = classification
+        self.message = message
+
+
+def _sanitize_attempts(attempts: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    sanitized: list[dict[str, Any]] = []
+    for attempt in attempts or []:
+        if not isinstance(attempt, dict):
+            continue
+        sanitized.append(
+            {
+                "provider": attempt.get("provider"),
+                "model": attempt.get("model"),
+                "status": attempt.get("status"),
+                "attempt": attempt.get("attempt"),
+                "error_type": attempt.get("error_type"),
+                "fallback_used": attempt.get("fallback_used"),
+                "message": attempt.get("message") or attempt.get("error"),
+            }
+        )
+    return sanitized
+
+
+def _classify_provider_attempts(attempts: list[dict[str, Any]] | None) -> str:
+    normalized = [str(item.get("error", item.get("message", ""))).lower() for item in attempts or []]
+    if not normalized:
+        return "all_llm_providers_failed"
+
+    if all("quota" in item or "insufficient_quota" in item or "rate limit" in item for item in normalized):
+        return "all_llm_providers_quota_exhausted"
+    if any("schema" in item or "additional_properties" in item or "invalid_argument" in item for item in normalized):
+        return "provider_schema_error"
+    if any("auth" in item or "unauthorized" in item or "api key" in item for item in normalized):
+        return "provider_auth_error"
+    if any("timeout" in item or "network" in item or "connection" in item or "transient" in item for item in normalized):
+        return "provider_transient_error"
+    return "all_llm_providers_failed"
+
+
 def parse_env_bool(name: str, default: bool) -> bool:
     value = os.getenv(name)
 
@@ -112,7 +162,7 @@ def normalize_provider_name(value: str | None, default: str) -> str:
 def redact_secret_values(message: str) -> str:
     sanitized = str(message)
 
-    for env_name in ("OPENAI_API_KEY", "GEMINI_API_KEY"):
+    for env_name in ("OPENAI_API_KEY", "GEMINI_API_KEY", "GROQ_API_KEY"):
         secret = os.getenv(env_name)
 
         if secret and len(secret) >= 6:
@@ -231,6 +281,37 @@ def build_metrics_section(market: dict[str, Any]) -> str:
     return json.dumps(metrics_payload, ensure_ascii=False, indent=2)
 
 
+def _strip_code_fences(text: str) -> str:
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        lines = stripped.splitlines()
+        if len(lines) >= 3 and lines[-1].strip().startswith("```"):
+            lines = lines[1:-1]
+        stripped = "\n".join(lines).strip()
+    return stripped
+
+
+def build_groq_response_schema(schema_model: type[Any]) -> dict[str, Any]:
+    schema = copy.deepcopy(schema_model.model_json_schema())
+
+    def _sanitize(node: Any) -> Any:
+        if isinstance(node, dict):
+            cleaned: dict[str, Any] = {}
+            for key, value in node.items():
+                if key in {"type", "properties", "required", "items", "enum", "description", "$defs", "$ref", "anyOf", "nullable"}:
+                    cleaned[key] = _sanitize(value)
+                elif key in {"title", "additionalProperties", "default", "examples", "const", "format", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "minLength", "maxLength", "pattern", "minItems", "maxItems", "unevaluatedProperties"}:
+                    continue
+                else:
+                    cleaned[key] = _sanitize(value)
+            return cleaned
+        if isinstance(node, list):
+            return [_sanitize(item) for item in node]
+        return node
+
+    return _sanitize(schema)
+
+
 def build_deepbrief_prompt(
     market: dict[str, Any],
     context_sources: list[dict[str, Any]] | None = None,
@@ -296,6 +377,123 @@ def build_success_raw_output(
     }
 
 
+def _build_provider_attempt(
+    *,
+    provider: str,
+    model: str,
+    attempt: int,
+    status: str,
+    error_type: str | None = None,
+    message: str | None = None,
+    fallback_used: bool | None = None,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "provider": provider,
+        "model": model,
+        "attempt": attempt,
+        "status": status,
+    }
+    if error_type is not None:
+        payload["error_type"] = error_type
+    if message is not None:
+        payload["message"] = message
+    if fallback_used is not None:
+        payload["fallback_used"] = fallback_used
+    return payload
+
+
+def _classify_groq_error(error: Exception) -> str:
+    status = getattr(error, "status_code", None) or getattr(error, "status", None)
+    message = redact_secret_values(str(error)).lower()
+
+    if status in {401, 403}:
+        return "provider_auth_error"
+    if status == 429:
+        if "quota" in message or "insufficient" in message:
+            return "provider_quota_error"
+        return "provider_rate_limit"
+    if status in {400, 422}:
+        if "response_format" in message or "json_schema" in message or "structured" in message:
+            return "provider_schema_error"
+        return "provider_invalid_response"
+    if status in {500, 502, 503, 504}:
+        return "provider_transient_error"
+    if "timeout" in message:
+        return "provider_timeout"
+    if "invalid" in message and "json" in message:
+        return "provider_invalid_response"
+    return "provider_transient_error"
+
+
+def _parse_response_text(response: Any) -> dict[str, Any]:
+    response_text = getattr(response, "text", None)
+    if not response_text:
+        raise RuntimeError("El modelo no devolvio texto JSON")
+    payload = json.loads(_strip_code_fences(response_text))
+    return payload
+
+
+def _groq_client() -> OpenAI:
+    timeout_seconds = os.getenv("GROQ_TIMEOUT_SECONDS", "120")
+    try:
+        timeout_value: Any = float(timeout_seconds)
+    except ValueError:
+        timeout_value = 120
+    return OpenAI(
+        api_key=os.environ["GROQ_API_KEY"],
+        base_url=os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
+        timeout=timeout_value,
+    )
+
+
+def _groq_generation_attempt(
+    *,
+    client: OpenAI,
+    model: str,
+    prompt: str,
+    prompt_source: str,
+    market: dict[str, Any],
+    context_sources: list[dict[str, Any]] | None,
+    primary_provider: str,
+    fallback_used: bool,
+    attempts: list[dict[str, Any]],
+    response_format: dict[str, Any] | None,
+    attempt: int,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    kwargs: dict[str, Any] = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": SYSTEM_INSTRUCTION},
+            {"role": "user", "content": prompt},
+        ],
+    }
+    if response_format is not None:
+        kwargs["response_format"] = response_format
+    response = client.responses.create(**kwargs)
+    payload = _parse_response_text(response)
+    deepbrief = validate_deepbrief_payload(payload)
+    attempts.append(_build_provider_attempt(provider="groq", model=model, attempt=attempt, status="ok"))
+    raw_output = build_success_raw_output(
+        provider="groq",
+        model=model,
+        fallback_used=fallback_used,
+        primary_provider=primary_provider,
+        attempts=attempts,
+        market=market,
+        context_sources=context_sources,
+        prompt_source=prompt_source,
+        prompt=prompt,
+        parsed_output=deepbrief,
+        response_id=getattr(response, "id", None),
+    )
+    raw_output["usage"] = {
+        "input_tokens": getattr(getattr(response, "usage", None), "input_tokens", None),
+        "output_tokens": getattr(getattr(response, "usage", None), "output_tokens", None),
+        "total_tokens": getattr(getattr(response, "usage", None), "total_tokens", None),
+    }
+    return deepbrief, raw_output
+
+
 def get_provider_sequence() -> tuple[str, list[str]]:
     primary = normalize_provider_name(
         os.getenv("LLM_PRIMARY_PROVIDER"),
@@ -312,12 +510,17 @@ def get_provider_sequence() -> tuple[str, list[str]]:
     if fallback_enabled and fallback != primary:
         providers.append(fallback)
 
+    if parse_env_bool("GROQ_ENABLED", False) and "groq" not in providers:
+        providers.append("groq")
+
     return primary, providers
 
 
 def get_provider_model(provider: str) -> str:
     if provider == "gemini":
         return os.getenv("GEMINI_MODEL", "gemini-2.5-pro")
+    if provider == "groq":
+        return os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
     return os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
@@ -333,6 +536,13 @@ def is_provider_configured(provider: str) -> tuple[bool, str | None]:
             return False, "SDK google-genai no instalado"
         if not os.getenv("GEMINI_API_KEY"):
             return False, "GEMINI_API_KEY no configurada"
+        return True, None
+
+    if provider == "groq":
+        if not parse_env_bool("GROQ_ENABLED", False):
+            return False, "groq_disabled"
+        if not os.getenv("GROQ_API_KEY"):
+            return False, "groq_not_configured"
         return True, None
 
     return False, f"Proveedor no soportado: {provider}"
@@ -555,6 +765,137 @@ def generate_with_gemini(
     )
 
 
+def generate_with_groq(
+    *,
+    market: dict[str, Any],
+    context_sources: list[dict[str, Any]] | None,
+    max_retries: int,
+    primary_provider: str,
+    fallback_used: bool,
+    anti_anchor_note: str | None = None,
+    prior_attempts: list[dict[str, Any]] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    model = get_provider_model("groq")
+    client = _groq_client()
+    attempts = list(prior_attempts or [])
+    last_error: str | None = None
+    groq_schema = build_groq_response_schema(DeepBriefSchema)
+
+    for attempt in range(1, max_retries + 2):
+        repair_note = None
+        if attempt > 1:
+            repair_note = load_json_repair_prompt()
+            if last_error:
+                repair_note += f"\n\nError anterior:\n{last_error}"
+
+        prompt, prompt_source = build_deepbrief_prompt(
+            market=market,
+            context_sources=context_sources,
+            repair_note=repair_note,
+            anti_anchor_note=anti_anchor_note,
+        )
+
+        try:
+            logger.info(
+                "[DEEPBRIEF_PROVIDER] provider=groq action=started model=%s",
+                model,
+            )
+            try:
+                return _groq_generation_attempt(
+                    client=client,
+                    model=model,
+                    prompt=prompt,
+                    prompt_source=prompt_source,
+                    market=market,
+                    context_sources=context_sources,
+                    primary_provider=primary_provider,
+                    fallback_used=fallback_used,
+                    attempts=attempts,
+                    response_format={
+                        "type": "json_schema",
+                        "json_schema": {
+                            "name": "deepbrief",
+                            "strict": False,
+                            "schema": groq_schema,
+                        },
+                    },
+                    attempt=attempt,
+                )
+            except Exception as error:
+                message = summarize_exception(error)
+                if getattr(error, "status_code", None) in {400, 422} or "response_format" in message.lower() or "json_schema" in message.lower():
+                    logger.info(
+                        "[DEEPBRIEF_PROVIDER] provider=groq action=structured_schema_rejected retry=json_object",
+                    )
+                    last_error = message
+                    response = client.responses.create(
+                        model=model,
+                        input=[
+                            {"role": "system", "content": SYSTEM_INSTRUCTION},
+                            {"role": "user", "content": prompt},
+                        ],
+                        response_format={"type": "json_object"},
+                    )
+                    payload = _parse_response_text(response)
+                    deepbrief = validate_deepbrief_payload(payload)
+                    attempts.append(_build_provider_attempt(provider="groq", model=model, attempt=attempt, status="ok"))
+                    raw_output = build_success_raw_output(
+                        provider="groq",
+                        model=model,
+                        fallback_used=fallback_used,
+                        primary_provider=primary_provider,
+                        attempts=attempts,
+                        market=market,
+                        context_sources=context_sources,
+                        prompt_source=prompt_source,
+                        prompt=prompt,
+                        parsed_output=deepbrief,
+                        response_id=getattr(response, "id", None),
+                    )
+                    usage = getattr(response, "usage", None)
+                    raw_output["usage"] = {
+                        "input_tokens": getattr(usage, "input_tokens", None) if usage else None,
+                        "output_tokens": getattr(usage, "output_tokens", None) if usage else None,
+                        "total_tokens": getattr(usage, "total_tokens", None) if usage else None,
+                    }
+                    logger.info(
+                        "[DEEPBRIEF_PROVIDER] provider=groq action=succeeded",
+                    )
+                    return deepbrief, raw_output
+                raise
+
+        except Exception as error:
+            last_error = summarize_exception(error)
+            attempts.append(
+                _build_provider_attempt(
+                    provider="groq",
+                    model=model,
+                    attempt=attempt,
+                    status="failed",
+                    error_type=_classify_groq_error(error),
+                    message=last_error,
+                )
+            )
+            logger.warning(
+                "[DEEPBRIEF_PROVIDER] provider=groq action=failed errorType=%s",
+                _classify_groq_error(error),
+            )
+            if attempt >= max_retries + 1:
+                raise ProviderGenerationError(
+                    provider="groq",
+                    model=model,
+                    message=f"Groq fallo despues de retries: {last_error}",
+                    attempts=attempts,
+                ) from error
+
+    raise ProviderGenerationError(
+        provider="groq",
+        model=model,
+        message="Groq fallo de forma inesperada",
+        attempts=attempts,
+    )
+
+
 def generate_deepbrief_for_market(
     market: dict[str, Any],
     context_sources: list[dict[str, Any]] | None = None,
@@ -572,6 +913,17 @@ def generate_deepbrief_for_market(
         provider_model = get_provider_model(provider)
 
         if not configured:
+            if provider == "groq" and reason == "groq_not_configured":
+                attempts.append(
+                    _build_provider_attempt(
+                        provider="groq",
+                        model=provider_model,
+                        attempt=1,
+                        status="failed",
+                        error_type="groq_not_configured",
+                        message=reason,
+                    )
+                )
             if provider == "gemini":
                 logger.warning(
                     "Proveedor gemini omitido: %s",
@@ -602,6 +954,16 @@ def generate_deepbrief_for_market(
         try:
             if provider == "gemini":
                 deepbrief, raw_output = generate_with_gemini(
+                    market=market,
+                    context_sources=context_sources,
+                    max_retries=max_retries,
+                    primary_provider=primary_provider,
+                    fallback_used=is_fallback,
+                    anti_anchor_note=anti_anchor_note,
+                    prior_attempts=attempts,
+                )
+            elif provider == "groq":
+                deepbrief, raw_output = generate_with_groq(
                     market=market,
                     context_sources=context_sources,
                     max_retries=max_retries,
@@ -650,5 +1012,10 @@ def generate_deepbrief_for_market(
                 )
 
     combined_error = " | ".join(provider_errors) or "No hay proveedores LLM configurados"
-    logger.error("LLM_ALL_PROVIDERS_FAILED | errors=%s", combined_error)
-    raise RuntimeError(f"Todos los proveedores LLM fallaron: {combined_error}")
+    classification = _classify_provider_attempts(attempts)
+    logger.error("LLM_ALL_PROVIDERS_FAILED | classification=%s | errors=%s", classification, combined_error)
+    raise AllDeepBriefProvidersFailedError(
+        f"Todos los proveedores LLM fallaron: {combined_error}",
+        attempts=_sanitize_attempts(attempts),
+        classification=classification,
+    )

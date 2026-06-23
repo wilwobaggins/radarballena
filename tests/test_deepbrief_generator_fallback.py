@@ -210,7 +210,7 @@ def test_generate_deepbrief_fails_clearly_when_all_providers_fail(monkeypatch):
     monkeypatch.setattr(deepbrief_generator, "generate_with_openai", fake_openai)
     monkeypatch.setattr(deepbrief_generator, "generate_with_gemini", fake_gemini)
 
-    with pytest.raises(RuntimeError) as exc_info:
+    with pytest.raises(deepbrief_generator.AllDeepBriefProvidersFailedError) as exc_info:
         deepbrief_generator.generate_deepbrief_for_market(
             market={"title": "market"},
             context_sources=[],
@@ -219,3 +219,4 @@ def test_generate_deepbrief_fails_clearly_when_all_providers_fail(monkeypatch):
     assert "Todos los proveedores LLM fallaron" in str(exc_info.value)
     assert "openai" in str(exc_info.value)
     assert "gemini" in str(exc_info.value)
+    assert exc_info.value.classification == "all_llm_providers_failed"
