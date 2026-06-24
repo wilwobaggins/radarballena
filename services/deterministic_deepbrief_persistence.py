@@ -71,13 +71,18 @@ def persist_deterministic_deepbrief(
     fallback_reason: str = "all_llm_providers_unavailable",
     pipeline_run_id: str | None = None,
     provider_attempts: list[dict[str, Any]] | None = None,
+    deterministic_deepbrief: Any | None = None,
 ) -> dict[str, Any]:
-    deepbrief = generate_deterministic_deepbrief(
-        market=market,
-        preliminary_score=preliminary_score,
-        score_breakdown=score_breakdown,
-        selection_reason=selection_reason,
-        fallback_reason=fallback_reason,
+    deepbrief = (
+        deterministic_deepbrief
+        if deterministic_deepbrief is not None
+        else generate_deterministic_deepbrief(
+            market=market,
+            preliminary_score=preliminary_score,
+            score_breakdown=score_breakdown,
+            selection_reason=selection_reason,
+            fallback_reason=fallback_reason,
+        )
     )
 
     deterministic_score = {

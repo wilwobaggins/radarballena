@@ -395,6 +395,7 @@ def _handle_deterministic_fallback(
             fallback_reason=fallback_reason,
             pipeline_run_id=None,
             provider_attempts=provider_attempts or [],
+            deterministic_deepbrief=deepbrief,
         )
         saved_id = str(saved.get("id")) if saved.get("id") else None
         print(f"DETERMINISTIC_FALLBACK_TEST | action=persisted | deepbrief_id={saved_id}")
