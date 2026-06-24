@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 from services import supabase_service as db
+from services.deterministic_deepbrief_generator import generate_deterministic_deepbrief
+from services.deterministic_deepbrief_persistence import persist_deterministic_deepbrief
 from services.deepbrief_generator import (
     AllDeepBriefProvidersFailedError,
     build_raw_market_input,
@@ -298,6 +300,119 @@ def _usage_value(raw_output: dict[str, Any], key: str) -> Any:
     return usage.get(key)
 
 
+def _deterministic_hybrid_score(preliminary_score: int | float) -> dict[str, Any]:
+    score = int(round(safe_float(preliminary_score)))
+    return {
+        "preliminary_radar_score": score,
+        "ai_interpretive_score": None,
+        "final_radar_score": score,
+        "radar_score": score,
+        "score_breakdown": {
+            "generation_mode": "deterministic_fallback",
+            "formula": "final_radar_score = preliminary_radar_score",
+            "ai_component_used": False,
+            "preliminary_radar_score": score,
+            "final_radar_score": score,
+        },
+    }
+
+
+def _sanitize_deterministic_result(
+    *,
+    deepbrief: dict[str, Any],
+    raw_output: dict[str, Any],
+    market: dict[str, Any],
+    provider_attempts: list[dict[str, Any]] | None,
+    fallback_reason: str,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    hybrid_score = _deterministic_hybrid_score(market.get("preliminary_radar_score"))
+
+    deepbrief = dict(deepbrief)
+    deepbrief["preliminaryRadarScore"] = hybrid_score["preliminary_radar_score"]
+    deepbrief["aiInterpretiveScore"] = None
+    deepbrief["finalRadarScore"] = hybrid_score["final_radar_score"]
+    deepbrief["radarScore"] = hybrid_score["radar_score"]
+
+    raw_output = dict(raw_output)
+    raw_output["provider"] = "deterministic"
+    raw_output["model"] = "none"
+    raw_output["fallback_used"] = True
+    raw_output["generation_mode"] = "deterministic_fallback"
+    raw_output["needs_ai_refresh"] = True
+    raw_output["market_input"] = build_raw_market_input(market)
+    raw_output["provider_attempts"] = provider_attempts or []
+    raw_output["fallback_reason"] = fallback_reason
+
+    return deepbrief, raw_output, hybrid_score
+
+
+def _handle_deterministic_fallback(
+    *,
+    market: dict[str, Any],
+    provider_attempts: list[dict[str, Any]] | None,
+    fallback_reason: str,
+    persist: bool,
+    show_json: bool,
+) -> int:
+    deterministic_deepbrief = generate_deterministic_deepbrief(
+        market=market,
+        preliminary_score=market.get("preliminary_radar_score"),
+        score_breakdown=market.get("score_breakdown") or {},
+        selection_reason=market.get("selection_reason"),
+        fallback_reason=fallback_reason,
+    )
+
+    deepbrief_payload = (
+        deterministic_deepbrief.model_dump()
+        if hasattr(deterministic_deepbrief, "model_dump")
+        else dict(deterministic_deepbrief)
+    )
+    raw_output = deepbrief_payload.get("rawOutput") or {
+        "provider": "deterministic",
+        "model": "none",
+        "fallback_used": True,
+        "generation_mode": "deterministic_fallback",
+        "needs_ai_refresh": True,
+    }
+
+    deepbrief, raw_output, hybrid_score = _sanitize_deterministic_result(
+        deepbrief=deepbrief_payload,
+        raw_output=raw_output,
+        market=market,
+        provider_attempts=provider_attempts,
+        fallback_reason=fallback_reason,
+    )
+
+    saved_id: str | None = None
+    if persist:
+        saved = persist_deterministic_deepbrief(
+            db=db,
+            market_db_id=market["id"],
+            market=market,
+            preliminary_score=market.get("preliminary_radar_score"),
+            score_breakdown=market.get("score_breakdown") or {},
+            selection_reason=market.get("selection_reason"),
+            fallback_reason=fallback_reason,
+            pipeline_run_id=None,
+            provider_attempts=provider_attempts or [],
+        )
+        saved_id = str(saved.get("id")) if saved.get("id") else None
+        print(f"DETERMINISTIC_FALLBACK_TEST | action=persisted | deepbrief_id={saved_id}")
+    else:
+        print("DETERMINISTIC_FALLBACK_TEST | action=generated")
+
+    _print_result(
+        market=market,
+        raw_output=raw_output,
+        hybrid_score=hybrid_score,
+        persisted=persist,
+        saved_id=saved_id,
+        show_json=show_json,
+        deepbrief=deepbrief,
+    )
+    return 0
+
+
 def _print_result(
     *,
     market: dict[str, Any],
@@ -391,6 +506,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--persist",
         action="store_true",
         help="Persiste el DeepBrief y su prediccion.",
+    )
+    parser.add_argument(
+        "--allow-deterministic",
+        action="store_true",
+        help="Permite fallback deterministico explicito si fallan todos los LLM.",
     )
     parser.add_argument(
         "--show-json",
@@ -491,24 +611,38 @@ def main() -> int:
             context_sources=context_sources,
         )
     except AllDeepBriefProvidersFailedError as error:
+        if not args.allow_deterministic:
+            print("DETERMINISTIC_FALLBACK_TEST | allowed=false")
+            print(
+                "ALL_LLM_PROVIDERS_FAILED",
+                file=sys.stderr,
+            )
+            print(
+                f"classification={error.classification}",
+                file=sys.stderr,
+            )
+            print(
+                json.dumps(
+                    error.attempts,
+                    ensure_ascii=False,
+                    indent=2,
+                    default=str,
+                ),
+                file=sys.stderr,
+            )
+            return 3
+
         print(
-            "ALL_LLM_PROVIDERS_FAILED",
-            file=sys.stderr,
+            "DETERMINISTIC_FALLBACK_TEST | allowed=true | "
+            f"persist={str(args.persist).lower()}"
         )
-        print(
-            f"classification={error.classification}",
-            file=sys.stderr,
+        return _handle_deterministic_fallback(
+            market=market,
+            provider_attempts=error.attempts,
+            fallback_reason=error.classification,
+            persist=args.persist,
+            show_json=args.show_json,
         )
-        print(
-            json.dumps(
-                error.attempts,
-                ensure_ascii=False,
-                indent=2,
-                default=str,
-            ),
-            file=sys.stderr,
-        )
-        return 3
     except Exception as error:
         print(f"ERROR_GENERATION: {error}", file=sys.stderr)
         return 1
