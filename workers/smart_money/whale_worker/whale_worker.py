@@ -44,6 +44,7 @@ DATA_API = "https://data-api.polymarket.com/activity"
 SEEN_FILE = os.getenv("SEEN_FILE", "/data/seen_hashes.json")
 MAX_SEEN_HASHES = 10000
 MAX_AGE_SECONDS = int(os.getenv("MAX_AGE_SECONDS", "259200"))
+MAX_ALERTS_PER_MARKET_PER_RUN = int(os.getenv("MAX_ALERTS_PER_MARKET_PER_RUN", "2"))
 BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:3000").rstrip("/")
 INTERNAL_API_KEY = os.getenv("INTERNAL_API_KEY", "")
 DRY_RUN = os.getenv("DRY_RUN", "true").lower() == "true"
@@ -183,6 +184,16 @@ GAMMA_API = "https://gamma-api.polymarket.com"
 
 def normalize_text(text):
     return " ".join((text or "").lower().replace("?", "").replace(",", "").split())
+
+
+def get_alert_market_key(alert, item):
+    return (
+        str(alert.get("market_id") or "").strip()
+        or str(item.get("slug") or "").strip()
+        or str(item.get("eventSlug") or "").strip()
+        or normalize_text(alert.get("market_title") or item.get("title") or "")
+        or "unknown_market"
+    )
 
 
 def get_market_id_by_slug(slug):
@@ -391,6 +402,9 @@ def main():
     while True:
         cycle += 1
         cycle_start = time.time()
+        alerts_by_market = {}
+        skipped_duplicate_market_alerts = 0
+        markets_limited = set()
 
         print(f"\n========== START CYCLE #{cycle} ==========", flush=True)
 
@@ -406,6 +420,7 @@ def main():
                 too_old = 0
                 duplicate = 0
                 printed = 0
+                market_limited = 0
 
                 for item in reversed(activity):
                     if item.get("type") != "TRADE":
@@ -450,6 +465,26 @@ def main():
                         continue
 
                     alert = parse_alert(item, whale_id, cfg["name"])
+                    market_key = get_alert_market_key(alert, item)
+                    current_market_count = alerts_by_market.get(market_key, 0)
+
+                    if current_market_count >= MAX_ALERTS_PER_MARKET_PER_RUN:
+                        market_limited += 1
+                        skipped_duplicate_market_alerts += 1
+                        markets_limited.add(market_key)
+
+                        # Como esta alert se está omitiendo intencionalmente por límite de mercado,
+                        # marcarla como seen para no reprocesarla en cada ciclo.
+                        seen.add(alert_hash)
+
+                        print(
+                            f"[MARKET_LIMIT_SKIP] whale={whale_id} market_key={market_key} "
+                            f"limit={MAX_ALERTS_PER_MARKET_PER_RUN} title={item.get('title')}",
+                            flush=True,
+                        )
+                        continue
+
+                    alerts_by_market[market_key] = current_market_count + 1
 
                     print("\n🐋 WHALE ALERT DETECTADA", flush=True)
                     print(json.dumps(alert, indent=2, ensure_ascii=False), flush=True)
@@ -465,12 +500,20 @@ def main():
                 print(
                     f"[{whale_id}] fetched={total} trades={total-non_trades} "
                     f"below_min={below_min} irrelevant={irrelevant} too_old={too_old} "
-                    f"duplicate={duplicate} printed={printed}"
+                    f"duplicate={duplicate} printed={printed} market_limited={market_limited}"
                 )
 
             except Exception as e:
                 print(f"[ERROR] {whale_id}: {type(e).__name__}: {e}")
                 continue
+
+        print(
+            f"[CYCLE_MARKET_LIMITS] max_alerts_per_market_per_run={MAX_ALERTS_PER_MARKET_PER_RUN} "
+            f"skipped_duplicate_market_alerts={skipped_duplicate_market_alerts} "
+            f"markets_limited={len(markets_limited)} "
+            f"accepted_market_counts={json.dumps(alerts_by_market, ensure_ascii=False)}",
+            flush=True,
+        )
 
         # Save seen hashes periodically
         save_seen_hashes(seen)
