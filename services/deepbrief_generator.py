@@ -3,6 +3,7 @@ import copy
 import os
 from pathlib import Path
 from typing import Any
+from urllib import response
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -432,6 +433,19 @@ def _parse_response_text(response: Any) -> dict[str, Any]:
     payload = json.loads(_strip_code_fences(response_text))
     return payload
 
+def _parse_chat_completion_json(response: Any) -> dict[str, Any]:
+    choices = getattr(response, "choices", None)
+
+    if not choices:
+        raise RuntimeError("Groq no devolvio choices")
+
+    message = getattr(choices[0], "message", None)
+    response_text = getattr(message, "content", None)
+
+    if not response_text:
+        raise RuntimeError("Groq no devolvio contenido JSON")
+
+    return json.loads(_strip_code_fences(response_text))
 
 def _groq_client() -> OpenAI:
     timeout_seconds = os.getenv("GROQ_TIMEOUT_SECONDS", "120")
@@ -469,8 +483,26 @@ def _groq_generation_attempt(
     }
     if response_format is not None:
         kwargs["response_format"] = response_format
-    response = client.responses.create(**kwargs)
-    payload = _parse_response_text(response)
+        response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {
+                "role": "system",
+                "content": SYSTEM_INSTRUCTION,
+            },
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ],
+        response_format=response_format,
+        extra_body={
+            "reasoning_effort": "low",
+            "include_reasoning": False,
+        },
+    )
+
+    payload = _parse_chat_completion_json(response)
     deepbrief = validate_deepbrief_payload(payload)
     attempts.append(_build_provider_attempt(provider="groq", model=model, attempt=attempt, status="ok"))
     raw_output = build_success_raw_output(
@@ -486,10 +518,23 @@ def _groq_generation_attempt(
         parsed_output=deepbrief,
         response_id=getattr(response, "id", None),
     )
+    usage = getattr(response, "usage", None)
     raw_output["usage"] = {
-        "input_tokens": getattr(getattr(response, "usage", None), "input_tokens", None),
-        "output_tokens": getattr(getattr(response, "usage", None), "output_tokens", None),
-        "total_tokens": getattr(getattr(response, "usage", None), "total_tokens", None),
+        "input_tokens": (
+            getattr(usage, "prompt_tokens", None)
+            if usage
+            else None
+        ),
+        "output_tokens": (
+            getattr(usage, "completion_tokens", None)
+            if usage
+            else None
+        ),
+        "total_tokens": (
+            getattr(usage, "total_tokens", None)
+            if usage
+            else None
+        ),
     }
     return deepbrief, raw_output
 
@@ -828,15 +873,26 @@ def generate_with_groq(
                         "[DEEPBRIEF_PROVIDER] provider=groq action=structured_schema_rejected retry=json_object",
                     )
                     last_error = message
-                    response = client.responses.create(
+                    response = client.chat.completions.create(
                         model=model,
-                        input=[
-                            {"role": "system", "content": SYSTEM_INSTRUCTION},
-                            {"role": "user", "content": prompt},
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": SYSTEM_INSTRUCTION,
+                            },
+                            {
+                                "role": "user",
+                                "content": prompt,
+                            },
                         ],
                         response_format={"type": "json_object"},
+                        extra_body={
+                            "reasoning_effort": "low",
+                            "include_reasoning": False,
+                        },
                     )
-                    payload = _parse_response_text(response)
+
+                    payload = _parse_chat_completion_json(response)
                     deepbrief = validate_deepbrief_payload(payload)
                     attempts.append(_build_provider_attempt(provider="groq", model=model, attempt=attempt, status="ok"))
                     raw_output = build_success_raw_output(
@@ -853,10 +909,23 @@ def generate_with_groq(
                         response_id=getattr(response, "id", None),
                     )
                     usage = getattr(response, "usage", None)
+
                     raw_output["usage"] = {
-                        "input_tokens": getattr(usage, "input_tokens", None) if usage else None,
-                        "output_tokens": getattr(usage, "output_tokens", None) if usage else None,
-                        "total_tokens": getattr(usage, "total_tokens", None) if usage else None,
+                        "input_tokens": (
+                            getattr(usage, "prompt_tokens", None)
+                            if usage
+                            else None
+                        ),
+                        "output_tokens": (
+                            getattr(usage, "completion_tokens", None)
+                            if usage
+                            else None
+                        ),
+                        "total_tokens": (
+                            getattr(usage, "total_tokens", None)
+                            if usage
+                            else None
+                        ),
                     }
                     logger.info(
                         "[DEEPBRIEF_PROVIDER] provider=groq action=succeeded",
