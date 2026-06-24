@@ -220,3 +220,120 @@ def test_generate_deepbrief_fails_clearly_when_all_providers_fail(monkeypatch):
     assert "openai" in str(exc_info.value)
     assert "gemini" in str(exc_info.value)
     assert exc_info.value.classification == "all_llm_providers_failed"
+
+
+def test_gemini_schema_error_retries_without_response_schema(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini-key")
+    monkeypatch.setenv("LLM_PRIMARY_PROVIDER", "openai")
+    monkeypatch.setenv("LLM_FALLBACK_PROVIDER", "gemini")
+    monkeypatch.setenv("LLM_ENABLE_FALLBACK", "true")
+    monkeypatch.setattr(deepbrief_generator, "GENAI_SDK_AVAILABLE", True)
+
+    class FakeParsed:
+        def model_dump(self):
+            return {
+                "lectura_clave": "Lectura suficientemente larga",
+                "radar_score": 58,
+                "radar_score_breakdown": {
+                    "movimiento_probabilidad": 8,
+                    "volumen": 8,
+                    "liquidez": 8,
+                    "cercania_cierre": 8,
+                    "claridad_resolucion": 8,
+                    "fuerza_narrativa": 8,
+                    "asimetria_detectada": 8,
+                    "riesgo_ruido": 3,
+                },
+                "signal_label": "Watchlist",
+                "estela_de_capital": "Capital estable",
+                "entorno_de_senal": {
+                    "steep_social": "social",
+                    "steep_tecnologico": "tech",
+                    "steep_economico": "econ",
+                    "steep_ecologico": "eco",
+                    "steep_politico_regulatorio": "reg",
+                    "sintesis": "Sintesis",
+                },
+                "corriente_narrativa": "Narrativa suficientemente descriptiva",
+                "filtro_de_ruido": {
+                    "red_team": "red",
+                    "sesgos_detectados": "sesgos",
+                    "riesgo_liquidez": "medio",
+                    "riesgo_resolucion": "bajo",
+                    "informacion_ya_descontada": "parcial",
+                },
+                "premortem": {
+                    "si_la_tesis_falla_probablemente_seria_por": "motivo",
+                    "senales_tempranas_de_invalidacion": ["senal"],
+                },
+                "mapa_de_ruptura": {
+                    "confirmacion": "conf",
+                    "ruptura_alcista": "up",
+                    "ruptura_bajista": "down",
+                    "invalidacion": "invalid",
+                    "evento_detonador": "evento",
+                },
+                "mapa_de_escenarios": [
+                    {"escenario": "Base", "probabilidad_interna": "50%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+                    {"escenario": "Ruptura", "probabilidad_interna": "65%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+                    {"escenario": "Contrario", "probabilidad_interna": "35%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+                ],
+                "actualizacion_bayesiana": {
+                    "probabilidad_actual_del_mercado": "55%",
+                    "lectura_deepsignal": "lectura",
+                    "direccion_sugerida_del_update": "subir",
+                    "razon": "razon",
+                },
+                "deepsignal_verdict": "verdict suficientemente largo",
+                "confidence_level": "Medium",
+                "watch_triggers": ["trigger"],
+                "prediction_audit": {
+                    "predicted_outcome": "no_call",
+                    "predicted_probability": None,
+                    "expected_direction": None,
+                    "prediction_confidence": None,
+                    "prediction_reasoning_summary": "suficientemente largo",
+                },
+            }
+
+    class FakeResponse:
+        def __init__(self, *, text=None, parsed=None, response_id="resp-1"):
+            self.text = text
+            self.parsed = parsed
+            self.response_id = response_id
+
+    class FakeModels:
+        def __init__(self):
+            self.calls = 0
+            self.configs = []
+
+        def generate_content(self, *, model, contents, config):
+            self.calls += 1
+            self.configs.append(config)
+            if self.calls == 1:
+                raise RuntimeError('400 INVALID_ARGUMENT Unknown name "additional_properties"')
+            return FakeResponse(parsed=FakeParsed())
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            self.models = FakeModels()
+
+    class FakeConfig:
+        def __init__(self, **kwargs):
+            self.__dict__.update(kwargs)
+
+    monkeypatch.setattr(deepbrief_generator, "genai", type("GenAI", (), {"Client": FakeClient}))
+    monkeypatch.setattr(deepbrief_generator, "genai_types", type("GenAITypes", (), {"GenerateContentConfig": FakeConfig}))
+
+    deepbrief, raw_output = deepbrief_generator.generate_with_gemini(
+        market={"title": "market"},
+        context_sources=[],
+        max_retries=0,
+        primary_provider="openai",
+        fallback_used=True,
+    )
+
+    assert deepbrief["radar_score"] == 58
+    assert raw_output["provider"] == "gemini"
+    assert raw_output["fallback_used"] is True

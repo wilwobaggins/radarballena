@@ -176,17 +176,17 @@ def test_groq_schema_rejection_retries_with_json_object(monkeypatch):
     monkeypatch.setenv("GROQ_API_KEY", "groq-key")
 
     class FakeUsage:
-        input_tokens = 11
-        output_tokens = 7
+        prompt_tokens = 11
+        completion_tokens = 7
         total_tokens = 18
 
     class FakeResponse:
         def __init__(self, text, response_id="resp-1"):
-            self.text = text
+            self.choices = [type("Choice", (), {"message": type("Message", (), {"content": text})()})()]
             self.id = response_id
             self.usage = FakeUsage()
 
-    class FakeResponses:
+    class FakeChatCompletions:
         def __init__(self):
             self.calls = []
 
@@ -198,7 +198,7 @@ def test_groq_schema_rejection_retries_with_json_object(monkeypatch):
 
     class FakeClient:
         def __init__(self):
-            self.responses = FakeResponses()
+            self.chat = type("Chat", (), {"completions": FakeChatCompletions()})()
 
     monkeypatch.setattr(deepbrief_generator, "_groq_client", lambda: FakeClient())
 

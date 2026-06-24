@@ -1,4 +1,5 @@
-from services.deepbrief_generator import build_deepbrief_prompt, build_raw_market_input
+from services.deepbrief_generator import build_deepbrief_prompt, build_raw_market_input, build_gemini_response_schema
+from services.deepbrief_schema import DeepBriefSchema
 
 
 def test_build_deepbrief_prompt_uses_master_prompt_placeholders():
@@ -79,3 +80,13 @@ def test_build_raw_market_input_keeps_relevance_metadata():
     assert raw_market_input["relevance_reasons"] == ["strategic_context"]
     assert raw_market_input["novelty_market"] is False
     assert "relevance_exclusion_reason" in raw_market_input
+
+
+def test_build_gemini_response_schema_strips_incompatible_keys():
+    original = DeepBriefSchema.model_json_schema()
+    schema = build_gemini_response_schema(DeepBriefSchema)
+
+    assert original != schema
+    assert "additionalProperties" in original
+    assert "additionalProperties" not in schema
+    assert "additional_properties" not in schema

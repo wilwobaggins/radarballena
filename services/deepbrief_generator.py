@@ -3,7 +3,6 @@ import copy
 import os
 from pathlib import Path
 from typing import Any
-from urllib import response
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -292,6 +291,23 @@ def _strip_code_fences(text: str) -> str:
     return stripped
 
 
+def _sanitize_json_schema(node: Any) -> Any:
+    if isinstance(node, dict):
+        cleaned: dict[str, Any] = {}
+        for key, value in node.items():
+            if key in {"additionalProperties", "additional_properties", "title"}:
+                continue
+            cleaned[key] = _sanitize_json_schema(value)
+        return cleaned
+    if isinstance(node, list):
+        return [_sanitize_json_schema(item) for item in node]
+    return node
+
+
+def build_gemini_response_schema(schema_model: type[Any]) -> dict[str, Any]:
+    return _sanitize_json_schema(copy.deepcopy(schema_model.model_json_schema()))
+
+
 def build_groq_response_schema(schema_model: type[Any]) -> dict[str, Any]:
     schema = copy.deepcopy(schema_model.model_json_schema())
 
@@ -299,9 +315,38 @@ def build_groq_response_schema(schema_model: type[Any]) -> dict[str, Any]:
         if isinstance(node, dict):
             cleaned: dict[str, Any] = {}
             for key, value in node.items():
-                if key in {"type", "properties", "required", "items", "enum", "description", "$defs", "$ref", "anyOf", "nullable"}:
+                if key in {
+                    "type",
+                    "properties",
+                    "required",
+                    "items",
+                    "enum",
+                    "description",
+                    "$defs",
+                    "$ref",
+                    "anyOf",
+                    "nullable",
+                }:
                     cleaned[key] = _sanitize(value)
-                elif key in {"title", "additionalProperties", "default", "examples", "const", "format", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "minLength", "maxLength", "pattern", "minItems", "maxItems", "unevaluatedProperties"}:
+                elif key in {
+                    "title",
+                    "additionalProperties",
+                    "additional_properties",
+                    "default",
+                    "examples",
+                    "const",
+                    "format",
+                    "minimum",
+                    "maximum",
+                    "exclusiveMinimum",
+                    "exclusiveMaximum",
+                    "minLength",
+                    "maxLength",
+                    "pattern",
+                    "minItems",
+                    "maxItems",
+                    "unevaluatedProperties",
+                }:
                     continue
                 else:
                     cleaned[key] = _sanitize(value)
@@ -447,6 +492,21 @@ def _parse_chat_completion_json(response: Any) -> dict[str, Any]:
 
     return json.loads(_strip_code_fences(response_text))
 
+
+def _is_schema_error(error: Exception) -> bool:
+    message = summarize_exception(error).lower()
+    return any(
+        token in message
+        for token in (
+            "additional_properties",
+            "additionalproperties",
+            "response_schema",
+            "json_schema",
+            "schema",
+            "unknown name",
+        )
+    )
+
 def _groq_client() -> OpenAI:
     timeout_seconds = os.getenv("GROQ_TIMEOUT_SECONDS", "120")
     try:
@@ -474,16 +534,7 @@ def _groq_generation_attempt(
     response_format: dict[str, Any] | None,
     attempt: int,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    kwargs: dict[str, Any] = {
-        "model": model,
-        "input": [
-            {"role": "system", "content": SYSTEM_INSTRUCTION},
-            {"role": "user", "content": prompt},
-        ],
-    }
-    if response_format is not None:
-        kwargs["response_format"] = response_format
-        response = client.chat.completions.create(
+    response = client.chat.completions.create(
         model=model,
         messages=[
             {
@@ -713,6 +764,7 @@ def generate_with_gemini(
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     attempts = list(prior_attempts or [])
     last_error = None
+    gemini_schema = build_gemini_response_schema(DeepBriefSchema)
 
     for attempt in range(1, max_retries + 2):
         repair_note = None
@@ -736,7 +788,7 @@ def generate_with_gemini(
                 config=genai_types.GenerateContentConfig(
                     system_instruction=SYSTEM_INSTRUCTION,
                     response_mime_type="application/json",
-                    response_schema=DeepBriefSchema,
+                    response_schema=gemini_schema,
                 ),
             )
 
@@ -784,6 +836,75 @@ def generate_with_gemini(
 
         except Exception as error:
             last_error = summarize_exception(error)
+            if _is_schema_error(error):
+                logger.info(
+                    "[DEEPBRIEF_PROVIDER] provider=gemini action=structured_schema_rejected retry=json_object",
+                )
+                try:
+                    response = client.models.generate_content(
+                        model=model,
+                        contents=prompt,
+                        config=genai_types.GenerateContentConfig(
+                            system_instruction=SYSTEM_INSTRUCTION,
+                            response_mime_type="application/json",
+                        ),
+                    )
+
+                    parsed_candidate = getattr(response, "parsed", None)
+                    if parsed_candidate is not None:
+                        if hasattr(parsed_candidate, "model_dump"):
+                            payload = parsed_candidate.model_dump()
+                        else:
+                            payload = parsed_candidate
+                    else:
+                        response_text = getattr(response, "text", None)
+                        if not response_text:
+                            raise RuntimeError("Gemini no devolvio texto JSON")
+                        payload = json.loads(_strip_code_fences(response_text))
+
+                    deepbrief = validate_deepbrief_payload(payload)
+                    attempts.append(
+                        {
+                            "provider": "gemini",
+                            "attempt": attempt,
+                            "status": "ok",
+                            "model": model,
+                        }
+                    )
+                    raw_output = build_success_raw_output(
+                        provider="gemini",
+                        model=model,
+                        fallback_used=fallback_used,
+                        primary_provider=primary_provider,
+                        attempts=attempts,
+                        market=market,
+                        context_sources=context_sources,
+                        prompt_source=prompt_source,
+                        prompt=prompt,
+                        parsed_output=deepbrief,
+                        response_id=getattr(response, "response_id", None),
+                    )
+                    return deepbrief, raw_output
+                except Exception as retry_error:
+                    last_error = summarize_exception(retry_error)
+                    attempts.append(
+                        {
+                            "provider": "gemini",
+                            "attempt": attempt,
+                            "status": "failed",
+                            "model": model,
+                            "error": last_error,
+                        }
+                    )
+                    if attempt >= max_retries + 1:
+                        raise ProviderGenerationError(
+                            provider="gemini",
+                            model=model,
+                            message=f"Gemini fallo despues de retries: {last_error}",
+                            attempts=attempts,
+                        ) from retry_error
+                    continue
+
             attempts.append(
                 {
                     "provider": "gemini",
