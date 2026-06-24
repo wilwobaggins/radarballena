@@ -1186,24 +1186,39 @@ def generate_deepbrief_for_market(
             attempts = list(error.attempts)
             provider_errors.append(f"{provider}: {error.message}")
 
-            if is_fallback:
-                logger.error(
-                    "LLM_ALL_PROVIDERS_FAILED | provider=%s | model=%s | error=%s",
-                    provider,
-                    provider_model,
-                    error.message,
+            remaining_providers = provider_sequence[index + 1 :]
+            log_context = {
+                "provider": provider,
+                "model": provider_model,
+                "error": error.message,
+            }
+
+            if provider == primary_provider:
+                logger.warning(
+                    "LLM_PRIMARY_FAILED | provider=%s | model=%s | error=%s | next_provider=%s | remaining_providers=%s",
+                    log_context["provider"],
+                    log_context["model"],
+                    log_context["error"],
+                    remaining_providers[0] if remaining_providers else None,
+                    remaining_providers[1:] if len(remaining_providers) > 1 else [],
                 )
             else:
                 logger.warning(
-                    "LLM_PRIMARY_FAILED | provider=%s | model=%s | error=%s",
-                    provider,
-                    provider_model,
-                    error.message,
+                    "LLM_PROVIDER_FAILED | provider=%s | model=%s | role=fallback | error=%s | next_provider=%s | remaining_providers=%s",
+                    log_context["provider"],
+                    log_context["model"],
+                    log_context["error"],
+                    remaining_providers[0] if remaining_providers else None,
+                    remaining_providers[1:] if len(remaining_providers) > 1 else [],
                 )
 
     combined_error = " | ".join(provider_errors) or "No hay proveedores LLM configurados"
     classification = _classify_provider_attempts(attempts)
-    logger.error("LLM_ALL_PROVIDERS_FAILED | classification=%s | errors=%s", classification, combined_error)
+    logger.error(
+        "LLM_ALL_PROVIDERS_FAILED | classification=%s | errors=%s",
+        classification,
+        combined_error,
+    )
     raise AllDeepBriefProvidersFailedError(
         f"Todos los proveedores LLM fallaron: {combined_error}",
         attempts=_sanitize_attempts(attempts),

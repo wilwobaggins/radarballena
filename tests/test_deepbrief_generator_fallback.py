@@ -337,3 +337,271 @@ def test_gemini_schema_error_retries_without_response_schema(monkeypatch):
     assert deepbrief["radar_score"] == 58
     assert raw_output["provider"] == "gemini"
     assert raw_output["fallback_used"] is True
+
+
+def test_logging_when_gemini_fails_and_groq_succeeds(monkeypatch, caplog):
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini-key")
+    monkeypatch.setenv("GROQ_ENABLED", "true")
+    monkeypatch.setenv("GROQ_API_KEY", "groq-key")
+    monkeypatch.setenv("LLM_PRIMARY_PROVIDER", "openai")
+    monkeypatch.setenv("LLM_FALLBACK_PROVIDER", "gemini")
+    monkeypatch.setenv("LLM_ENABLE_FALLBACK", "true")
+    monkeypatch.setattr(deepbrief_generator, "GENAI_SDK_AVAILABLE", True)
+
+    caplog.set_level("INFO", logger="deepbrief_generator")
+
+    def fail_openai(**kwargs):
+        raise deepbrief_generator.ProviderGenerationError("openai", "openai-model", "openai quota", attempts=[])
+
+    def fail_gemini(**kwargs):
+        raise deepbrief_generator.ProviderGenerationError("gemini", "gemini-model", "gemini schema", attempts=kwargs["prior_attempts"])
+
+    def fake_groq(**kwargs):
+        deepbrief = {
+            "lectura_clave": "Lectura suficientemente larga",
+            "radar_score": 61,
+            "radar_score_breakdown": {
+                "movimiento_probabilidad": 8,
+                "volumen": 8,
+                "liquidez": 8,
+                "cercania_cierre": 8,
+                "claridad_resolucion": 8,
+                "fuerza_narrativa": 8,
+                "asimetria_detectada": 8,
+                "riesgo_ruido": 3,
+            },
+            "signal_label": "Watchlist",
+            "estela_de_capital": "Capital estable",
+            "entorno_de_senal": {
+                "steep_social": "social",
+                "steep_tecnologico": "tech",
+                "steep_economico": "econ",
+                "steep_ecologico": "eco",
+                "steep_politico_regulatorio": "reg",
+                "sintesis": "Sintesis",
+            },
+            "corriente_narrativa": "Narrativa suficientemente descriptiva",
+            "filtro_de_ruido": {
+                "red_team": "red",
+                "sesgos_detectados": "sesgos",
+                "riesgo_liquidez": "medio",
+                "riesgo_resolucion": "bajo",
+                "informacion_ya_descontada": "parcial",
+            },
+            "premortem": {
+                "si_la_tesis_falla_probablemente_seria_por": "motivo",
+                "senales_tempranas_de_invalidacion": ["senal"],
+            },
+            "mapa_de_ruptura": {
+                "confirmacion": "conf",
+                "ruptura_alcista": "up",
+                "ruptura_bajista": "down",
+                "invalidacion": "invalid",
+                "evento_detonador": "evento",
+            },
+            "mapa_de_escenarios": [
+                {"escenario": "Base", "probabilidad_interna": "50%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+                {"escenario": "Ruptura", "probabilidad_interna": "65%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+                {"escenario": "Contrario", "probabilidad_interna": "35%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+            ],
+            "actualizacion_bayesiana": {
+                "probabilidad_actual_del_mercado": "55%",
+                "lectura_deepsignal": "lectura",
+                "direccion_sugerida_del_update": "subir",
+                "razon": "razon",
+            },
+            "deepsignal_verdict": "verdict suficientemente largo",
+            "confidence_level": "Medium",
+            "watch_triggers": ["trigger"],
+            "prediction_audit": {
+                "predicted_outcome": "no_call",
+                "predicted_probability": None,
+                "expected_direction": None,
+                "prediction_confidence": None,
+                "prediction_reasoning_summary": "suficientemente largo",
+            },
+        }
+        raw_output = {
+            "status": "ok",
+            "provider": "groq",
+            "model": "openai/gpt-oss-120b",
+            "fallback_used": True,
+            "primary_provider": "openai",
+            "attempts": kwargs["prior_attempts"] + [{"provider": "groq", "attempt": 1, "status": "ok", "model": "openai/gpt-oss-120b"}],
+            "market_input": {"title": "m"},
+            "context_sources": [],
+            "prompt_source": "deepbrief_master_prompt.txt",
+            "prompt": "prompt",
+            "parsed_output": deepbrief,
+        }
+        return deepbrief, raw_output
+
+    monkeypatch.setattr(deepbrief_generator, "generate_with_openai", fail_openai)
+    monkeypatch.setattr(deepbrief_generator, "generate_with_gemini", fail_gemini)
+    monkeypatch.setattr(deepbrief_generator, "generate_with_groq", fake_groq)
+
+    deepbrief, raw_output = deepbrief_generator.generate_deepbrief_for_market(
+        market={"title": "market"},
+        context_sources=[],
+    )
+
+    assert raw_output["provider"] == "groq"
+    assert raw_output["fallback_used"] is True
+    assert "LLM_PRIMARY_FAILED | provider=openai" in caplog.text
+    assert "LLM_PROVIDER_FAILED | provider=gemini" in caplog.text
+    assert "role=fallback" in caplog.text
+    assert "LLM_FALLBACK_SUCCESS | provider=groq" in caplog.text
+    assert "LLM_ALL_PROVIDERS_FAILED" not in caplog.text
+    assert deepbrief["radar_score"] == 61
+
+
+def test_logging_when_all_providers_fail(monkeypatch, caplog):
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini-key")
+    monkeypatch.setenv("GROQ_ENABLED", "true")
+    monkeypatch.setenv("GROQ_API_KEY", "groq-key")
+    monkeypatch.setenv("LLM_PRIMARY_PROVIDER", "openai")
+    monkeypatch.setenv("LLM_FALLBACK_PROVIDER", "gemini")
+    monkeypatch.setenv("LLM_ENABLE_FALLBACK", "true")
+    monkeypatch.setattr(deepbrief_generator, "GENAI_SDK_AVAILABLE", True)
+
+    caplog.set_level("INFO", logger="deepbrief_generator")
+
+    def fail_openai(**kwargs):
+        raise deepbrief_generator.ProviderGenerationError("openai", "openai-model", "openai quota", attempts=[])
+
+    def fail_gemini(**kwargs):
+        raise deepbrief_generator.ProviderGenerationError("gemini", "gemini-model", "gemini schema", attempts=kwargs["prior_attempts"])
+
+    def fail_groq(**kwargs):
+        raise deepbrief_generator.ProviderGenerationError("groq", "openai/gpt-oss-120b", "groq rate limit", attempts=kwargs["prior_attempts"])
+
+    monkeypatch.setattr(deepbrief_generator, "generate_with_openai", fail_openai)
+    monkeypatch.setattr(deepbrief_generator, "generate_with_gemini", fail_gemini)
+    monkeypatch.setattr(deepbrief_generator, "generate_with_groq", fail_groq)
+
+    with pytest.raises(deepbrief_generator.AllDeepBriefProvidersFailedError) as exc_info:
+        deepbrief_generator.generate_deepbrief_for_market(
+            market={"title": "market"},
+            context_sources=[],
+        )
+
+    assert exc_info.value.classification == "all_llm_providers_failed"
+    assert caplog.text.count("LLM_ALL_PROVIDERS_FAILED") == 1
+    assert "LLM_PRIMARY_FAILED | provider=openai" in caplog.text
+    assert "LLM_PROVIDER_FAILED | provider=gemini" in caplog.text
+    assert "LLM_PROVIDER_FAILED | provider=groq" in caplog.text
+
+
+def test_logging_when_gemini_succeeds_no_groq_attempt(monkeypatch, caplog):
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini-key")
+    monkeypatch.setenv("GROQ_ENABLED", "true")
+    monkeypatch.setenv("GROQ_API_KEY", "groq-key")
+    monkeypatch.setenv("LLM_PRIMARY_PROVIDER", "openai")
+    monkeypatch.setenv("LLM_FALLBACK_PROVIDER", "gemini")
+    monkeypatch.setenv("LLM_ENABLE_FALLBACK", "true")
+    monkeypatch.setattr(deepbrief_generator, "GENAI_SDK_AVAILABLE", True)
+
+    caplog.set_level("INFO", logger="deepbrief_generator")
+
+    def fail_openai(**kwargs):
+        raise deepbrief_generator.ProviderGenerationError("openai", "openai-model", "openai quota", attempts=[])
+
+    def fake_gemini(**kwargs):
+        deepbrief = {
+            "lectura_clave": "Lectura suficientemente larga",
+            "radar_score": 58,
+            "radar_score_breakdown": {
+                "movimiento_probabilidad": 8,
+                "volumen": 8,
+                "liquidez": 8,
+                "cercania_cierre": 8,
+                "claridad_resolucion": 8,
+                "fuerza_narrativa": 8,
+                "asimetria_detectada": 8,
+                "riesgo_ruido": 3,
+            },
+            "signal_label": "Watchlist",
+            "estela_de_capital": "Capital estable",
+            "entorno_de_senal": {
+                "steep_social": "social",
+                "steep_tecnologico": "tech",
+                "steep_economico": "econ",
+                "steep_ecologico": "eco",
+                "steep_politico_regulatorio": "reg",
+                "sintesis": "Sintesis",
+            },
+            "corriente_narrativa": "Narrativa suficientemente descriptiva",
+            "filtro_de_ruido": {
+                "red_team": "red",
+                "sesgos_detectados": "sesgos",
+                "riesgo_liquidez": "medio",
+                "riesgo_resolucion": "bajo",
+                "informacion_ya_descontada": "parcial",
+            },
+            "premortem": {
+                "si_la_tesis_falla_probablemente_seria_por": "motivo",
+                "senales_tempranas_de_invalidacion": ["senal"],
+            },
+            "mapa_de_ruptura": {
+                "confirmacion": "conf",
+                "ruptura_alcista": "up",
+                "ruptura_bajista": "down",
+                "invalidacion": "invalid",
+                "evento_detonador": "evento",
+            },
+            "mapa_de_escenarios": [
+                {"escenario": "Base", "probabilidad_interna": "50%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+                {"escenario": "Ruptura", "probabilidad_interna": "65%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+                {"escenario": "Contrario", "probabilidad_interna": "35%", "descripcion": "desc", "impacto_en_mercado": "impacto"},
+            ],
+            "actualizacion_bayesiana": {
+                "probabilidad_actual_del_mercado": "55%",
+                "lectura_deepsignal": "lectura",
+                "direccion_sugerida_del_update": "subir",
+                "razon": "razon",
+            },
+            "deepsignal_verdict": "verdict suficientemente largo",
+            "confidence_level": "Medium",
+            "watch_triggers": ["trigger"],
+            "prediction_audit": {
+                "predicted_outcome": "no_call",
+                "predicted_probability": None,
+                "expected_direction": None,
+                "prediction_confidence": None,
+                "prediction_reasoning_summary": "suficientemente largo",
+            },
+        }
+        raw_output = {
+            "status": "ok",
+            "provider": "gemini",
+            "model": "gemini-test",
+            "fallback_used": True,
+            "primary_provider": "openai",
+            "attempts": kwargs["prior_attempts"] + [{"provider": "gemini", "attempt": 1, "status": "ok", "model": "gemini-test"}],
+            "market_input": {"title": "m"},
+            "context_sources": [],
+            "prompt_source": "deepbrief_master_prompt.txt",
+            "prompt": "prompt",
+            "parsed_output": deepbrief,
+        }
+        return deepbrief, raw_output
+
+    def fail_groq(**kwargs):
+        raise AssertionError("Groq no debe ejecutarse cuando Gemini funciona")
+
+    monkeypatch.setattr(deepbrief_generator, "generate_with_openai", fail_openai)
+    monkeypatch.setattr(deepbrief_generator, "generate_with_gemini", fake_gemini)
+    monkeypatch.setattr(deepbrief_generator, "generate_with_groq", fail_groq)
+
+    deepbrief, raw_output = deepbrief_generator.generate_deepbrief_for_market(
+        market={"title": "market"},
+        context_sources=[],
+    )
+
+    assert raw_output["provider"] == "gemini"
+    assert deepbrief["radar_score"] == 58
+    assert "LLM_ALL_PROVIDERS_FAILED" not in caplog.text
+    assert "Groq no debe ejecutarse" not in caplog.text
