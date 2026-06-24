@@ -35,6 +35,7 @@ from services.closing_recheck_scoring import (
 from services.deepbrief_generator import (
     SYSTEM_INSTRUCTION,
     ProviderGenerationError,
+    build_groq_response_schema,
     get_provider_model,
     get_provider_sequence,
     is_provider_configured,
@@ -528,6 +529,16 @@ def _is_json_repair_needed(error: Exception) -> bool:
     return "json" in message or "schema" in message or "parse" in message
 
 
+def _strip_code_fences(text: str) -> str:
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        lines = stripped.splitlines()
+        if len(lines) >= 3 and lines[-1].strip().startswith("```"):
+            lines = lines[1:-1]
+        stripped = "\n".join(lines).strip()
+    return stripped
+
+
 def build_gemini_response_schema(model_type: type[Any]) -> dict[str, Any]:
     schema = copy.deepcopy(model_type.model_json_schema(mode="validation"))
 
@@ -565,6 +576,27 @@ def _is_gemini_schema_compatibility_error(error: Exception) -> bool:
         "schema",
     )
     return any(marker in message for marker in markers)
+
+
+def _classify_provider_error(error: Exception) -> str:
+    status_code = getattr(error, "status_code", None) or getattr(
+        getattr(error, "response", None),
+        "status_code",
+        None,
+    )
+    message = summarize_exception(error).lower()
+
+    if status_code in {401, 403} or "unauthorized" in message or "api key" in message:
+        return "provider_auth_error"
+    if status_code == 429 or any(marker in message for marker in ("quota", "insufficient_quota", "rate limit", "too many requests", "resource_exhausted")):
+        return "provider_quota_error" if "quota" in message or "insufficient_quota" in message or "resource_exhausted" in message else "provider_rate_limit"
+    if status_code in {400, 422} or any(marker in message for marker in ("response_schema", "json_schema", "schema", "additional_properties", "additionalproperties", "invalid_argument")):
+        return "provider_schema_error" if any(marker in message for marker in ("response_schema", "json_schema", "schema", "additional_properties", "additionalproperties", "invalid_argument")) else "provider_invalid_response"
+    if status_code in {500, 502, 503, 504} or any(marker in message for marker in ("timeout", "network", "connection", "transient")):
+        return "provider_timeout" if "timeout" in message else "provider_transient_error"
+    if "json" in message and any(marker in message for marker in ("invalid", "parse", "decode")):
+        return "provider_invalid_response"
+    return "provider_transient_error"
 
 
 def _build_model_prompt(
@@ -621,6 +653,17 @@ def call_closing_recheck_model_with_provider_sequence(
         try:
             if provider == "gemini":
                 deepbrief, raw_output = _call_gemini_model(
+                    candidate=candidate,
+                    new_preliminary=new_preliminary,
+                    score_parity=score_parity,
+                    context_source=context_source,
+                    max_retries=max_retries,
+                    primary_provider=primary_provider,
+                    fallback_used=is_fallback,
+                    prior_attempts=attempts,
+                )
+            elif provider == "groq":
+                deepbrief, raw_output = _call_groq_model(
                     candidate=candidate,
                     new_preliminary=new_preliminary,
                     score_parity=score_parity,
@@ -876,6 +919,141 @@ def _call_gemini_model(
         provider="gemini",
         model=model,
         message="Gemini failed unexpectedly",
+        attempts=attempts,
+    )
+
+
+def _call_groq_model(
+    *,
+    candidate: dict[str, Any],
+    new_preliminary: dict[str, Any],
+    score_parity: dict[str, Any] | None,
+    context_source: str | None,
+    max_retries: int,
+    primary_provider: str,
+    fallback_used: bool,
+    prior_attempts: list[dict[str, Any]] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    model = get_provider_model("groq")
+    client = OpenAI(
+        api_key=os.environ["GROQ_API_KEY"],
+        base_url=os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
+    )
+    attempts = list(prior_attempts or [])
+    last_error: str | None = None
+    schema = build_groq_response_schema(ClosingRecheckModelOutput)
+    structured_schema_rejected = False
+
+    for attempt in range(1, max_retries + 2):
+        repair_note = None
+        if attempt > 1:
+            repair_note = load_json_repair_prompt()
+            if last_error:
+                repair_note += f"\n\nError anterior:\n{last_error}"
+
+        prompt, prompt_source = _build_model_prompt(
+            candidate,
+            new_preliminary=new_preliminary,
+            score_parity=score_parity,
+            context_source=context_source,
+            repair_note=repair_note,
+        )
+
+        try:
+            config_kwargs: dict[str, Any] = {
+                "response_mime_type": "application/json",
+            }
+            if not structured_schema_rejected:
+                config_kwargs["response_format"] = {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "closing_recheck",
+                        "strict": False,
+                        "schema": schema,
+                        },
+                    }
+            else:
+                config_kwargs["response_format"] = {"type": "json_object"}
+
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": SYSTEM_INSTRUCTION},
+                    {"role": "user", "content": prompt},
+                ],
+                extra_body={
+                    "reasoning_effort": "low",
+                    "include_reasoning": False,
+                },
+                **config_kwargs,
+            )
+
+            response_text = getattr(response.choices[0].message, "content", None)
+            if not response_text:
+                raise RuntimeError("Groq no devolvio contenido JSON")
+
+            payload = json.loads(_strip_code_fences(response_text))
+            validated = ClosingRecheckModelOutput.model_validate(payload)
+            attempts.append(
+                {
+                    "provider": "groq",
+                    "attempt": attempt,
+                    "status": "ok",
+                    "model": model,
+                }
+            )
+
+            usage = getattr(response, "usage", None)
+            raw_output = {
+                "status": "ok",
+                "provider": "groq",
+                "model": model,
+                "fallback_used": fallback_used,
+                "primary_provider": primary_provider,
+                "attempts": attempts,
+                "prompt_source": prompt_source,
+                "prompt": prompt,
+                "parsed_output": validated.model_dump(),
+                "response_id": getattr(response, "id", None),
+                "usage": {
+                    "input_tokens": getattr(usage, "prompt_tokens", None) if usage else None,
+                    "output_tokens": getattr(usage, "completion_tokens", None) if usage else None,
+                    "total_tokens": getattr(usage, "total_tokens", None) if usage else None,
+                },
+            }
+            return validated.model_dump(), raw_output
+        except Exception as error:
+            if not structured_schema_rejected and _is_gemini_schema_compatibility_error(error):
+                structured_schema_rejected = True
+                logger.warning(
+                    "[CLOSING_RECHECK_GROQ_SCHEMA] structured_schema_rejected=true retrying_without_response_schema=true"
+                )
+                continue
+
+            last_error = summarize_exception(error)
+            attempts.append(
+                {
+                    "provider": "groq",
+                    "attempt": attempt,
+                    "status": "failed",
+                    "model": model,
+                    "error": last_error,
+                    "error_type": _classify_provider_error(error),
+                }
+            )
+
+            if attempt >= max_retries + 1:
+                raise ProviderGenerationError(
+                    provider="groq",
+                    model=model,
+                    message=f"Groq failed after retries: {last_error}",
+                    attempts=attempts,
+                ) from error
+
+    raise ProviderGenerationError(
+        provider="groq",
+        model=model,
+        message="Groq failed unexpectedly",
         attempts=attempts,
     )
 
