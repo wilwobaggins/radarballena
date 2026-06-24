@@ -960,9 +960,7 @@ def _call_groq_model(
         )
 
         try:
-            config_kwargs: dict[str, Any] = {
-                "response_mime_type": "application/json",
-            }
+            config_kwargs: dict[str, Any] = {}
             if not structured_schema_rejected:
                 config_kwargs["response_format"] = {
                     "type": "json_schema",
@@ -970,8 +968,8 @@ def _call_groq_model(
                         "name": "closing_recheck",
                         "strict": False,
                         "schema": schema,
-                        },
                     }
+                }
             else:
                 config_kwargs["response_format"] = {"type": "json_object"}
 

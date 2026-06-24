@@ -265,6 +265,11 @@ def test_call_groq_model_retries_json_schema_then_json_object(monkeypatch):
         def create(self, **kwargs):
             self.calls += 1
             seen.append(kwargs)
+            assert "response_mime_type" not in kwargs
+            assert "response_schema" not in kwargs
+            assert "messages" in kwargs
+            assert "model" in kwargs
+            assert "response_format" in kwargs
             if self.calls == 1:
                 raise RuntimeError('400 INVALID_ARGUMENT Unknown name "additional_properties"')
 
@@ -329,9 +334,12 @@ def test_call_groq_model_retries_json_schema_then_json_object(monkeypatch):
         "total_tokens": 18,
     }
     assert len(seen) == 2
-    assert "response_format" in seen[0]
     assert seen[0]["response_format"]["type"] == "json_schema"
     assert seen[1]["response_format"]["type"] == "json_object"
+    assert "response_mime_type" not in seen[0]
+    assert "response_schema" not in seen[0]
+    assert "response_mime_type" not in seen[1]
+    assert "response_schema" not in seen[1]
 
 
 def test_provider_sequence_routes_groq_to_groq_model(monkeypatch):
