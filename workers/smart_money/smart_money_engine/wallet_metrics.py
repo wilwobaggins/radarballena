@@ -3,8 +3,12 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
-from noise_filter import build_noise_profile
-from wallet_classifier import classify_wallet
+try:  # pragma: no cover - support package and script-style imports
+    from .noise_filter import build_noise_profile
+    from .wallet_classifier import classify_wallet
+except ImportError:  # pragma: no cover
+    from noise_filter import build_noise_profile
+    from wallet_classifier import classify_wallet
 
 
 def clamp(value: float, lower: float = 0.0, upper: float = 100.0) -> float:

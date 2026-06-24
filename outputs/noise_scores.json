@@ -1,0 +1,719 @@
+[
+  {
+    "wallet": "0x204f72f35326db932158cba6adff0b9a1da95e14",
+    "noiseScore": 20,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x228b8d11eba89bf1c554f8879a9293b7106daf4c",
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x91a84f83b529c68db43bba25994a35f74394b42e",
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x32b484581fc5606de9c1e43af4636b6be9bc8b21",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x684e8f44e1a04a5bba463fa53f293a3ea0932d3a",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb4d250f58c26840e09723a83ce9c8149aa32ce99",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe400dfc7a16fedfdd4fa59bae58d88deeaed9aa9",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xc29198ad764bd6adaf7bb971a3757a689ece5d74",
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xfe787d2da716d60e8acff57fb87eb13cd4d10319",
+    "noiseScore": 0,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x349606c1b77f3ba668879cbc9347f15a44cf8fc4",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x86c878cde72660ec52f5e6f0f0438b76de8fc867",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xef3a85e91c9fd96f37546495536a7964ab011eb3",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x53757615de1c42b83f893b79d4241a009dc2aeea",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x37e053beabee77acc15e641dfe8e395b2b2d024e",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xbde579ead903b9cf5c3fc4be5a0c515464769c38",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe9076a87c5ed90ef16e6fe6529c943baeca0cff6",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x4483c26cdf27496cf32fb244972fca3f9ee5c565",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x89f967233e8473a0b7f2004b9d1b31ebebd9b9c5",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x96489abcb9f583d6835c8ef95ffc923d05a86825",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xc46e1b1753ef0adf35483e042cecc0b743679ed8",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x2d6ac4f70307102ac46e9e6ded67f3838ddf8add",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xfa011919b3ce3222620052757ee0f0c66c41f0a7",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x47138dc1eef25f1ea91f3b2fda0e0f455c634d21",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb6ace68506451a0384d72b185944418049ed6b83",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x0d2d845a6ff64e31e04a70afce8a573940767ff5",
+    "noiseScore": 0,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x849ccb5907938ce8be18ed5dbf583288e2da4009",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x60ec17443af511a21945f01430e61c803465f7b0",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x98883c610e4400dd998f81cf41658d51ff06e6fe",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x39dcad6ddc175233875b8b0ccf2687ba1c58fc23",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x56f4f054e92ced8fa7accfebcad73251afe49ec5",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x62ff0d095004a31700eba2c89582c0ad35aa5058",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe30172a60cda439db2b15b7c2cffe801ade38654",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x0346afae2603313d2bbee96b628536c8cbe352a5",
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x12ed45d2b45259d27a7fb593e564cd269c4fc9b4",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x5268527977f700f9bf9b6d5cd843859e4e70135d",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x65503c7f9e142ac88b1ce09df3363ff77f188451",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x330b5a96c10958ae0d0861901d7e8ea6a37569f1",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xad97d0ffada1dadc3f61500171633ad61723dc4c",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb886580698ede4b18de3e446b2d8da8bcedd81b3",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x293fe7c5cabcef88d543ed6083b92c74c8c526a1",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb3557fb2f13149ffbee8f9580fe8cfb4e698f149",
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x222b39028382cf70873f92487fb6e93324751a8d",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "possible_hedge",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x503e2958f32c6f854918df13ff952ac1336c1cd0",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x74957ea27ac4fbdee46d861fdae357859ff67fcf",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x38de5a209473f675d10822982bec95edf2d2f06c",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x60bad0ad4871a31cb2bf392472056b15e20b3c6c",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe4fc1041edb5c205e449fb6a5967e9db24418af7",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x92bae198769a0b7134a1ceca2b326b0bffb71d1c",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xaabb9635b907c0ab34e6c6e4000481dac1245554",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x2f5bb96e2da56a85e7bfddcad6e48f73e9bbe747",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x41337012c28ad2bdb97ca28d11fbb0fbf6a9e7a9",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x3c918a8ef8c379304f744592120cbb4d76149af7",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x622f181cecfc05fb358e33bae7601e8e153d9992",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xf6c6f97260df6b37d0d047e756703f60ce6c7d80",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x98db8cca55c32b24cfb414b5b43d273f4e1fdd17",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x33ab58e55895f39619815d31dfc92d90d65f9523",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xaeb2e1b6f564cc6faee83276a029771683ae58c1",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb89f5425341719d298dc2f5b9a92374f5fde1c44",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x84bc4e82f9763b86abe31684f72666bea9654aad",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x9c265ef8609d8899747fa64be7c666d0d1edd474",
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  }
+]

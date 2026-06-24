@@ -2,11 +2,18 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
-from wallet_classifier import (
-    SIGNAL_WALLET,
-    SPECIALIST_WALLET,
-    WHALE_BUT_NOISY,
-)
+try:  # pragma: no cover - support package and script-style imports
+    from .wallet_classifier import (
+        SIGNAL_WALLET,
+        SPECIALIST_WALLET,
+        WHALE_BUT_NOISY,
+    )
+except ImportError:  # pragma: no cover
+    from wallet_classifier import (
+        SIGNAL_WALLET,
+        SPECIALIST_WALLET,
+        WHALE_BUT_NOISY,
+    )
 
 
 QUALIFIED_CLASSIFICATION_WEIGHTS = {

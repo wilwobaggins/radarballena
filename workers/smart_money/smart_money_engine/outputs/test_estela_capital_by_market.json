@@ -1,0 +1,212 @@
+[
+  {
+    "marketId": "m2",
+    "title": "macro market m2",
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero todavía no alcanza para una confirmación fuerte.",
+    "confidence": 53,
+    "smartBias": 1.0,
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1500.0,
+    "weightedYesFlow": 918.0,
+    "weightedNoFlow": 0.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 52,
+    "freshnessScore": 100,
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [
+      {
+        "wallet": "0xabc",
+        "walletQualityScore": 68,
+        "classification": "SPECIALIST_WALLET",
+        "side": "BUY",
+        "outcome": "YES",
+        "sizeUsd": 1500.0,
+        "price": 0.25,
+        "timestamp": "2026-06-24T18:22:07.644617+00:00"
+      }
+    ],
+    "relatedMarkets": [],
+    "generatedAt": "2026-06-24T19:22:07.649116+00:00"
+  },
+  {
+    "marketId": "m6",
+    "title": "macro market m6",
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero todavía no alcanza para una confirmación fuerte.",
+    "confidence": 52,
+    "smartBias": 1.0,
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1300.0,
+    "weightedYesFlow": 795.6,
+    "weightedNoFlow": 0.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 51,
+    "freshnessScore": 100,
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [
+      {
+        "wallet": "0xabc",
+        "walletQualityScore": 68,
+        "classification": "SPECIALIST_WALLET",
+        "side": "BUY",
+        "outcome": "YES",
+        "sizeUsd": 1300.0,
+        "price": 0.5,
+        "timestamp": "2026-06-24T18:22:07.644617+00:00"
+      }
+    ],
+    "relatedMarkets": [],
+    "generatedAt": "2026-06-24T19:22:07.649116+00:00"
+  },
+  {
+    "marketId": "m1",
+    "title": "macro market m1",
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero todavía no alcanza para una confirmación fuerte.",
+    "confidence": 52,
+    "smartBias": 1.0,
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1200.0,
+    "weightedYesFlow": 734.4,
+    "weightedNoFlow": 0.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 51,
+    "freshnessScore": 100,
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [
+      {
+        "wallet": "0xabc",
+        "walletQualityScore": 68,
+        "classification": "SPECIALIST_WALLET",
+        "side": "BUY",
+        "outcome": "YES",
+        "sizeUsd": 1200.0,
+        "price": 0.2,
+        "timestamp": "2026-06-24T18:22:07.644617+00:00"
+      }
+    ],
+    "relatedMarkets": [],
+    "generatedAt": "2026-06-24T19:22:07.649116+00:00"
+  },
+  {
+    "marketId": "m4",
+    "title": "macro market m4",
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero todavía no alcanza para una confirmación fuerte.",
+    "confidence": 52,
+    "smartBias": 1.0,
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1100.0,
+    "weightedYesFlow": 673.2,
+    "weightedNoFlow": 0.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 51,
+    "freshnessScore": 100,
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [
+      {
+        "wallet": "0xabc",
+        "walletQualityScore": 68,
+        "classification": "SPECIALIST_WALLET",
+        "side": "BUY",
+        "outcome": "YES",
+        "sizeUsd": 1100.0,
+        "price": 0.55,
+        "timestamp": "2026-06-24T18:22:07.644617+00:00"
+      }
+    ],
+    "relatedMarkets": [],
+    "generatedAt": "2026-06-24T19:22:07.649116+00:00"
+  },
+  {
+    "marketId": "m5",
+    "title": "macro market m5",
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero todavía no alcanza para una confirmación fuerte.",
+    "confidence": 51,
+    "smartBias": 1.0,
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1000.0,
+    "weightedYesFlow": 612.0,
+    "weightedNoFlow": 0.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 50,
+    "freshnessScore": 100,
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [
+      {
+        "wallet": "0xabc",
+        "walletQualityScore": 68,
+        "classification": "SPECIALIST_WALLET",
+        "side": "BUY",
+        "outcome": "YES",
+        "sizeUsd": 1000.0,
+        "price": 0.45,
+        "timestamp": "2026-06-24T18:22:07.644617+00:00"
+      }
+    ],
+    "relatedMarkets": [],
+    "generatedAt": "2026-06-24T19:22:07.649116+00:00"
+  },
+  {
+    "marketId": "m3",
+    "title": "macro market m3",
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero todavía no alcanza para una confirmación fuerte.",
+    "confidence": 51,
+    "smartBias": 1.0,
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 900.0,
+    "weightedYesFlow": 550.8,
+    "weightedNoFlow": 0.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 50,
+    "freshnessScore": 100,
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [
+      {
+        "wallet": "0xabc",
+        "walletQualityScore": 68,
+        "classification": "SPECIALIST_WALLET",
+        "side": "BUY",
+        "outcome": "YES",
+        "sizeUsd": 900.0,
+        "price": 0.3,
+        "timestamp": "2026-06-24T18:22:07.644617+00:00"
+      }
+    ],
+    "relatedMarkets": [],
+    "generatedAt": "2026-06-24T19:22:07.649116+00:00"
+  }
+]

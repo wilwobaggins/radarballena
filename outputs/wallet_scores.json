@@ -1,0 +1,2183 @@
+[
+  {
+    "wallet": "0x204f72f35326db932158cba6adff0b9a1da95e14",
+    "walletQualityScore": 68,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 11850.04,
+      "tradeCount": 5,
+      "uniqueMarkets": 4,
+      "avgSize": 2370.01,
+      "earlyEntryRatio": 0.4,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 0.8,
+      "concentrationRisk": 0.0769
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 71,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 62,
+      "sizeScore": 100,
+      "consistencyScore": 45,
+      "antiNoiseScore": 97
+    },
+    "noiseScore": 20,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+    "walletQualityScore": 66,
+    "classification": "SPECIALIST_WALLET",
+    "metrics": {
+      "totalVolume": 6605.92,
+      "tradeCount": 8,
+      "uniqueMarkets": 5,
+      "avgSize": 825.74,
+      "earlyEntryRatio": 0.75,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.3885
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 85,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 38,
+      "sizeScore": 96,
+      "consistencyScore": 44,
+      "antiNoiseScore": 86
+    },
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x228b8d11eba89bf1c554f8879a9293b7106daf4c",
+    "walletQualityScore": 61,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 2300.0,
+      "tradeCount": 2,
+      "uniqueMarkets": 2,
+      "avgSize": 1150.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.5808
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 89,
+      "consistencyScore": 12,
+      "antiNoiseScore": 80
+    },
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x91a84f83b529c68db43bba25994a35f74394b42e",
+    "walletQualityScore": 60,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 1089.74,
+      "tradeCount": 2,
+      "uniqueMarkets": 2,
+      "avgSize": 544.87,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.5808
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 81,
+      "consistencyScore": 12,
+      "antiNoiseScore": 80
+    },
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x32b484581fc5606de9c1e43af4636b6be9bc8b21",
+    "walletQualityScore": 59,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 5632.97,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 5632.97,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 95,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x684e8f44e1a04a5bba463fa53f293a3ea0932d3a",
+    "walletQualityScore": 59,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 4751.44,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 4751.44,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 94,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb4d250f58c26840e09723a83ce9c8149aa32ce99",
+    "walletQualityScore": 59,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 4142.56,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 4142.56,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 93,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe400dfc7a16fedfdd4fa59bae58d88deeaed9aa9",
+    "walletQualityScore": 59,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 2162.86,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 2162.86,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 88,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xc29198ad764bd6adaf7bb971a3757a689ece5d74",
+    "walletQualityScore": 59,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 2060.22,
+      "tradeCount": 3,
+      "uniqueMarkets": 3,
+      "avgSize": 686.74,
+      "earlyEntryRatio": 0.6667,
+      "lateEntryRatio": 0.3333,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.35
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 67,
+      "directionalClarityScore": 78,
+      "categorySpecializationScore": 38,
+      "sizeScore": 87,
+      "consistencyScore": 27,
+      "antiNoiseScore": 78
+    },
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xfe787d2da716d60e8acff57fb87eb13cd4d10319",
+    "walletQualityScore": 59,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 591.0,
+      "tradeCount": 2,
+      "uniqueMarkets": 2,
+      "avgSize": 295.5,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.5808
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 74,
+      "consistencyScore": 12,
+      "antiNoiseScore": 80
+    },
+    "noiseScore": 0,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x349606c1b77f3ba668879cbc9347f15a44cf8fc4",
+    "walletQualityScore": 58,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 1842.11,
+      "tradeCount": 3,
+      "uniqueMarkets": 1,
+      "avgSize": 614.04,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 86,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x86c878cde72660ec52f5e6f0f0438b76de8fc867",
+    "walletQualityScore": 58,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 1354.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 1354.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 85,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xef3a85e91c9fd96f37546495536a7964ab011eb3",
+    "walletQualityScore": 58,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 1052.63,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 1052.63,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 83,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x53757615de1c42b83f893b79d4241a009dc2aeea",
+    "walletQualityScore": 58,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 762.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 762.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 81,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x37e053beabee77acc15e641dfe8e395b2b2d024e",
+    "walletQualityScore": 58,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 762.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 762.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 81,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xbde579ead903b9cf5c3fc4be5a0c515464769c38",
+    "walletQualityScore": 58,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 736.84,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 736.84,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 80,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe9076a87c5ed90ef16e6fe6529c943baeca0cff6",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 538.11,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 538.11,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 76,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x4483c26cdf27496cf32fb244972fca3f9ee5c565",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 526.32,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 526.32,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 76,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x89f967233e8473a0b7f2004b9d1b31ebebd9b9c5",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 468.75,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 468.75,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 75,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x96489abcb9f583d6835c8ef95ffc923d05a86825",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 425.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 425.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 74,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xc46e1b1753ef0adf35483e042cecc0b743679ed8",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 354.82,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 354.82,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 71,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x2d6ac4f70307102ac46e9e6ded67f3838ddf8add",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 340.5,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 340.5,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 71,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xfa011919b3ce3222620052757ee0f0c66c41f0a7",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 300.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 300.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 69,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x47138dc1eef25f1ea91f3b2fda0e0f455c634d21",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 280.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 280.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 69,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb6ace68506451a0384d72b185944418049ed6b83",
+    "walletQualityScore": 57,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 263.16,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 263.16,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 68,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x0d2d845a6ff64e31e04a70afce8a573940767ff5",
+    "walletQualityScore": 56,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 859.0,
+      "tradeCount": 2,
+      "uniqueMarkets": 2,
+      "avgSize": 429.5,
+      "earlyEntryRatio": 0.5,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.5808
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 75,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 79,
+      "consistencyScore": 12,
+      "antiNoiseScore": 80
+    },
+    "noiseScore": 0,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x849ccb5907938ce8be18ed5dbf583288e2da4009",
+    "walletQualityScore": 56,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 254.08,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 254.08,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 67,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x60ec17443af511a21945f01430e61c803465f7b0",
+    "walletQualityScore": 56,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 254.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 254.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 67,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x98883c610e4400dd998f81cf41658d51ff06e6fe",
+    "walletQualityScore": 56,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 252.5,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 252.5,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 67,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x39dcad6ddc175233875b8b0ccf2687ba1c58fc23",
+    "walletQualityScore": 56,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 250.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 250.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 67,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x56f4f054e92ced8fa7accfebcad73251afe49ec5",
+    "walletQualityScore": 55,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 1090.89,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 1090.89,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 84,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x62ff0d095004a31700eba2c89582c0ad35aa5058",
+    "walletQualityScore": 55,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 1017.85,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 1017.85,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 83,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe30172a60cda439db2b15b7c2cffe801ade38654",
+    "walletQualityScore": 55,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 976.6,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 976.6,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 83,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x0346afae2603313d2bbee96b628536c8cbe352a5",
+    "walletQualityScore": 53,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 2561.91,
+      "tradeCount": 2,
+      "uniqueMarkets": 2,
+      "avgSize": 1280.95,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.5808
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 90,
+      "consistencyScore": 12,
+      "antiNoiseScore": 80
+    },
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x12ed45d2b45259d27a7fb593e564cd269c4fc9b4",
+    "walletQualityScore": 53,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 322.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 322.0,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 70,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x5268527977f700f9bf9b6d5cd843859e4e70135d",
+    "walletQualityScore": 51,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 4622.5,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 4622.5,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 94,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x65503c7f9e142ac88b1ce09df3363ff77f188451",
+    "walletQualityScore": 51,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 2555.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 2555.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 90,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x330b5a96c10958ae0d0861901d7e8ea6a37569f1",
+    "walletQualityScore": 50,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 736.84,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 736.84,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 80,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xad97d0ffada1dadc3f61500171633ad61723dc4c",
+    "walletQualityScore": 50,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 692.37,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 692.37,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 80,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb886580698ede4b18de3e446b2d8da8bcedd81b3",
+    "walletQualityScore": 49,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 5000.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 5000.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 94,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x293fe7c5cabcef88d543ed6083b92c74c8c526a1",
+    "walletQualityScore": 49,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 2000.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 2000.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 88,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb3557fb2f13149ffbee8f9580fe8cfb4e698f149",
+    "walletQualityScore": 49,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 288.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 288.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 69,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 24,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x222b39028382cf70873f92487fb6e93324751a8d",
+    "walletQualityScore": 48,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 730.97,
+      "tradeCount": 2,
+      "uniqueMarkets": 1,
+      "avgSize": 365.49,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.5,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 71,
+      "categorySpecializationScore": 18,
+      "sizeScore": 77,
+      "consistencyScore": 0,
+      "antiNoiseScore": 65
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "possible_hedge",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x503e2958f32c6f854918df13ff952ac1336c1cd0",
+    "walletQualityScore": 48,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 500.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 500.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 76,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x74957ea27ac4fbdee46d861fdae357859ff67fcf",
+    "walletQualityScore": 47,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 265.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 265.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 18,
+      "sizeScore": 68,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x38de5a209473f675d10822982bec95edf2d2f06c",
+    "walletQualityScore": 46,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 5000.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 5000.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 94,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x60bad0ad4871a31cb2bf392472056b15e20b3c6c",
+    "walletQualityScore": 44,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 500.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 500.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 76,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xe4fc1041edb5c205e449fb6a5967e9db24418af7",
+    "walletQualityScore": 44,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 500.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 500.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 76,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x92bae198769a0b7134a1ceca2b326b0bffb71d1c",
+    "walletQualityScore": 44,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 498.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 498.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 76,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xaabb9635b907c0ab34e6c6e4000481dac1245554",
+    "walletQualityScore": 44,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 400.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 400.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 73,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x2f5bb96e2da56a85e7bfddcad6e48f73e9bbe747",
+    "walletQualityScore": 44,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 337.42,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 337.42,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 71,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x41337012c28ad2bdb97ca28d11fbb0fbf6a9e7a9",
+    "walletQualityScore": 44,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 262.58,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 262.58,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 55,
+      "directionalClarityScore": 60,
+      "categorySpecializationScore": 18,
+      "sizeScore": 68,
+      "consistencyScore": 0,
+      "antiNoiseScore": 30
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x3c918a8ef8c379304f744592120cbb4d76149af7",
+    "walletQualityScore": 38,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 2162.86,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 2162.86,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 70,
+      "categorySpecializationScore": 18,
+      "sizeScore": 88,
+      "consistencyScore": 0,
+      "antiNoiseScore": 35
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x622f181cecfc05fb358e33bae7601e8e153d9992",
+    "walletQualityScore": 37,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 530.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 530.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 70,
+      "categorySpecializationScore": 18,
+      "sizeScore": 76,
+      "consistencyScore": 0,
+      "antiNoiseScore": 35
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xf6c6f97260df6b37d0d047e756703f60ce6c7d80",
+    "walletQualityScore": 37,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 425.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 425.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 70,
+      "categorySpecializationScore": 18,
+      "sizeScore": 74,
+      "consistencyScore": 0,
+      "antiNoiseScore": 35
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x98db8cca55c32b24cfb414b5b43d273f4e1fdd17",
+    "walletQualityScore": 37,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 332.0,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 332.0,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 70,
+      "categorySpecializationScore": 18,
+      "sizeScore": 71,
+      "consistencyScore": 0,
+      "antiNoiseScore": 35
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x33ab58e55895f39619815d31dfc92d90d65f9523",
+    "walletQualityScore": 35,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 421.75,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 421.75,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 70,
+      "categorySpecializationScore": 18,
+      "sizeScore": 74,
+      "consistencyScore": 0,
+      "antiNoiseScore": 0
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xaeb2e1b6f564cc6faee83276a029771683ae58c1",
+    "walletQualityScore": 35,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 352.27,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 352.27,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 70,
+      "categorySpecializationScore": 18,
+      "sizeScore": 71,
+      "consistencyScore": 0,
+      "antiNoiseScore": 0
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0xb89f5425341719d298dc2f5b9a92374f5fde1c44",
+    "walletQualityScore": 35,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 285.11,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 285.11,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 70,
+      "categorySpecializationScore": 18,
+      "sizeScore": 69,
+      "consistencyScore": 0,
+      "antiNoiseScore": 0
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x84bc4e82f9763b86abe31684f72666bea9654aad",
+    "walletQualityScore": 32,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 421.75,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 421.75,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 48,
+      "categorySpecializationScore": 18,
+      "sizeScore": 74,
+      "consistencyScore": 0,
+      "antiNoiseScore": 0
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  },
+  {
+    "wallet": "0x9c265ef8609d8899747fa64be7c666d0d1edd474",
+    "walletQualityScore": 32,
+    "classification": "INSUFFICIENT_HISTORY",
+    "metrics": {
+      "totalVolume": 352.27,
+      "tradeCount": 1,
+      "uniqueMarkets": 1,
+      "avgSize": 352.27,
+      "earlyEntryRatio": 0.0,
+      "lateEntryRatio": 1.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 1.0,
+      "sellRatio": 1.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 1.0
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 10,
+      "directionalClarityScore": 48,
+      "categorySpecializationScore": 18,
+      "sizeScore": 71,
+      "consistencyScore": 0,
+      "antiNoiseScore": 0
+    },
+    "noiseScore": 29,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [
+      "low_trade_count",
+      "low_market_diversity",
+      "sell_heavy",
+      "high_noise_profile",
+      "late_chaser",
+      "extreme_price_behavior",
+      "concentration_risk"
+    ],
+    "generatedAt": "2026-06-24T19:25:35.317591+00:00"
+  }
+]

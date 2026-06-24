@@ -1,4 +1,5 @@
 import json
+import asyncio
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -117,6 +118,219 @@ def test_main_run_writes_wallet_scores_json(monkeypatch):
     estela_payload = json.loads(output_estela_file.read_text(encoding="utf-8"))
     assert len(estela_payload) == 6
     assert all(item["status"] == "DIRECT_WEAK" for item in estela_payload)
+
+
+def test_main_shadow_disabled_preserves_productive_output(monkeypatch):
+    trades = [
+        build_trade("0xabc", "m1", price=0.2, size_usd=1200, category_guess="macro"),
+        build_trade("0xabc", "m2", price=0.25, size_usd=1500, category_guess="macro"),
+        build_trade("0xabc", "m3", price=0.3, size_usd=900, category_guess="macro"),
+        build_trade("0xabc", "m4", price=0.55, size_usd=1100, category_guess="macro"),
+        build_trade("0xabc", "m5", price=0.45, size_usd=1000, category_guess="macro"),
+        build_trade("0xabc", "m6", price=0.5, size_usd=1300, category_guess="macro"),
+    ]
+
+    async def fake_fetch_recent_activity():
+        return trades
+
+    monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
+    monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
+    monkeypatch.setattr(smart_money_main, "SKILL_SHADOW_ENABLED", False)
+    monkeypatch.setattr(
+        smart_money_main,
+        "_fetch_shadow_positions",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("shadow should be disabled")),
+    )
+    written = {}
+
+    def fake_save_json(filename: str, data):
+        written[filename] = data
+        return Path(filename)
+
+    monkeypatch.setattr(smart_money_main, "save_json", fake_save_json)
+
+    result = asyncio.run(smart_money_main.execute_engine())
+
+    assert "wallet_skill_shadow.json" not in written
+    assert "shadow_rows" in result
+    assert result["wallet_scores"][0]["walletQualityScore"] == written["wallet_scores.json"][0]["walletQualityScore"]
+
+
+def test_shadow_fetch_failure_does_not_cancel_other_wallets(monkeypatch):
+    async def fake_fetch(wallet, max_positions=500):
+        if wallet.endswith("1"):
+            raise RuntimeError("boom")
+        return [{"avgPrice": 0.2, "totalBought": 10, "realizedPnl": 2}]
+
+    monkeypatch.setattr(smart_money_main, "fetch_closed_positions", fake_fetch)
+
+    selected = [
+        {"wallet": "0x" + "1" * 40, "walletQualityScore": 90, "metrics": {"totalVolume": 1000}},
+        {"wallet": "0x" + "2" * 40, "walletQualityScore": 80, "metrics": {"totalVolume": 900}},
+    ]
+
+    shadow_positions = asyncio.run(smart_money_main._fetch_shadow_positions(selected))
+
+    assert shadow_positions["0x" + "1" * 40]["error"]
+    assert shadow_positions["0x" + "2" * 40]["closed_positions"]
+
+
+def test_priority_wallet_present_reuses_global_behavior(monkeypatch):
+    trades = [
+        build_trade("0x" + "a" * 40, "m1", price=0.2, size_usd=1200, category_guess="macro"),
+        build_trade("0x" + "a" * 40, "m2", price=0.25, size_usd=1500, category_guess="macro"),
+        build_trade("0x" + "a" * 40, "m3", price=0.3, size_usd=900, category_guess="macro"),
+        build_trade("0x" + "a" * 40, "m4", price=0.55, size_usd=1100, category_guess="macro"),
+        build_trade("0x" + "a" * 40, "m5", price=0.45, size_usd=1000, category_guess="macro"),
+        build_trade("0x" + "a" * 40, "m6", price=0.5, size_usd=1300, category_guess="macro"),
+        build_trade("0x" + "b" * 40, "m7", price=0.2, size_usd=1200, category_guess="macro"),
+        build_trade("0x" + "b" * 40, "m8", price=0.25, size_usd=1500, category_guess="macro"),
+        build_trade("0x" + "b" * 40, "m9", price=0.3, size_usd=900, category_guess="macro"),
+        build_trade("0x" + "b" * 40, "m10", price=0.55, size_usd=1100, category_guess="macro"),
+        build_trade("0x" + "b" * 40, "m11", price=0.45, size_usd=1000, category_guess="macro"),
+        build_trade("0x" + "b" * 40, "m12", price=0.5, size_usd=1300, category_guess="macro"),
+    ]
+
+    async def fake_fetch_recent_activity():
+        return trades
+
+    monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
+    monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
+    monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", "0x" + "a" * 40)
+    monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
+
+    selected = smart_money_main.build_shadow_wallet_targets(compute_wallet_scores(trades))
+    assert len(selected) == 1
+    assert selected[0]["wallet"] == "0x" + "a" * 40
+    assert selected[0]["source"] == "global_wallet_scores"
+
+
+def test_priority_wallet_missing_uses_targeted_activity_and_shadow_only(monkeypatch):
+    global_wallet = "0x" + "b" * 40
+    priority_wallet = "0x" + "c" * 40
+    trades = [
+        build_trade(global_wallet, "m1", price=0.2, size_usd=1200, category_guess="macro"),
+        build_trade(global_wallet, "m2", price=0.25, size_usd=1500, category_guess="macro"),
+        build_trade(global_wallet, "m3", price=0.3, size_usd=900, category_guess="macro"),
+        build_trade(global_wallet, "m4", price=0.55, size_usd=1100, category_guess="macro"),
+        build_trade(global_wallet, "m5", price=0.45, size_usd=1000, category_guess="macro"),
+        build_trade(global_wallet, "m6", price=0.5, size_usd=1300, category_guess="macro"),
+    ]
+
+    async def fake_fetch_recent_activity():
+        return trades
+
+    monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
+    monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
+    monkeypatch.setattr(
+        smart_money_main,
+        "_fetch_targeted_activity_for_wallet",
+        lambda wallet: asyncio.sleep(0, result=(
+            [{"id": "evt-1"}],
+            [{"wallet": wallet, "market_id": "m1", "side": "BUY", "outcome": "Yes", "title": "election result", "category_guess": "politics", "size_usd": 1000, "price": 0.2, "timestamp": datetime.now(timezone.utc), "raw": {}}],
+        )),
+    )
+    monkeypatch.setattr(
+        smart_money_main,
+        "fetch_closed_positions",
+        lambda wallet, max_positions=500: asyncio.sleep(0, result=[{"avgPrice": 0.2, "totalBought": 10, "realizedPnl": 2, "title": "election result"}]),
+    )
+    monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", priority_wallet)
+    monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
+
+    selected = smart_money_main.build_shadow_wallet_targets(compute_wallet_scores(trades))
+    assert selected[0]["wallet"] == priority_wallet
+    assert selected[0]["source"] == "targeted_wallet_activity"
+
+    targeted_behaviors = asyncio.run(smart_money_main._fetch_targeted_wallet_behaviors([selected[0]]))
+    assert targeted_behaviors[priority_wallet]["walletScore"] is not None
+    assert targeted_behaviors[priority_wallet]["behaviorStatus"] == "sufficient"
+
+
+def test_priority_wallet_missing_without_activity_keeps_shadow_only(monkeypatch):
+    global_wallet = "0x" + "b" * 40
+    priority_wallet = "0x" + "d" * 40
+    trades = [
+        build_trade(global_wallet, "m1", price=0.2, size_usd=1200, category_guess="macro"),
+        build_trade(global_wallet, "m2", price=0.25, size_usd=1500, category_guess="macro"),
+        build_trade(global_wallet, "m3", price=0.3, size_usd=900, category_guess="macro"),
+        build_trade(global_wallet, "m4", price=0.55, size_usd=1100, category_guess="macro"),
+        build_trade(global_wallet, "m5", price=0.45, size_usd=1000, category_guess="macro"),
+        build_trade(global_wallet, "m6", price=0.5, size_usd=1300, category_guess="macro"),
+    ]
+
+    async def fake_fetch_recent_activity():
+        return trades
+
+    monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
+    monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
+    monkeypatch.setattr(
+        smart_money_main,
+        "_fetch_targeted_activity_for_wallet",
+        lambda wallet: asyncio.sleep(0, result=([], [])),
+    )
+    monkeypatch.setattr(
+        smart_money_main,
+        "fetch_closed_positions",
+        lambda wallet, max_positions=500: asyncio.sleep(0, result=[]),
+    )
+    monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", priority_wallet)
+    monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
+
+    selected = smart_money_main.build_shadow_wallet_targets(compute_wallet_scores(trades))
+    assert selected[0]["wallet"] == priority_wallet
+    assert selected[0]["source"] == "targeted_wallet_activity"
+
+    targeted_behaviors = asyncio.run(smart_money_main._fetch_targeted_wallet_behaviors([selected[0]]))
+    assert targeted_behaviors[priority_wallet]["behaviorStatus"] == "insufficient_recent_activity"
+    assert targeted_behaviors[priority_wallet]["walletScore"] is None
+
+
+def test_priority_wallet_missing_does_not_enter_productive_wallet_scores(monkeypatch):
+    priority_wallet = "0x" + "e" * 40
+    global_wallet = "0x" + "f" * 40
+    trades = [
+        build_trade(global_wallet, "m1", price=0.2, size_usd=1200, category_guess="macro"),
+        build_trade(global_wallet, "m2", price=0.25, size_usd=1500, category_guess="macro"),
+        build_trade(global_wallet, "m3", price=0.3, size_usd=900, category_guess="macro"),
+        build_trade(global_wallet, "m4", price=0.55, size_usd=1100, category_guess="macro"),
+        build_trade(global_wallet, "m5", price=0.45, size_usd=1000, category_guess="macro"),
+        build_trade(global_wallet, "m6", price=0.5, size_usd=1300, category_guess="macro"),
+    ]
+
+    async def fake_fetch_recent_activity():
+        return trades
+
+    written = {}
+
+    def fake_save_json(filename: str, data):
+        written[filename] = data
+        return Path(filename)
+
+    monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
+    monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
+    monkeypatch.setattr(
+        smart_money_main,
+        "_fetch_targeted_activity_for_wallet",
+        lambda wallet: asyncio.sleep(0, result=([], [])),
+    )
+    monkeypatch.setattr(
+        smart_money_main,
+        "fetch_closed_positions",
+        lambda wallet, max_positions=500: asyncio.sleep(0, result=[]),
+    )
+    monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", priority_wallet)
+    monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
+    monkeypatch.setattr(smart_money_main, "SKILL_SHADOW_ENABLED", True)
+    monkeypatch.setattr(smart_money_main, "save_json", fake_save_json)
+    monkeypatch.setattr(smart_money_main, "build_market_capital_trails", lambda trades, wallet_scores: [])
+    monkeypatch.setattr(smart_money_main, "build_estela_capital_by_market", lambda trades, market_trails, wallet_scores: [])
+
+    result = asyncio.run(smart_money_main.execute_engine())
+
+    assert all(entry["wallet"] != priority_wallet for entry in written["wallet_scores.json"])
+    assert any(entry["wallet"] == priority_wallet for entry in written["wallet_skill_shadow.json"])
+    assert result["wallet_scores"] == written["wallet_scores.json"]
 
 
 def test_high_noise_high_volume_wallet_is_demoted_to_whale_but_noisy():

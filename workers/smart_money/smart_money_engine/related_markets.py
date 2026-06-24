@@ -2,7 +2,10 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any
 
-from market_trail import build_wallet_score_map
+try:  # pragma: no cover - support package and script-style imports
+    from .market_trail import build_wallet_score_map
+except ImportError:  # pragma: no cover
+    from market_trail import build_wallet_score_map
 
 
 STOPWORDS = {

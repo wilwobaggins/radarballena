@@ -1,0 +1,134 @@
+[
+  {
+    "marketId": "m2",
+    "title": "macro market m2",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1500.0,
+    "weightedYesFlow": 918.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 52,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-24T19:22:07.647633+00:00"
+  },
+  {
+    "marketId": "m6",
+    "title": "macro market m6",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1300.0,
+    "weightedYesFlow": 795.6,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 51,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-24T19:22:07.647633+00:00"
+  },
+  {
+    "marketId": "m1",
+    "title": "macro market m1",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1200.0,
+    "weightedYesFlow": 734.4,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 51,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-24T19:22:07.647633+00:00"
+  },
+  {
+    "marketId": "m4",
+    "title": "macro market m4",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1100.0,
+    "weightedYesFlow": 673.2,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 51,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-24T19:22:07.647633+00:00"
+  },
+  {
+    "marketId": "m5",
+    "title": "macro market m5",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1000.0,
+    "weightedYesFlow": 612.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 50,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-24T19:22:07.647633+00:00"
+  },
+  {
+    "marketId": "m3",
+    "title": "macro market m3",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 900.0,
+    "weightedYesFlow": 550.8,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 50,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-24T19:22:07.647633+00:00"
+  }
+]

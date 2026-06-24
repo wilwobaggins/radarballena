@@ -7,25 +7,58 @@ from typing import Any, Optional
 import httpx
 from dotenv import load_dotenv
 
-from market_trail import (
-    build_market_capital_trails,
-    summarize_market_trails,
-)
-from related_markets import build_estela_capital_by_market
-from storage import save_json
-from supabase_writer import (
-    fail_engine_run,
-    finish_engine_run,
-    start_engine_run,
-    upsert_capital_trails,
-    upsert_wallet_scores,
-)
-from wallet_classifier import (
-    INSUFFICIENT_HISTORY,
-    SIGNAL_WALLET,
-    WHALE_BUT_NOISY,
-)
-from wallet_metrics import compute_wallet_scores
+try:  # pragma: no cover - support package and script-style imports
+    from .market_trail import (
+        build_market_capital_trails,
+        summarize_market_trails,
+    )
+    from .related_markets import build_estela_capital_by_market
+    from .polymarket_profile_client import fetch_closed_positions
+    from .storage import save_json
+    from .supabase_writer import (
+        fail_engine_run,
+        finish_engine_run,
+        start_engine_run,
+        upsert_capital_trails,
+        upsert_wallet_scores,
+    )
+    from .category_utils import guess_category_from_title
+    from .wallet_skill_score import (
+        compute_shadow_meta_evaluation,
+        compute_wallet_skill,
+    )
+    from .wallet_classifier import (
+        INSUFFICIENT_HISTORY,
+        SIGNAL_WALLET,
+        WHALE_BUT_NOISY,
+    )
+    from .wallet_metrics import compute_wallet_scores
+except ImportError:  # pragma: no cover
+    from market_trail import (
+        build_market_capital_trails,
+        summarize_market_trails,
+    )
+    from related_markets import build_estela_capital_by_market
+    from polymarket_profile_client import fetch_closed_positions
+    from storage import save_json
+    from supabase_writer import (
+        fail_engine_run,
+        finish_engine_run,
+        start_engine_run,
+        upsert_capital_trails,
+        upsert_wallet_scores,
+    )
+    from category_utils import guess_category_from_title
+    from wallet_skill_score import (
+        compute_shadow_meta_evaluation,
+        compute_wallet_skill,
+    )
+    from wallet_classifier import (
+        INSUFFICIENT_HISTORY,
+        SIGNAL_WALLET,
+        WHALE_BUT_NOISY,
+    )
+    from wallet_metrics import compute_wallet_scores
 
 
 load_dotenv()
@@ -35,6 +68,11 @@ MIN_TRADE_USD = float(os.getenv("MIN_TRADE_USD", "250"))
 LOOKBACK_HOURS = int(os.getenv("LOOKBACK_HOURS", "168"))
 PAGE_LIMIT = int(os.getenv("PAGE_LIMIT", "1000"))
 MAX_OFFSET = int(os.getenv("MAX_OFFSET", "4000"))
+SKILL_SHADOW_ENABLED = os.getenv("SKILL_SHADOW_ENABLED", "true").lower() == "true"
+SKILL_MAX_WALLETS_PER_RUN = int(os.getenv("SKILL_MAX_WALLETS_PER_RUN", "25"))
+SKILL_MAX_CLOSED_POSITIONS = int(os.getenv("SKILL_MAX_CLOSED_POSITIONS", "500"))
+SKILL_HTTP_CONCURRENCY = int(os.getenv("SKILL_HTTP_CONCURRENCY", "4"))
+SKILL_PRIORITY_WALLETS = os.getenv("SKILL_PRIORITY_WALLETS", "")
 
 
 def parse_float(value: Any, default: float = 0.0) -> float:
@@ -114,43 +152,6 @@ def is_short_term_noise_market(title: str) -> bool:
         return True
 
     return False
-
-
-def guess_category_from_title(title: str) -> str:
-    lowered = title.lower()
-
-    sports_terms = [
-        "nba",
-        "nfl",
-        "mlb",
-        "nhl",
-        "soccer",
-        "tennis",
-        "open",
-        "league",
-        " vs ",
-        "vs.",
-        "ipl",
-        "cricket",
-        "ufc",
-        "fight",
-        "game",
-        "match",
-    ]
-    crypto_terms = ["bitcoin", "btc", "ethereum", "eth", "solana", "xrp", "crypto"]
-    politics_terms = ["trump", "biden", "election", "senate", "congress", "president", "poll"]
-    macro_terms = ["fed", "fomc", "rate", "inflation", "cpi", "recession", "gdp"]
-
-    if any(term in lowered for term in sports_terms):
-        return "sports"
-    if any(term in lowered for term in crypto_terms):
-        return "crypto"
-    if any(term in lowered for term in politics_terms):
-        return "politics"
-    if any(term in lowered for term in macro_terms):
-        return "macro"
-
-    return "unknown"
 
 
 def normalize_activity(row: dict[str, Any]) -> Optional[dict[str, Any]]:
@@ -265,6 +266,364 @@ def dedupe_trades(trades: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return clean
 
 
+def _normalize_wallet(value: Any) -> str:
+    return str(value or "").strip().lower()
+
+
+def _parse_priority_wallets() -> list[str]:
+    seen: set[str] = set()
+    wallets: list[str] = []
+    for wallet in SKILL_PRIORITY_WALLETS.split(","):
+        normalized = _normalize_wallet(wallet)
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        wallets.append(normalized)
+    return wallets
+
+
+def _score_wallet_selection_key(score: dict[str, Any]) -> tuple[float, float]:
+    metrics = score.get("metrics") or {}
+    return (
+        float(score.get("walletQualityScore") or 0),
+        float(metrics.get("totalVolume") or 0),
+    )
+
+
+def select_shadow_wallets(wallet_scores: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if not wallet_scores:
+        return []
+
+    by_wallet = {_normalize_wallet(score.get("wallet")): score for score in wallet_scores if score.get("wallet")}
+    selected: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    for wallet in _parse_priority_wallets():
+        score = by_wallet.get(wallet)
+        if score and wallet not in seen:
+            selected.append(score)
+            seen.add(wallet)
+
+    remaining = [
+        score
+        for score in wallet_scores
+        if _normalize_wallet(score.get("wallet")) not in seen
+    ]
+    remaining.sort(key=_score_wallet_selection_key, reverse=True)
+
+    for score in remaining:
+        if len(selected) >= SKILL_MAX_WALLETS_PER_RUN:
+            break
+        wallet = _normalize_wallet(score.get("wallet"))
+        if wallet in seen:
+            continue
+        selected.append(score)
+        seen.add(wallet)
+
+    return selected[:SKILL_MAX_WALLETS_PER_RUN]
+
+
+def build_shadow_wallet_targets(wallet_scores: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_wallet = {
+        _normalize_wallet(score.get("wallet")): score
+        for score in wallet_scores
+        if score.get("wallet")
+    }
+    targets: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    for wallet in _parse_priority_wallets():
+        if wallet in seen:
+            continue
+        seen.add(wallet)
+        score = by_wallet.get(wallet)
+        if score:
+            targets.append(
+                {
+                    "wallet": wallet,
+                    "source": "global_wallet_scores",
+                    "walletScore": score,
+                }
+            )
+        else:
+            print(
+                "SMART_MONEY_SKILL_PRIORITY_TARGETED "
+                f"wallet={wallet} "
+                "reason=missing_from_global_wallet_scores"
+            )
+            targets.append(
+                {
+                    "wallet": wallet,
+                    "source": "targeted_wallet_activity",
+                    "walletScore": None,
+                }
+            )
+
+    remaining_budget = max(0, SKILL_MAX_WALLETS_PER_RUN - len(targets))
+    if remaining_budget <= 0:
+        return targets[:SKILL_MAX_WALLETS_PER_RUN]
+
+    remaining = [
+        score
+        for score in wallet_scores
+        if _normalize_wallet(score.get("wallet")) not in seen
+    ]
+    remaining.sort(key=_score_wallet_selection_key, reverse=True)
+
+    for score in remaining:
+        if len(targets) >= SKILL_MAX_WALLETS_PER_RUN:
+            break
+        wallet = _normalize_wallet(score.get("wallet"))
+        if wallet in seen:
+            continue
+        seen.add(wallet)
+        targets.append(
+            {
+                "wallet": wallet,
+                "source": "global_wallet_scores",
+                "walletScore": score,
+            }
+        )
+
+    return targets[:SKILL_MAX_WALLETS_PER_RUN]
+
+
+def _safe_error_message(error: Exception) -> str:
+    message = str(error).strip()
+    if not message:
+        message = error.__class__.__name__
+    return " ".join(message.split())[:240]
+
+
+async def _fetch_shadow_positions(
+    selected_wallets: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    if not selected_wallets:
+        return {}
+
+    print(f"SMART_MONEY_SKILL_SHADOW_STARTED wallets={len(selected_wallets)}")
+    semaphore = asyncio.Semaphore(max(1, SKILL_HTTP_CONCURRENCY))
+    results: dict[str, dict[str, Any]] = {}
+    selected_wallet_set = {_normalize_wallet(score.get("wallet")) for score in selected_wallets}
+
+    async def _load_one(score: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+        wallet = _normalize_wallet(score.get("wallet"))
+        try:
+            async with semaphore:
+                positions = await fetch_closed_positions(wallet, max_positions=SKILL_MAX_CLOSED_POSITIONS)
+            print(f"SMART_MONEY_SKILL_FETCHED wallet={wallet} closed_positions={len(positions)}")
+            return wallet, {
+                "wallet": wallet,
+                "closed_positions": positions,
+            }
+        except Exception as error:
+            print(
+                "SMART_MONEY_SKILL_FAILED "
+                f"wallet={wallet} "
+                f"error={_safe_error_message(error)}"
+            )
+            return wallet, {
+                "wallet": wallet,
+                "closed_positions": [],
+                "error": _safe_error_message(error),
+            }
+
+    tasks = [asyncio.create_task(_load_one(score)) for score in selected_wallets]
+    for task in asyncio.as_completed(tasks):
+        wallet, payload = await task
+        results[wallet] = payload
+
+    # keep a stable map for wallets we never selected
+    for wallet in selected_wallet_set:
+        results.setdefault(wallet, {"wallet": wallet, "closed_positions": []})
+
+    return results
+
+
+async def _fetch_targeted_activity_for_wallet(wallet: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    raw_events: list[dict[str, Any]] = []
+    async with httpx.AsyncClient(timeout=float(os.getenv("SKILL_HTTP_TIMEOUT_SECONDS", "25"))) as http:
+        for offset in range(0, SKILL_MAX_CLOSED_POSITIONS, 50):
+            response = await http.get(
+                f"{DATA_API}/trades",
+                params={
+                    "user": wallet,
+                    "limit": 50,
+                    "offset": offset,
+                    "takerOnly": False,
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+            if isinstance(data, dict):
+                items = data.get("data") or data.get("items") or data.get("trades") or []
+            else:
+                items = data
+            if not isinstance(items, list) or not items:
+                break
+            raw_events.extend(item for item in items if isinstance(item, dict))
+            if len(items) < 50:
+                break
+
+    normalized = []
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
+    for item in raw_events:
+        row = normalize_activity(item)
+        if not row:
+            continue
+        if row["timestamp"] and row["timestamp"] < cutoff:
+            continue
+        if row["size_usd"] < MIN_TRADE_USD:
+            continue
+        normalized.append(row)
+
+    return raw_events, dedupe_trades(normalized)
+
+
+async def _fetch_targeted_wallet_behaviors(
+    target_wallets: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    if not target_wallets:
+        return {}
+
+    semaphore = asyncio.Semaphore(max(1, SKILL_HTTP_CONCURRENCY))
+    results: dict[str, dict[str, Any]] = {}
+
+    async def _load_one(target: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+        wallet = _normalize_wallet(target.get("wallet"))
+        async with semaphore:
+            raw_events, normalized_trades = await _fetch_targeted_activity_for_wallet(wallet)
+        print(
+            "SMART_MONEY_SKILL_TARGETED_ACTIVITY_FETCHED "
+            f"wallet={wallet} "
+            f"events={len(raw_events)} "
+            f"normalized_trades={len(normalized_trades)}"
+        )
+        if not normalized_trades:
+            return wallet, {
+                "wallet": wallet,
+                "behaviorStatus": "insufficient_recent_activity",
+                "walletScore": None,
+                "rawEvents": raw_events,
+                "normalizedTrades": normalized_trades,
+            }
+
+        temp_scores = compute_wallet_scores(normalized_trades)
+        temp_score = next(
+            (
+                score
+                for score in temp_scores
+                if _normalize_wallet(score.get("wallet")) == wallet
+            ),
+            None,
+        )
+        if temp_score is None:
+            return wallet, {
+                "wallet": wallet,
+                "behaviorStatus": "insufficient_recent_activity",
+                "walletScore": None,
+                "rawEvents": raw_events,
+                "normalizedTrades": normalized_trades,
+            }
+
+        return wallet, {
+            "wallet": wallet,
+            "behaviorStatus": "sufficient",
+            "walletScore": temp_score,
+            "rawEvents": raw_events,
+            "normalizedTrades": normalized_trades,
+        }
+
+    tasks = [asyncio.create_task(_load_one(target)) for target in target_wallets]
+    for task in asyncio.as_completed(tasks):
+        wallet, payload = await task
+        results[wallet] = payload
+
+    return results
+
+
+def _attach_shadow_outputs(
+    wallet_scores: list[dict[str, Any]],
+    shadow_targets: list[dict[str, Any]],
+    shadow_positions: dict[str, dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    enriched: list[dict[str, Any]] = []
+    shadow_rows: list[dict[str, Any]] = []
+    wallet_score_map = {
+        _normalize_wallet(score.get("wallet")): score
+        for score in wallet_scores
+        if score.get("wallet")
+    }
+
+    for target in shadow_targets:
+        wallet = _normalize_wallet(target.get("wallet"))
+        shadow_source = target.get("source") or "global_wallet_scores"
+        score = target.get("walletScore") or wallet_score_map.get(wallet)
+        shadow_payload = shadow_positions.get(wallet)
+        if shadow_payload is None:
+            continue
+
+        closed_positions = shadow_payload.get("closed_positions") or []
+        shadow_error = shadow_payload.get("error")
+        behavior_status = target.get("behaviorStatus") or "sufficient"
+        if shadow_error:
+            shadow_skill = {
+                "wallet": wallet,
+                "skillStatus": "error",
+                "error": shadow_error,
+            }
+            shadow_rows.append(
+                {
+                    "wallet": wallet,
+                    "walletQualityScore": score.get("walletQualityScore") if score else None,
+                    "classification": score.get("classification") if score else None,
+                    "shadowSource": shadow_source,
+                    "shadowSkill": shadow_skill,
+                    "shadowMetaEvaluation": None,
+                    "behaviorStatus": "error",
+                    "generatedAt": (score.get("generatedAt") if score else None) or datetime.now(timezone.utc).isoformat(),
+                }
+            )
+            continue
+
+        if not closed_positions:
+            shadow_skill = {"skillStatus": "insufficient"}
+            shadow_meta = None if shadow_source == "targeted_wallet_activity" or score is None else compute_shadow_meta_evaluation(int(score.get("walletQualityScore") or 0), shadow_skill)
+            behavior_status = target.get("behaviorStatus") or (
+                "insufficient_recent_activity" if shadow_source == "targeted_wallet_activity" else "insufficient"
+            )
+        else:
+            try:
+                shadow_skill = compute_wallet_skill(wallet, closed_positions)
+            except Exception as error:
+                shadow_skill = {
+                    "wallet": wallet,
+                    "skillStatus": "error",
+                    "error": _safe_error_message(error),
+                }
+                shadow_meta = None
+                behavior_status = "error"
+            else:
+                behavior_score = int(score.get("walletQualityScore") or 0) if score else 0
+                shadow_meta = compute_shadow_meta_evaluation(behavior_score, shadow_skill) if score is not None or shadow_source == "global_wallet_scores" else None
+                behavior_status = target.get("behaviorStatus") or ("sufficient" if shadow_skill.get("skillStatus") == "sufficient" else "limited")
+
+        shadow_rows.append(
+            {
+                "wallet": wallet,
+                "walletQualityScore": score.get("walletQualityScore") if score else None,
+                "classification": score.get("classification") if score else None,
+                "shadowSource": shadow_source,
+                "shadowSkill": shadow_skill,
+                "shadowMetaEvaluation": shadow_meta,
+                "behaviorStatus": behavior_status,
+                "generatedAt": (score.get("generatedAt") if score else None) or datetime.now(timezone.utc).isoformat(),
+            }
+        )
+
+    return wallet_scores, shadow_rows
+
+
 def build_noise_scores(wallet_scores: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {
@@ -309,6 +668,34 @@ async def execute_engine() -> dict[str, Any]:
     noise_scores = build_noise_scores(wallet_scores)
     save_json("noise_scores.json", noise_scores)
 
+    shadow_rows: list[dict[str, Any]] = []
+    if SKILL_SHADOW_ENABLED:
+        shadow_targets = build_shadow_wallet_targets(wallet_scores)
+        targeted_wallets = [target for target in shadow_targets if target.get("source") == "targeted_wallet_activity"]
+        targeted_behaviors = await _fetch_targeted_wallet_behaviors(targeted_wallets)
+        for target in shadow_targets:
+            wallet = _normalize_wallet(target.get("wallet"))
+            if target.get("source") == "targeted_wallet_activity":
+                targeted_payload = targeted_behaviors.get(wallet) or {}
+                target["behaviorStatus"] = targeted_payload.get("behaviorStatus") or "insufficient_recent_activity"
+                target["walletScore"] = targeted_payload.get("walletScore")
+            else:
+                target["behaviorStatus"] = "sufficient"
+
+        selected_wallets = shadow_targets
+        shadow_positions = await _fetch_shadow_positions(selected_wallets)
+        wallet_scores, shadow_rows = _attach_shadow_outputs(wallet_scores, selected_wallets, shadow_positions)
+        save_json("wallet_scores.json", wallet_scores)
+        save_json("wallet_skill_shadow.json", shadow_rows)
+        scored_count = sum(1 for row in shadow_rows if row.get("shadowMetaEvaluation") is not None)
+        failed_count = sum(1 for row in shadow_rows if (row.get("shadowSkill") or {}).get("skillStatus") == "error")
+        print(
+            "SMART_MONEY_SKILL_SHADOW_COMPLETED "
+            f"requested={len(selected_wallets)} "
+            f"scored={scored_count} "
+            f"failed={failed_count}"
+        )
+
     market_trails = build_market_capital_trails(
         trades=deduped_trades,
         wallet_scores=wallet_scores,
@@ -327,6 +714,7 @@ async def execute_engine() -> dict[str, Any]:
         "deduped_trades": deduped_trades,
         "wallet_scores": wallet_scores,
         "noise_scores": noise_scores,
+        "shadow_rows": shadow_rows,
         "market_trails": market_trails,
         "estela_capital": estela_capital,
     }

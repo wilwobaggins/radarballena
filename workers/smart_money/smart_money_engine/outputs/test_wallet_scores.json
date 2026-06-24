@@ -1,0 +1,33 @@
+[
+  {
+    "wallet": "0xabc",
+    "walletQualityScore": 68,
+    "classification": "SPECIALIST_WALLET",
+    "metrics": {
+      "totalVolume": 7000.0,
+      "tradeCount": 6,
+      "uniqueMarkets": 6,
+      "avgSize": 1166.67,
+      "earlyEntryRatio": 1.0,
+      "lateEntryRatio": 0.0,
+      "opposingOutcomeRatio": 0.0,
+      "extremePriceRatio": 0.0,
+      "sellRatio": 0.0,
+      "categoryConcentration": 1.0,
+      "concentrationRisk": 0.35
+    },
+    "subScores": {
+      "performanceScore": 50,
+      "timingScore": 95,
+      "directionalClarityScore": 82,
+      "categorySpecializationScore": 38,
+      "sizeScore": 97,
+      "consistencyScore": 45,
+      "antiNoiseScore": 88
+    },
+    "noiseScore": 7,
+    "noiseLevel": "LOW_NOISE",
+    "riskFlags": [],
+    "generatedAt": "2026-06-24T19:22:07.645729+00:00"
+  }
+]

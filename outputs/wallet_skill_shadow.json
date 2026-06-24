@@ -1,0 +1,104 @@
+[
+  {
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "walletQualityScore": 67,
+    "classification": "SCALPER",
+    "shadowSource": "targeted_wallet_activity",
+    "shadowSkill": {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "closedPositionsCount": 500,
+      "totalCostBasis": 6396025.866482,
+      "totalRealizedPnl": 1948864.941688,
+      "roi": 0.304699,
+      "roiPct": 30.47,
+      "profitablePositions": 311,
+      "losingPositions": 180,
+      "breakevenPositions": 9,
+      "winRate": 0.633401,
+      "grossProfit": 2261503.691368,
+      "grossLoss": 312638.74968,
+      "profitFactor": 5.0,
+      "averageWin": 7271.716049,
+      "averageLoss": 1736.881943,
+      "payoffRatio": 4.18665,
+      "bestPositionPnl": 1403042.146461,
+      "worstPositionPnl": -48869.779518,
+      "sampleConfidence": 100.0,
+      "dominantCategory": "unknown",
+      "categoryConsistency": 0.688,
+      "categoryConsistencyScore": 69,
+      "categorySkillScores": {
+        "sports": {
+          "closedPositionsCount": 22,
+          "totalCostBasis": 39736.557963,
+          "totalRealizedPnl": 3370.871981,
+          "roi": 0.08483,
+          "winRate": 0.7,
+          "profitFactor": 2.612122,
+          "payoffRatio": 1.119481,
+          "skillScore": 71,
+          "skillStatus": "sufficient"
+        },
+        "politics": {
+          "closedPositionsCount": 99,
+          "totalCostBasis": 2470447.846559,
+          "totalRealizedPnl": 1498943.302846,
+          "roi": 0.60675,
+          "winRate": 0.606061,
+          "profitFactor": 5.0,
+          "payoffRatio": 5.0,
+          "skillScore": 94,
+          "skillStatus": "sufficient"
+        },
+        "macro": {
+          "closedPositionsCount": 27,
+          "totalCostBasis": 323999.779682,
+          "totalRealizedPnl": 46962.538891,
+          "roi": 0.144946,
+          "winRate": 0.777778,
+          "profitFactor": 5.0,
+          "payoffRatio": 5.0,
+          "skillScore": 85,
+          "skillStatus": "sufficient"
+        },
+        "crypto": {
+          "closedPositionsCount": 8,
+          "totalCostBasis": 39913.662037,
+          "totalRealizedPnl": 62.577336,
+          "roi": 0.001568,
+          "winRate": 0.625,
+          "profitFactor": 1.010186,
+          "payoffRatio": 0.606112,
+          "skillScore": 48,
+          "skillStatus": "limited"
+        },
+        "unknown": {
+          "closedPositionsCount": 344,
+          "totalCostBasis": 3521928.02024,
+          "totalRealizedPnl": 399525.650634,
+          "roi": 0.113439,
+          "winRate": 0.626113,
+          "profitFactor": 2.489787,
+          "payoffRatio": 1.486792,
+          "skillScore": 75,
+          "skillStatus": "sufficient"
+        }
+      },
+      "skillStatus": "sufficient",
+      "skillScore": 89,
+      "noLossesObserved": false
+    },
+    "shadowMetaEvaluation": {
+      "behaviorQualityScore": 67,
+      "skillScore": 89,
+      "sampleConfidence": 100.0,
+      "categoryConsistencyScore": 69,
+      "shadowMetaScore": 80,
+      "skillStatus": "sufficient",
+      "usedSkillScore": true,
+      "shadowRecommendation": "shadow_high"
+    },
+    "behaviorStatus": "sufficient",
+    "generatedAt": "2026-06-24T19:25:39.152496+00:00"
+  }
+]
