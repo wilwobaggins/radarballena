@@ -75,6 +75,9 @@ SCORE_PARITY:
 CONTEXT_SOURCE:
 {{CONTEXT_SOURCE}}
 
+CONTEXT_SOURCES:
+{{CONTEXT_SOURCES}}
+
 REGLAS DE SALIDA
 - Devuelve exclusivamente JSON valido.
 - No agregues markdown.

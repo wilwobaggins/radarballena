@@ -258,6 +258,226 @@ def _build_market_snapshot(candidate: dict[str, Any]) -> dict[str, Any]:
     return market_snapshot
 
 
+def _truncate_text(value: Any, limit: int) -> str | None:
+    text = _clean_text(value)
+    if text is None:
+        return None
+    if limit <= 0:
+        return ""
+    if len(text) <= limit:
+        return text
+    return text[: max(limit - 1, 0)].rstrip() + "…"
+
+
+def _compact_context_sources_for_prompt(context_sources: Any) -> list[dict[str, Any]]:
+    if not isinstance(context_sources, list):
+        return []
+
+    compacted: list[dict[str, Any]] = []
+    for source in context_sources[:3]:
+        if not isinstance(source, dict):
+            continue
+        compacted.append(
+            {
+                "title": _truncate_text(source.get("title"), 160),
+                "url": _clean_text(source.get("url") or source.get("link")),
+                "publishedAt": _clean_text(
+                    _coalesce(
+                        source.get("publishedAt"),
+                        source.get("published_at"),
+                        source.get("date"),
+                        source.get("createdAt"),
+                        source.get("created_at"),
+                    )
+                ),
+                "snippet": _truncate_text(
+                    _coalesce(
+                        source.get("snippet"),
+                        source.get("summary"),
+                        source.get("content"),
+                        source.get("text"),
+                    ),
+                    400,
+                ),
+            }
+        )
+    return compacted
+
+
+def _compact_analysis_for_prompt(analysis: Any, *, thesis_limit: int = 2000) -> dict[str, Any]:
+    normalized = _normalize_analysis(analysis)
+    if not normalized:
+        return {}
+
+    return {
+        "analysisId": normalized.get("analysisId"),
+        "generatedAt": normalized.get("generatedAt"),
+        "thesis": _truncate_text(normalized.get("thesis"), thesis_limit),
+        "signalLabel": normalized.get("signalLabel"),
+        "preliminaryRadarScore": _as_float(
+            _coalesce(
+                normalized.get("preliminaryRadarScore"),
+                normalized.get("preliminary_radar_score"),
+            )
+        ),
+        "aiInterpretiveScore": _as_float(
+            _coalesce(
+                normalized.get("aiInterpretiveScore"),
+                normalized.get("ai_interpretive_score"),
+            )
+        ),
+        "finalRadarScore": _as_float(
+            _coalesce(
+                normalized.get("finalRadarScore"),
+                normalized.get("radarScore"),
+                normalized.get("final_radar_score"),
+            )
+        ),
+        "probability": normalized.get("probability"),
+        "score_breakdown": normalized.get("score_breakdown"),
+        "generation_mode": normalized.get("generation_mode"),
+        "provider": normalized.get("provider"),
+        "model": normalized.get("model"),
+    }
+
+
+def _compact_market_for_prompt(market: Any) -> dict[str, Any]:
+    normalized = _normalize_market(market)
+    if not normalized:
+        return {}
+
+    return {
+        "marketId": normalized.get("marketId"),
+        "title": normalized.get("title"),
+        "description": _truncate_text(
+            _coalesce(
+                normalized.get("description"),
+                normalized.get("summary"),
+                normalized.get("marketDescription"),
+                normalized.get("market_description"),
+            ),
+            1000,
+        ),
+        "category": normalized.get("category"),
+        "closingTime": normalized.get("closingTime"),
+        "daysToClose": normalized.get("daysToClose"),
+        "current_probability": normalized.get("current_probability"),
+        "previous_probability_24h": normalized.get("previous_probability_24h"),
+        "probability_change_24h": normalized.get("probability_change_24h"),
+        "volume": normalized.get("volume"),
+        "liquidity": normalized.get("liquidity"),
+        "probabilityScale": _coalesce(
+            normalized.get("probabilityScale"),
+            normalized.get("probability_scale"),
+        ),
+        "dataSource": _coalesce(
+            normalized.get("dataSource"),
+            normalized.get("data_source"),
+            normalized.get("source"),
+        ),
+        "freshness": normalized.get("freshness"),
+        "outcomes": normalized.get("outcomes"),
+    }
+
+
+def _compact_capital_trail_for_prompt(capital_trail: Any) -> dict[str, Any] | list[Any] | None:
+    if capital_trail is None:
+        return None
+
+    if isinstance(capital_trail, dict):
+        compacted: dict[str, Any] = {}
+        for key in (
+            "status",
+            "summary",
+            "score",
+            "confidence",
+            "signal",
+            "trend",
+            "direction",
+            "timestamp",
+            "updatedAt",
+            "updated_at",
+        ):
+            if key in capital_trail and capital_trail.get(key) is not None:
+                value = capital_trail.get(key)
+                compacted[key] = _truncate_text(value, 300) if isinstance(value, str) else value
+
+        for key in ("highlights", "events", "entries", "signals", "evidence", "reasoning"):
+            value = capital_trail.get(key)
+            if isinstance(value, list) and value:
+                compacted[key] = []
+                for item in value[:5]:
+                    if isinstance(item, dict):
+                        compacted[key].append(
+                            {
+                                "type": _clean_text(item.get("type")),
+                                "label": _truncate_text(
+                                    _coalesce(item.get("label"), item.get("title"), item.get("name")),
+                                    200,
+                                ),
+                                "value": _truncate_text(
+                                    _coalesce(item.get("value"), item.get("text"), item.get("description")),
+                                    400,
+                                ),
+                            }
+                        )
+                    else:
+                        compacted[key].append(_truncate_text(item, 400) if isinstance(item, str) else item)
+        return compacted or {"status": _clean_text(capital_trail.get("status"))}
+
+    if isinstance(capital_trail, list):
+        compacted_list: list[Any] = []
+        for item in capital_trail[:5]:
+            if isinstance(item, dict):
+                compacted_list.append(
+                    {
+                        "type": _clean_text(item.get("type")),
+                        "label": _truncate_text(
+                            _coalesce(item.get("label"), item.get("title"), item.get("name")),
+                            200,
+                        ),
+                        "value": _truncate_text(
+                            _coalesce(item.get("value"), item.get("text"), item.get("description")),
+                            400,
+                        ),
+                    }
+                )
+            else:
+                compacted_list.append(_truncate_text(item, 400) if isinstance(item, str) else item)
+        return compacted_list
+
+    return capital_trail
+
+
+def _compact_score_parity_for_prompt(score_parity: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(score_parity, dict):
+        return score_parity
+
+    compacted = {
+        key: score_parity.get(key)
+        for key in (
+            "formula",
+            "baselineAnalysisId",
+            "previousPreliminaryRadarScore",
+            "newPreliminaryRadarScore",
+            "preliminaryRadarScoreDelta",
+            "previousAiInterpretiveScore",
+            "newAiInterpretiveScore",
+            "aiInterpretiveScoreDelta",
+            "previousFinalRadarScore",
+            "newFinalRadarScore",
+            "finalRadarScoreDelta",
+        )
+        if key in score_parity
+    }
+
+    for key in ("previousScoreBreakdown", "newScoreBreakdown", "hybridScoreBreakdown"):
+        if key in score_parity:
+            compacted[key] = score_parity.get(key)
+
+    return compacted
+
+
 def _build_recheck_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     recheck_candidate = dict(candidate.get("recheckCandidate") or {})
 
@@ -280,16 +500,21 @@ def _build_prompt_inputs(candidate: dict[str, Any]) -> dict[str, Any]:
     market_current = candidate.get("marketCurrent") or {}
     previous_analysis = candidate.get("previousAnalysis") or {}
     latest_analysis = candidate.get("latestAnalysis") or {}
+    score_parity = candidate.get("scoreParity") or {}
 
     return {
-        "market": market,
-        "market_current": market_current,
-        "previous_analysis": previous_analysis,
-        "latest_analysis": latest_analysis,
+        "market": _compact_market_for_prompt(market),
+        "market_current": _compact_market_for_prompt(market_current),
+        "previous_analysis": _compact_analysis_for_prompt(previous_analysis),
+        "latest_analysis": _compact_analysis_for_prompt(latest_analysis),
         "deltas": _build_deltas(candidate),
         "recheck_candidate": _build_recheck_candidate(candidate),
-        "capital_trail": candidate.get("capitalTrail"),
+        "capital_trail": _compact_capital_trail_for_prompt(candidate.get("capitalTrail")),
         "market_snapshot": _build_market_snapshot(candidate),
+        "score_parity": _compact_score_parity_for_prompt(score_parity),
+        "context_sources": _compact_context_sources_for_prompt(
+            candidate.get("contextSources") or candidate.get("context_sources") or []
+        ),
     }
 
 
@@ -586,6 +811,19 @@ def _classify_provider_error(error: Exception) -> str:
     )
     message = summarize_exception(error).lower()
 
+    if status_code == 413 or any(
+        marker in message
+        for marker in (
+            "request too large",
+            "too large",
+            "payload too large",
+            "context length",
+            "tokens per minute",
+            "reduce your prompt",
+            "reduce your message size",
+        )
+    ):
+        return "provider_request_too_large"
     if status_code in {401, 403} or "unauthorized" in message or "api key" in message:
         return "provider_auth_error"
     if status_code == 429 or any(marker in message for marker in ("quota", "insufficient_quota", "rate limit", "too many requests", "resource_exhausted")):
@@ -618,11 +856,16 @@ def _build_model_prompt(
         recheck_candidate=prompt_input["recheck_candidate"],
         capital_trail=prompt_input["capital_trail"],
         market_snapshot=prompt_input["market_snapshot"],
-        score_parity=score_parity,
+        score_parity=prompt_input["score_parity"] or score_parity,
         context_source=context_source,
+        context_sources=prompt_input["context_sources"],
         repair_note=repair_note,
     )
     return prompt, prompt_source
+
+
+def _estimate_prompt_tokens(prompt: str) -> int:
+    return max(1, (len(prompt) + 3) // 4)
 
 
 def call_closing_recheck_model_with_provider_sequence(
@@ -945,6 +1188,7 @@ def _call_groq_model(
     structured_schema_rejected = False
 
     for attempt in range(1, max_retries + 2):
+        prompt_inputs = _build_prompt_inputs(candidate)
         repair_note = None
         if attempt > 1:
             repair_note = load_json_repair_prompt()
@@ -957,6 +1201,16 @@ def _call_groq_model(
             score_parity=score_parity,
             context_source=context_source,
             repair_note=repair_note,
+        )
+        logger.info(
+            "[CLOSING_RECHECK_PROMPT_SIZE] provider=groq chars=%s estimated_tokens=%s market_chars=%s previous_analysis_chars=%s latest_analysis_chars=%s capital_trail_chars=%s score_parity_chars=%s",
+            len(prompt),
+            _estimate_prompt_tokens(prompt),
+            len(json.dumps(prompt_inputs.get("market") or {}, ensure_ascii=False, default=str)),
+            len(json.dumps(prompt_inputs.get("previous_analysis") or {}, ensure_ascii=False, default=str)),
+            len(json.dumps(prompt_inputs.get("latest_analysis") or {}, ensure_ascii=False, default=str)),
+            len(json.dumps(prompt_inputs.get("capital_trail") or {}, ensure_ascii=False, default=str)),
+            len(json.dumps(prompt_inputs.get("score_parity") or {}, ensure_ascii=False, default=str)),
         )
 
         try:
@@ -972,6 +1226,7 @@ def _call_groq_model(
                 }
             else:
                 config_kwargs["response_format"] = {"type": "json_object"}
+            config_kwargs["max_tokens"] = 1200
 
             response = client.chat.completions.create(
                 model=model,
@@ -1021,6 +1276,24 @@ def _call_groq_model(
             }
             return validated.model_dump(), raw_output
         except Exception as error:
+            if _classify_provider_error(error) == "provider_request_too_large":
+                last_error = summarize_exception(error)
+                attempts.append(
+                    {
+                        "provider": "groq",
+                        "attempt": attempt,
+                        "status": "failed",
+                        "model": model,
+                        "error": last_error,
+                        "error_type": "provider_request_too_large",
+                    }
+                )
+                raise ProviderGenerationError(
+                    provider="groq",
+                    model=model,
+                    message=f"Groq failed after retries: {last_error}",
+                    attempts=attempts,
+                ) from error
             if not structured_schema_rejected and _is_gemini_schema_compatibility_error(error):
                 structured_schema_rejected = True
                 logger.warning(

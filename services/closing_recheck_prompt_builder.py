@@ -34,6 +34,7 @@ def build_closing_recheck_prompt(
     market_snapshot: Any = None,
     score_parity: dict[str, Any] | None = None,
     context_source: str | None = None,
+    context_sources: list[dict[str, Any]] | None = None,
     repair_note: str | None = None,
 ) -> tuple[str, str]:
     template = load_closing_recheck_prompt_template()
@@ -53,6 +54,7 @@ def build_closing_recheck_prompt(
         .replace("{{MARKET_SNAPSHOT}}", _format_json(market_snapshot))
         .replace("{{SCORE_PARITY}}", _format_json(score_parity))
         .replace("{{CONTEXT_SOURCE}}", _format_json(context_source))
+        .replace("{{CONTEXT_SOURCES}}", _format_json(context_sources))
     )
 
     if repair_note:
