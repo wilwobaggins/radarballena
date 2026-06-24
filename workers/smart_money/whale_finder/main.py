@@ -2,42 +2,33 @@ import os
 import json
 import asyncio
 from datetime import datetime, timezone, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Literal
 
 import httpx
 import pandas as pd
 from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel, Field
-from typing import Literal
 
 load_dotenv()
-
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent
-OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "output"))
-
-if not OUTPUT_DIR.is_absolute():
-    OUTPUT_DIR = BASE_DIR / OUTPUT_DIR
-
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def save_json(filename: str, data: Any) -> None:
-    path = OUTPUT_DIR / filename
-
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2, default=str)
-
-    print(f"Saved {path}")
 
 DATA_API = "https://data-api.polymarket.com"
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 
-# DEBUG / LOCAL DEFAULTS
+# Output / worker mode
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "output")
+STATE_FILE_NAME = os.getenv("STATE_FILE_NAME", "state.json")
+WHALE_FINDER_MODE = os.getenv("WHALE_FINDER_MODE", "worker").lower()  # worker | once
+RUN_ON_START = os.getenv("RUN_ON_START", "true").lower() == "true"
+
+# Cadence
+ACTIVE_HEALTH_INTERVAL_SECONDS = int(os.getenv("ACTIVE_HEALTH_INTERVAL_SECONDS", "14400"))  # 4h
+DISCOVERY_INTERVAL_SECONDS = int(os.getenv("DISCOVERY_INTERVAL_SECONDS", "86400"))          # 24h
+WORKER_SLEEP_SECONDS = int(os.getenv("WORKER_SLEEP_SECONDS", "300"))                       # 5min
+
+# API / filters
 MIN_TRADE_USD = float(os.getenv("MIN_TRADE_USD", "250"))
 LOOKBACK_HOURS = int(os.getenv("LOOKBACK_HOURS", "168"))
 MAX_CANDIDATES_FOR_AI = int(os.getenv("MAX_CANDIDATES_FOR_AI", "20"))
@@ -45,11 +36,20 @@ MAX_CANDIDATES_FOR_AI = int(os.getenv("MAX_CANDIDATES_FOR_AI", "20"))
 # Pagination: keep this conservative. Some offsets can return 400.
 PAGE_LIMIT = int(os.getenv("PAGE_LIMIT", "1000"))
 MAX_OFFSET = int(os.getenv("MAX_OFFSET", "4000"))
+HTTP_TIMEOUT_SECONDS = int(os.getenv("HTTP_TIMEOUT_SECONDS", "25"))
 
 # Discovery quality gates
 MIN_APPROVE_TRADES = int(os.getenv("MIN_APPROVE_TRADES", "10"))
 MIN_APPROVE_MARKETS = int(os.getenv("MIN_APPROVE_MARKETS", "5"))
 MIN_APPROVE_VOLUME = float(os.getenv("MIN_APPROVE_VOLUME", "5000"))
+
+# AI behavior
+AI_REVIEW_ACTIVE = os.getenv("AI_REVIEW_ACTIVE", "true").lower() == "true"
+AI_REVIEW_CANDIDATES = os.getenv("AI_REVIEW_CANDIDATES", "true").lower() == "true"
+REQUIRE_AI_APPROVAL_FOR_REPLACEMENT = (
+    os.getenv("REQUIRE_AI_APPROVAL_FOR_REPLACEMENT", "true").lower() == "true"
+)
+MIN_AI_REPLACEMENT_CONFIDENCE = int(os.getenv("MIN_AI_REPLACEMENT_CONFIDENCE", "70"))
 
 ACTIVE_WALLETS = {
     "nba_volume": {
@@ -88,7 +88,6 @@ ACTIVE_WALLETS = {
         "min_usdc": 175,
         "profile": "sports",
     },
-
 }
 
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
@@ -105,6 +104,70 @@ class AIWalletReview(BaseModel):
     weaknesses: List[str]
     reason: str
     suggested_action: str
+
+
+def now_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def iso_now() -> str:
+    return now_utc().isoformat()
+
+
+def ensure_output_dir() -> None:
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+
+def output_path(filename: str) -> str:
+    ensure_output_dir()
+    return os.path.join(OUTPUT_DIR, filename)
+
+
+def save_json(filename: str, data: Any) -> None:
+    """
+    Atomic-ish JSON write:
+    writes to .tmp first, then replaces final file.
+    This prevents half-written JSONs if the process dies mid-write.
+    """
+    path = output_path(filename)
+    tmp_path = f"{path}.tmp"
+
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+
+    os.replace(tmp_path, path)
+
+
+def load_json(filename: str, default: Any) -> Any:
+    path = output_path(filename)
+    if not os.path.exists(path):
+        return default
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as exc:
+        print(f"Could not load {filename}: {exc}")
+        return default
+
+
+def load_state() -> Dict[str, Any]:
+    return load_json(STATE_FILE_NAME, {})
+
+
+def save_state(state: Dict[str, Any]) -> None:
+    state["updated_at"] = iso_now()
+    save_json(STATE_FILE_NAME, state)
+
+
+def parse_datetime(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except Exception:
+        return None
 
 
 def parse_float(value: Any, default: float = 0.0) -> float:
@@ -167,11 +230,11 @@ def is_short_term_noise_market(title: str) -> bool:
     if "up or down" in t:
         return True
 
-    # Detect obvious minute windows: 1:20PM-1:25PM, 13:20-13:25, etc.
     time_window_tokens = [
         "am-", "pm-", ":00-", ":05-", ":10-", ":15-", ":20-", ":25-",
-        ":30-", ":35-", ":40-", ":45-", ":50-", ":55-"
+        ":30-", ":35-", ":40-", ":45-", ":50-", ":55-",
     ]
+
     if any(token in t for token in time_window_tokens) and (
         "bitcoin" in t or "ethereum" in t or "btc" in t or "eth" in t
     ):
@@ -185,7 +248,7 @@ def guess_category_from_title(title: str) -> str:
 
     sports_terms = [
         "nba", "nfl", "mlb", "nhl", "soccer", "tennis", "open", "league",
-        " vs ", "vs.", "ipl", "cricket", "ufc", "fight", "game", "match"
+        " vs ", "vs.", "ipl", "cricket", "ufc", "fight", "game", "match",
     ]
     crypto_terms = ["bitcoin", "btc", "ethereum", "eth", "solana", "xrp", "crypto"]
     politics_terms = ["trump", "biden", "election", "senate", "congress", "president", "poll"]
@@ -247,7 +310,7 @@ async def fetch_recent_activity() -> List[Dict[str, Any]]:
     """
     all_items: List[Dict[str, Any]] = []
 
-    async with httpx.AsyncClient(timeout=25) as http:
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as http:
         for offset in range(0, MAX_OFFSET, PAGE_LIMIT):
             params = {
                 "limit": PAGE_LIMIT,
@@ -284,7 +347,7 @@ async def fetch_recent_activity() -> List[Dict[str, Any]]:
     print(f"Raw trades fetched: {len(all_items)}")
 
     normalized: List[Dict[str, Any]] = []
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
+    cutoff = now_utc() - timedelta(hours=LOOKBACK_HOURS)
 
     dropped_old = 0
     dropped_small = 0
@@ -312,10 +375,12 @@ async def fetch_recent_activity() -> List[Dict[str, Any]]:
 
     return normalized
 
-async def fetch_wallet_trades(wallet: str, limit: int = 1000):
-    all_items = []
 
-    async with httpx.AsyncClient(timeout=25) as http:
+async def fetch_wallet_trades(wallet: str, min_trade_usd: Optional[float] = None) -> List[Dict[str, Any]]:
+    all_items: List[Dict[str, Any]] = []
+    min_trade = MIN_TRADE_USD if min_trade_usd is None else float(min_trade_usd)
+
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as http:
         for offset in range(0, MAX_OFFSET, PAGE_LIMIT):
             params = {
                 "user": wallet,
@@ -327,20 +392,24 @@ async def fetch_wallet_trades(wallet: str, limit: int = 1000):
             res = await http.get(f"{DATA_API}/trades", params=params)
 
             if res.status_code == 400:
+                print(f"Stopping wallet pagination: wallet={wallet} offset={offset}")
                 break
 
             res.raise_for_status()
             data = res.json()
 
-            items = data.get("data") or data.get("items") or data.get("trades") or data if isinstance(data, dict) else data
+            if isinstance(data, dict):
+                items = data.get("data") or data.get("items") or data.get("trades") or []
+            else:
+                items = data
 
             if not items:
                 break
 
             all_items.extend(items)
 
-    normalized = []
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
+    normalized: List[Dict[str, Any]] = []
+    cutoff = now_utc() - timedelta(hours=LOOKBACK_HOURS)
 
     for item in all_items:
         row = normalize_activity(item)
@@ -348,7 +417,7 @@ async def fetch_wallet_trades(wallet: str, limit: int = 1000):
             continue
         if row["timestamp"] and row["timestamp"] < cutoff:
             continue
-        if row["size_usd"] < MIN_TRADE_USD:
+        if row["size_usd"] < min_trade:
             continue
         normalized.append(row)
 
@@ -360,7 +429,7 @@ def count_opposing_outcome_markets(g: pd.DataFrame) -> Tuple[int, List[str]]:
     Counts markets where the same wallet traded more than one outcome.
     This is a strong hedge/arb/noise signal.
     """
-    bad_markets = []
+    bad_markets: List[str] = []
 
     for market_id, mg in g.groupby("market_id"):
         outcomes = set(str(x).lower() for x in mg["outcome"].dropna().unique())
@@ -385,7 +454,8 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
 
     df = pd.DataFrame(trades)
 
-    grouped = []
+    grouped: List[Dict[str, Any]] = []
+
     for wallet, g in df.groupby("wallet"):
         trade_count = len(g)
         total_volume = float(g["size_usd"].sum())
@@ -393,36 +463,34 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
         max_size = float(g["size_usd"].max())
 
         unique_markets = int(g["market_id"].nunique(dropna=True))
-        avg_price = float(g["price"].replace(0, pd.NA).dropna().mean() or 0)
+
+        prices_without_zero = g["price"].replace(0, pd.NA).dropna()
+        avg_price = float(prices_without_zero.mean()) if len(prices_without_zero) else 0.0
 
         early_entries = int(((g["price"] > 0.05) & (g["price"] < 0.65)).sum())
         late_entries = int((g["price"] >= 0.85).sum())
-        late_entry_ratio = late_entries / trade_count if trade_count else 0
+        late_entry_ratio = late_entries / trade_count if trade_count else 0.0
 
-        # NUEVO: detectar estrategia de precios muy bajos / mostly sells
         low_price_trades = int((g["price"] <= 0.05).sum())
-        low_price_ratio = low_price_trades / trade_count if trade_count else 0
+        low_price_ratio = low_price_trades / trade_count if trade_count else 0.0
 
         sell_trades = int((g["side"].astype(str).str.upper() == "SELL").sum())
-        sell_ratio = sell_trades / trade_count if trade_count else 0
+        sell_ratio = sell_trades / trade_count if trade_count else 0.0
 
         extreme_price_volume = float(
             g[(g["price"] <= 0.05) | (g["price"] >= 0.95)]["size_usd"].sum()
         )
-
-        extreme_price_volume_ratio = (
-            extreme_price_volume / total_volume if total_volume else 0
-        )
+        extreme_price_volume_ratio = extreme_price_volume / total_volume if total_volume else 0.0
 
         market_repeats = trade_count - unique_markets
-        concentration = max_size / total_volume if total_volume > 0 else 0
+        concentration = max_size / total_volume if total_volume > 0 else 0.0
         opposing_market_count, opposing_markets = count_opposing_outcome_markets(g)
-        opposing_market_ratio = opposing_market_count / unique_markets if unique_markets else 0
+        opposing_market_ratio = opposing_market_count / unique_markets if unique_markets else 0.0
         category = dominant_category(g)
 
         score = 0.0
 
-        # señales positivas
+        # Positive signals
         score += min(25, total_volume / 1000)
         score += min(20, trade_count * 2)
         score += min(15, avg_size / 400)
@@ -432,7 +500,7 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
         if unique_markets >= 3:
             score += min(10, market_repeats * 1.5)
 
-        # penalizaciones
+        # Penalties
         if late_entries >= max(2, trade_count * 0.4):
             score -= 15
 
@@ -454,7 +522,6 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
         if opposing_market_count >= 3 or opposing_market_ratio > 0.15:
             score -= 20
 
-        # NUEVO: penalización suave
         if low_price_ratio > 0.65:
             score -= 10
 
@@ -463,13 +530,12 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
 
         if extreme_price_volume_ratio > 0.7:
             score -= 10
-
         elif extreme_price_volume_ratio > 0.5:
             score -= 5
 
         score = max(0, min(100, round(score)))
 
-        hard_flags = []
+        hard_flags: List[str] = []
 
         if trade_count < MIN_APPROVE_TRADES:
             hard_flags.append("low_trade_count")
@@ -479,22 +545,16 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
             hard_flags.append("low_total_volume")
         if opposing_market_count > 0:
             hard_flags.append("opposing_outcomes_detected")
-
         if opposing_market_count >= 3 or opposing_market_ratio > 0.15:
             hard_flags.append("heavy_opposing_outcomes")
-
         if late_entry_ratio > 0.65:
             hard_flags.append("mostly_late_entries")
-
         if low_price_ratio > 0.65:
             hard_flags.append("mostly_low_price_trades")
-
         if extreme_price_volume_ratio > 0.7:
-             hard_flags.append("extreme_price_volume_heavy")
-
+            hard_flags.append("extreme_price_volume_heavy")
         elif extreme_price_volume_ratio > 0.5:
             hard_flags.append("extreme_price_volume_warning")
-
         if sell_ratio > 0.8:
             hard_flags.append("mostly_sells")
 
@@ -532,15 +592,12 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
             "early_entries": early_entries,
             "late_entries": late_entries,
             "late_entry_ratio": round(late_entry_ratio, 3),
-
-            #  métricas visibles
             "low_price_trades": low_price_trades,
             "low_price_ratio": round(low_price_ratio, 3),
             "sell_trades": sell_trades,
             "sell_ratio": round(sell_ratio, 3),
             "extreme_price_volume": round(extreme_price_volume, 2),
             "extreme_price_volume_ratio": round(extreme_price_volume_ratio, 3),
-
             "opposing_market_count": opposing_market_count,
             "opposing_market_ratio": round(opposing_market_ratio, 3),
             "opposing_markets": opposing_markets[:5],
@@ -551,9 +608,10 @@ def compute_wallet_metrics(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]
 
     return sorted(grouped, key=lambda x: x["score"], reverse=True)
 
-def dedupe_trades(trades):
+
+def dedupe_trades(trades: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     seen = set()
-    clean = []
+    clean: List[Dict[str, Any]] = []
 
     for t in trades:
         key = (
@@ -573,10 +631,11 @@ def dedupe_trades(trades):
 
     return clean
 
-async def enrich_candidates_with_wallet_history(initial_candidates):
-    enriched = []
 
-    # Solo enriquecemos wallets que valen la pena revisar.
+async def enrich_candidates_with_wallet_history(initial_candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    enriched: List[Dict[str, Any]] = []
+
+    # Only enrich wallets worth reviewing.
     wallets_to_check = [
         c["wallet"]
         for c in initial_candidates
@@ -592,7 +651,7 @@ async def enrich_candidates_with_wallet_history(initial_candidates):
     for idx, wallet in enumerate(wallets_to_check, start=1):
         print(f"[{idx}/{len(wallets_to_check)}] Fetching wallet history: {wallet}")
 
-        wallet_trades = await fetch_wallet_trades(wallet)
+        wallet_trades = await fetch_wallet_trades(wallet, min_trade_usd=MIN_TRADE_USD)
         wallet_trades = dedupe_trades(wallet_trades)
 
         if not wallet_trades:
@@ -603,17 +662,17 @@ async def enrich_candidates_with_wallet_history(initial_candidates):
         if not wallet_metrics:
             continue
 
-        # compute_wallet_metrics regresa lista, pero aquí debería ser una sola wallet.
         final_candidate = wallet_metrics[0]
         final_candidate["source"] = "wallet_history"
         final_candidate["global_pre_score"] = next(
             (c["score"] for c in initial_candidates if c["wallet"] == wallet),
-            None
+            None,
         )
 
         enriched.append(final_candidate)
 
     return sorted(enriched, key=lambda x: x["score"], reverse=True)
+
 
 def classify_active_wallet(metric: Dict[str, Any]) -> str:
     flags = set(metric.get("hard_flags", []))
@@ -636,17 +695,32 @@ def classify_active_wallet(metric: Dict[str, Any]) -> str:
 
 
 async def run_active_health_check() -> List[Dict[str, Any]]:
-    results = []
+    results: List[Dict[str, Any]] = []
 
     for whale_id, cfg in ACTIVE_WALLETS.items():
         wallet = cfg["wallet"].lower()
+        min_usdc = float(cfg.get("min_usdc", MIN_TRADE_USD))
 
         print(f"Checking active wallet: {whale_id} {wallet}")
 
-        trades = await fetch_wallet_trades(wallet)
-        trades = dedupe_trades(trades)
-
-        metrics = compute_wallet_metrics(trades)
+        try:
+            trades = await fetch_wallet_trades(wallet, min_trade_usd=min_usdc)
+            trades = dedupe_trades(trades)
+            metrics = compute_wallet_metrics(trades)
+        except Exception as exc:
+            print(f"Active wallet check failed: whale_id={whale_id} error={exc}")
+            results.append({
+                "whale_id": whale_id,
+                "name": cfg["name"],
+                "wallet": wallet,
+                "profile": cfg.get("profile", "mixed"),
+                "status": "error",
+                "score": 0,
+                "reason": str(exc),
+                "source": "active_wallet_health",
+                "checked_at": iso_now(),
+            })
+            continue
 
         if not metrics:
             results.append({
@@ -657,6 +731,8 @@ async def run_active_health_check() -> List[Dict[str, Any]]:
                 "status": "inactive",
                 "score": 0,
                 "reason": "No recent qualifying trades",
+                "source": "active_wallet_health",
+                "checked_at": iso_now(),
             })
             continue
 
@@ -666,68 +742,12 @@ async def run_active_health_check() -> List[Dict[str, Any]]:
         metric["profile"] = cfg.get("profile", "mixed")
         metric["status"] = classify_active_wallet(metric)
         metric["source"] = "active_wallet_health"
+        metric["checked_at"] = iso_now()
 
         results.append(metric)
 
     return results
 
-def ai_review_active_wallets(active_health: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    reviewed = []
-
-    for wallet in active_health:
-        review = ai_review_wallet(wallet, review_type="active_wallet_health")
-        wallet["ai_review"] = review
-        reviewed.append(wallet)
-
-    return reviewed
-
-def compare_active_vs_candidates(
-    active_health: List[Dict[str, Any]],
-    candidates: List[Dict[str, Any]],
-) -> List[Dict[str, Any]]:
-    recommendations = []
-
-    usable_candidates = [
-    c for c in candidates
-    if c["tier"] in ["candidate_high", "candidate_watch"]
-    and c["score"] >= 60
-    and "heavy_opposing_outcomes" not in c.get("hard_flags", [])
-    and "mostly_late_entries" not in c.get("hard_flags", [])
-    and c.get("ai_review", {}).get("recommendation") == "approve"
-    and c.get("ai_review", {}).get("confidence", 0) >= 70
-]
-
-    for active in active_health:
-        if active["status"] not in ["degraded", "inactive", "watch"]:
-            continue
-
-        profile = active.get("profile")
-
-        same_profile = [
-            c for c in usable_candidates
-            if c.get("category_guess") == profile or profile == "mixed"
-        ]
-
-        same_profile = sorted(
-            same_profile,
-            key=lambda x: x["score"],
-            reverse=True,
-        )
-
-        best = same_profile[0] if same_profile else None
-
-        recommendations.append({
-            "active_whale_id": active["whale_id"],
-            "active_name": active["name"],
-            "active_wallet": active["wallet"],
-            "active_status": active["status"],
-            "active_score": active.get("score", 0),
-            "active_flags": active.get("hard_flags", []),
-            "recommended_action": "replace_candidate_found" if best else "keep_watch_no_replacement",
-            "replacement_candidate": best,
-        })
-
-    return recommendations
 
 def ai_review_wallet(wallet_data: Dict[str, Any], review_type: str) -> Optional[Dict[str, Any]]:
     if not client:
@@ -755,40 +775,129 @@ Wallet JSON:
 {json.dumps(wallet_data, ensure_ascii=False)}
 """
 
-    response = client.responses.parse(
-        model=OPENAI_MODEL,
-        input=[
-            {
-                "role": "system",
-                "content": "Eres analista cuantitativo de wallets de Polymarket para un sistema de whale alerts. Evalúas calidad de señal, riesgo, continuidad y posible reemplazo.",
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-        text_format=AIWalletReview,
-    )
+    try:
+        response = client.responses.parse(
+            model=OPENAI_MODEL,
+            input=[
+                {
+                    "role": "system",
+                    "content": "Eres analista cuantitativo de wallets de Polymarket para un sistema de whale alerts. Evalúas calidad de señal, riesgo, continuidad y posible reemplazo.",
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            text_format=AIWalletReview,
+        )
 
-    parsed: AIWalletReview = response.output_parsed
-    return parsed.model_dump()
+        parsed: AIWalletReview = response.output_parsed
+        return parsed.model_dump()
+    except Exception as exc:
+        print(f"AI review failed: {exc}")
+        return {
+            "recommendation": "watch",
+            "confidence": 0,
+            "category_guess": wallet_data.get("category_guess", "unknown"),
+            "health_verdict": "watch",
+            "replacement_readiness": "none",
+            "risk_flags": ["ai_review_error"],
+            "strengths": [],
+            "weaknesses": [str(exc)],
+            "reason": "AI review failed. Using algorithmic metrics only.",
+            "suggested_action": "review_manually",
+        }
 
 
-async def main():
-    print(f"Output dir: {OUTPUT_DIR}")
+def ai_review_active_wallets(active_health: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    reviewed: List[Dict[str, Any]] = []
 
+    for wallet in active_health:
+        review = ai_review_wallet(wallet, review_type="active_wallet_health")
+        wallet["ai_review"] = review
+        reviewed.append(wallet)
+
+    return reviewed
+
+
+def candidate_is_usable(candidate: Dict[str, Any]) -> bool:
+    if candidate.get("tier") not in ["candidate_high", "candidate_watch"]:
+        return False
+
+    if candidate.get("score", 0) < 60:
+        return False
+
+    flags = set(candidate.get("hard_flags", []))
+    if "heavy_opposing_outcomes" in flags or "mostly_late_entries" in flags:
+        return False
+
+    if REQUIRE_AI_APPROVAL_FOR_REPLACEMENT:
+        review = candidate.get("ai_review") or {}
+        if review.get("recommendation") != "approve":
+            return False
+        if int(review.get("confidence", 0)) < MIN_AI_REPLACEMENT_CONFIDENCE:
+            return False
+
+    return True
+
+
+def compare_active_vs_candidates(
+    active_health: List[Dict[str, Any]],
+    candidates: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    recommendations: List[Dict[str, Any]] = []
+    usable_candidates = [c for c in candidates if candidate_is_usable(c)]
+
+    for active in active_health:
+        if active.get("status") not in ["degraded", "inactive", "watch", "error"]:
+            continue
+
+        profile = active.get("profile", "mixed")
+
+        same_profile = [
+            c for c in usable_candidates
+            if c.get("category_guess") == profile or profile == "mixed"
+        ]
+
+        same_profile = sorted(same_profile, key=lambda x: x.get("score", 0), reverse=True)
+        best = same_profile[0] if same_profile else None
+
+        recommendations.append({
+            "active_whale_id": active.get("whale_id"),
+            "active_name": active.get("name"),
+            "active_wallet": active.get("wallet"),
+            "active_profile": profile,
+            "active_status": active.get("status"),
+            "active_score": active.get("score", 0),
+            "active_flags": active.get("hard_flags", []),
+            "recommended_action": "replace_candidate_found" if best else "keep_watch_no_replacement",
+            "replacement_candidate": best,
+            "generated_at": iso_now(),
+        })
+
+    return recommendations
+
+
+async def run_active_cycle() -> List[Dict[str, Any]]:
+    print("\n" + "=" * 80)
     print("Running active wallet health check...")
+    print("=" * 80)
 
     active_health = await run_active_health_check()
 
-    if os.getenv("AI_REVIEW_ACTIVE", "true").lower() == "true":
+    if AI_REVIEW_ACTIVE:
         active_health = ai_review_active_wallets(active_health)
 
     save_json("active_wallet_health.json", active_health)
 
     print(f"Active wallets checked: {len(active_health)}")
+    return active_health
 
-    print("Fetching recent Polymarket activity...")
+
+async def run_discovery_cycle() -> List[Dict[str, Any]]:
+    print("\n" + "=" * 80)
+    print("Running global wallet discovery...")
+    print("=" * 80)
 
     trades = await fetch_recent_activity()
     print(f"Global trades after filters: {len(trades)}")
@@ -808,61 +917,188 @@ async def main():
 
     candidates_for_ai = [
         c for c in enriched_candidates
-        if (
-            c["tier"] in ["candidate_high", "candidate_watch"]
-            or c["score"] >= 60
-        )
+        if c.get("tier") in ["candidate_high", "candidate_watch"] or c.get("score", 0) >= 60
     ]
 
     top = candidates_for_ai[:MAX_CANDIDATES_FOR_AI]
+    print(f"Candidates for AI/manual review: {len(top)}")
 
-    print(f"Candidates for AI: {len(top)}")
+    if AI_REVIEW_CANDIDATES:
+        for idx, candidate in enumerate(top, start=1):
+            review = ai_review_wallet(candidate, review_type="candidate_discovery")
+            candidate["ai_review"] = review
 
-    for idx, candidate in enumerate(top, start=1):
-        review = ai_review_wallet(candidate, review_type="candidate_discovery")
-        candidate["ai_review"] = review
+            print("\n" + "=" * 80)
+            print(f"{idx}. {candidate['wallet']}")
+            print(f"score={candidate['score']} tier={candidate['tier']} category={candidate['category_guess']}")
+            print(f"global_pre_score={candidate.get('global_pre_score')}")
+            print(f"trades={candidate['trade_count']} volume=${candidate['total_volume']} avg=${candidate['avg_size']}")
+            print(f"markets={candidate['unique_markets']} early={candidate['early_entries']} late={candidate['late_entries']}")
+            print(f"opposing_markets={candidate['opposing_market_count']} hard_flags={candidate['hard_flags']}")
 
-        print("\n" + "=" * 80)
-        print(f"{idx}. {candidate['wallet']}")
-        print(
-            f"score={candidate['score']} "
-            f"tier={candidate['tier']} "
-            f"category={candidate['category_guess']}"
-        )
-        print(f"global_pre_score={candidate.get('global_pre_score')}")
-        print(
-            f"trades={candidate['trade_count']} "
-            f"volume=${candidate['total_volume']} "
-            f"avg=${candidate['avg_size']}"
-        )
-        print(
-            f"markets={candidate['unique_markets']} "
-            f"early={candidate['early_entries']} "
-            f"late={candidate['late_entries']}"
-        )
-        print(
-            f"opposing_markets={candidate['opposing_market_count']} "
-            f"hard_flags={candidate['hard_flags']}"
-        )
-
-        if review:
-            print(f"AI: {review['recommendation']} | {review['category_guess']}")
-            print(f"flags: {', '.join(review['risk_flags'])}")
-            print(f"reason: {review['reason']}")
+            if review:
+                print(f"AI: {review.get('recommendation')} | {review.get('category_guess')}")
+                print(f"confidence: {review.get('confidence')}")
+                print(f"flags: {', '.join(review.get('risk_flags', []))}")
+                print(f"reason: {review.get('reason')}")
 
     save_json("global_candidates.json", top)
     save_json("candidates.json", top)
 
-    recommendations = compare_active_vs_candidates(active_health, top)
+    return top
 
+
+def run_recommendations_cycle(
+    active_health: Optional[List[Dict[str, Any]]] = None,
+    candidates: Optional[List[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+    print("\n" + "=" * 80)
+    print("Running replacement recommendations...")
+    print("=" * 80)
+
+    if active_health is None:
+        active_health = load_json("active_wallet_health.json", [])
+
+    if candidates is None:
+        candidates = load_json("global_candidates.json", [])
+
+    recommendations = compare_active_vs_candidates(active_health, candidates)
     save_json("replacement_recommendations.json", recommendations)
 
-    print("\nWhale finder terminado.")
-    print(f"Active wallets checked: {len(active_health)}")
-    print(f"Initial wallets scored: {len(initial_candidates)}")
-    print(f"Enriched wallets scored: {len(enriched_candidates)}")
-    print(f"Candidates reviewed by AI: {len(top)}")
-    print(f"Recommendations: {len(recommendations)}")
+    print(f"Replacement recommendations saved: {len(recommendations)}")
+    return recommendations
+
+
+def save_run_summary(
+    active_health: Optional[List[Dict[str, Any]]] = None,
+    candidates: Optional[List[Dict[str, Any]]] = None,
+    recommendations: Optional[List[Dict[str, Any]]] = None,
+    status: str = "success",
+    error: Optional[str] = None,
+) -> None:
+    summary = {
+        "status": status,
+        "error": error,
+        "generated_at": iso_now(),
+        "mode": WHALE_FINDER_MODE,
+        "lookback_hours": LOOKBACK_HOURS,
+        "min_trade_usd": MIN_TRADE_USD,
+        "active_wallets_checked": len(active_health or []),
+        "candidates_count": len(candidates or []),
+        "recommendations_count": len(recommendations or []),
+        "active_interval_seconds": ACTIVE_HEALTH_INTERVAL_SECONDS,
+        "discovery_interval_seconds": DISCOVERY_INTERVAL_SECONDS,
+    }
+
+    save_json("run_summary.json", summary)
+
+
+async def run_once() -> None:
+    active_health = await run_active_cycle()
+    candidates = await run_discovery_cycle()
+    recommendations = run_recommendations_cycle(active_health, candidates)
+    save_run_summary(active_health, candidates, recommendations)
+
+
+async def worker_loop() -> None:
+    ensure_output_dir()
+
+    state = load_state()
+    last_active_run = parse_datetime(state.get("last_active_run"))
+    last_discovery_run = parse_datetime(state.get("last_discovery_run"))
+
+    if RUN_ON_START:
+        print("RUN_ON_START=true. Running full cycle first...")
+        try:
+            await run_once()
+            now = now_utc()
+            state["last_active_run"] = now.isoformat()
+            state["last_discovery_run"] = now.isoformat()
+            state["last_success"] = now.isoformat()
+            state["last_error"] = None
+            save_state(state)
+            last_active_run = now
+            last_discovery_run = now
+        except Exception as exc:
+            state["last_error"] = str(exc)
+            state["last_error_at"] = iso_now()
+            save_state(state)
+            save_run_summary(status="error", error=str(exc))
+            print(f"Initial full cycle failed: {exc}")
+
+    while True:
+        now = now_utc()
+
+        should_run_active = (
+            last_active_run is None
+            or (now - last_active_run).total_seconds() >= ACTIVE_HEALTH_INTERVAL_SECONDS
+        )
+
+        should_run_discovery = (
+            last_discovery_run is None
+            or (now - last_discovery_run).total_seconds() >= DISCOVERY_INTERVAL_SECONDS
+        )
+
+        active_health: Optional[List[Dict[str, Any]]] = None
+        candidates: Optional[List[Dict[str, Any]]] = None
+        recommendations: Optional[List[Dict[str, Any]]] = None
+
+        try:
+            if should_run_active:
+                active_health = await run_active_cycle()
+                last_active_run = now_utc()
+                state["last_active_run"] = last_active_run.isoformat()
+
+            if should_run_discovery:
+                candidates = await run_discovery_cycle()
+                last_discovery_run = now_utc()
+                state["last_discovery_run"] = last_discovery_run.isoformat()
+
+            if active_health is not None or candidates is not None:
+                if active_health is None:
+                    active_health = load_json("active_wallet_health.json", [])
+
+                if candidates is None:
+                    candidates = load_json("global_candidates.json", [])
+
+                recommendations = run_recommendations_cycle(active_health, candidates)
+                save_run_summary(active_health, candidates, recommendations)
+
+                state["last_success"] = iso_now()
+                state["last_error"] = None
+                save_state(state)
+
+        except Exception as exc:
+            print(f"Worker cycle failed: {exc}")
+            state["last_error"] = str(exc)
+            state["last_error_at"] = iso_now()
+            save_state(state)
+            save_run_summary(
+                active_health=active_health,
+                candidates=candidates,
+                recommendations=recommendations,
+                status="error",
+                error=str(exc),
+            )
+
+        print(f"Sleeping {WORKER_SLEEP_SECONDS}s...")
+        await asyncio.sleep(WORKER_SLEEP_SECONDS)
+
+
+async def main() -> None:
+    print("Starting whale-finder")
+    print(f"mode={WHALE_FINDER_MODE}")
+    print(f"output_dir={OUTPUT_DIR}")
+    print(f"lookback_hours={LOOKBACK_HOURS}")
+    print(f"active_interval_seconds={ACTIVE_HEALTH_INTERVAL_SECONDS}")
+    print(f"discovery_interval_seconds={DISCOVERY_INTERVAL_SECONDS}")
+
+    if WHALE_FINDER_MODE == "once":
+        await run_once()
+        return
+
+    await worker_loop()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
