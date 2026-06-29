@@ -427,6 +427,63 @@ def _candidate_sources(base: Path):
     _write_json(base / "trade_copyability_shadow.json", {"clusters": [], "walletResults": []})
 
 
+def _write_low_signal_candidate_sources(base: Path, candidate_count: int = 195):
+    now = datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc)
+    general_rankings = [
+        {
+            "wallet": BENCHMARK,
+            "displayName": "Ken",
+            "roles": ["active", "benchmark"],
+            "profiles": ["mixed"],
+            "classification": "WHALE_BUT_NOISY",
+            "behaviorQualityScore": 64,
+            "robustSkillScore": 77,
+            "shadowRobustMetaScore": 69,
+            "longitudinalComparisonScore": 62.1,
+            "comparisonConfidence": "sufficient",
+            "runCount": 9,
+            "stabilityScore": 0.0,
+            "scoreTrend": "stable",
+            "dominantKnownCategory": "geopolitics",
+            "knownCategoryCoverageScore": 54,
+            "pnlConcentrationLevel": "low",
+            "recommendation": "shadow_watch",
+            "rank": 1,
+        }
+    ]
+    for index in range(candidate_count):
+        wallet = f"0x{index + 1:040x}"
+        general_rankings.append(
+            {
+                "wallet": wallet,
+                "displayName": f"Candidate {index + 1}",
+                "roles": ["candidate"],
+                "profiles": ["mixed"],
+                "classification": "WHALE_BUT_NOISY",
+                "behaviorQualityScore": 8,
+                "robustSkillScore": 12,
+                "shadowRobustMetaScore": 10,
+                "longitudinalComparisonScore": 6,
+                "comparisonConfidence": "insufficient",
+                "runCount": 0,
+                "stabilityScore": 0.0,
+                "scoreTrend": "stable",
+                "dominantKnownCategory": "mixed",
+                "knownCategoryCoverageScore": 0,
+                "pnlConcentrationLevel": "low",
+                "recommendation": "shadow_watch",
+                "rank": index + 2,
+            }
+        )
+
+    _write_json(base / "wallet_shadow_rankings.json", general_rankings)
+    _write_json(base / "wallet_category_rankings.json", {})
+    _write_history(base / "wallet_shadow_history.jsonl", [])
+    _write_json(base / "wallet_copyability_summary.json", {})
+    _write_json(base / "wallet_comparison_summary.json", {"comparisons": [], "sufficient": 0})
+    _write_json(base / "trade_copyability_shadow.json", {"clusters": [], "walletResults": []})
+
+
 def test_adaptive_signal_wallet_roster_selects_six_wallets_and_writes_output(monkeypatch):
     base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp"
     shutil.rmtree(base, ignore_errors=True)
@@ -453,9 +510,10 @@ def test_adaptive_signal_wallet_roster_selects_six_wallets_and_writes_output(mon
     assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
     assert payload["selectedWallets"][0]["isBenchmark"] is True
     assert payload["selectedWallets"][0]["signalWalletRosterScore"] == 100
+    assert all(row["probationaryCandidate"] is False for row in payload["selectedWallets"][1:])
     assert any(row["wallet"] == WALLETS["rejected"] for row in payload["rejectedWallets"])
     rejected = next(row for row in payload["rejectedWallets"] if row["wallet"] == WALLETS["rejected"])
-    assert rejected["reason"] in {"high hedge rate", "stale activity"}
+    assert rejected["rejectionReason"] in {"extreme hedge risk", "high concentration penalty", "low copyability", "lower signal score than selected roster", "stale activity verified"}
     selected_scores = {row["wallet"]: row["signalWalletRosterScore"] for row in payload["selectedWallets"]}
     assert selected_scores[WALLETS["macro"]] > rejected["signalWalletRosterScore"]
     shutil.rmtree(base, ignore_errors=True)
@@ -483,17 +541,15 @@ def test_adaptive_signal_wallet_roster_keeps_benchmark_when_no_candidates(monkey
         output_dir=base,
     )
 
-    assert payload["selectedWallets"] == [
-        {
-            "wallet": BENCHMARK,
-            "rank": 1,
-            "isBenchmark": True,
-            "signalWalletRosterScore": 100.0,
-            "primaryCategory": "mixed",
-            "reason": "benchmark wallet",
-            "scoreBreakdown": payload["selectedWallets"][0]["scoreBreakdown"],
-        }
-    ]
+    assert len(payload["selectedWallets"]) == 1
+    assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
+    assert payload["selectedWallets"][0]["rank"] == 1
+    assert payload["selectedWallets"][0]["isBenchmark"] is True
+    assert payload["selectedWallets"][0]["signalWalletRosterScore"] == 100.0
+    assert payload["selectedWallets"][0]["primaryCategory"] == "mixed"
+    assert payload["selectedWallets"][0]["reason"] == "benchmark wallet"
+    assert payload["selectedWallets"][0]["selectionReason"] == "benchmark wallet"
+    assert payload["selectedWallets"][0]["probationaryCandidate"] is False
     assert payload["rejectedWallets"] == []
     shutil.rmtree(base, ignore_errors=True)
 
@@ -684,7 +740,7 @@ def test_high_hedge_and_not_copyable_penalize_roster_score(monkeypatch):
 
     payload = roster.build_adaptive_signal_wallet_roster(
         benchmark_wallet=BENCHMARK,
-        target_roster_size=3,
+        target_roster_size=2,
         wallet_scores=[],
         shadow_rows=[],
         output_dir=base,
@@ -693,5 +749,38 @@ def test_high_hedge_and_not_copyable_penalize_roster_score(monkeypatch):
     macro = next(row for row in payload["selectedWallets"] if row["wallet"] == WALLETS["macro"])
     rejected = next(row for row in payload["rejectedWallets"] if row["wallet"] == WALLETS["rejected"])
     assert macro["signalWalletRosterScore"] > rejected["signalWalletRosterScore"]
-    assert rejected["reason"] in {"high hedge rate", "stale activity"}
+    assert rejected["rejectionReason"] in {"extreme hedge risk", "high concentration penalty", "low copyability", "lower signal score than selected roster", "stale activity verified"}
+    shutil.rmtree(base, ignore_errors=True)
+
+
+def test_adaptive_signal_wallet_roster_fallback_fills_to_target_and_marks_probationary(monkeypatch, capsys):
+    base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp_fallback"
+    shutil.rmtree(base, ignore_errors=True)
+    base.mkdir(parents=True, exist_ok=True)
+    _write_low_signal_candidate_sources(base, candidate_count=195)
+
+    monkeypatch.setattr(roster, "OUTPUT_DIR", base)
+    monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+
+    payload = roster.build_adaptive_signal_wallet_roster(
+        benchmark_wallet=BENCHMARK,
+        target_roster_size=6,
+        wallet_scores=[],
+        shadow_rows=[],
+        output_dir=base,
+    )
+    output = capsys.readouterr().out
+
+    assert payload["candidatesFound"] == 196
+    assert len(payload["selectedWallets"]) == 6
+    assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
+    assert payload["selectedWallets"][0]["rank"] == 1
+    assert payload["selectedWallets"][0]["probationaryCandidate"] is False
+    assert all(row["probationaryCandidate"] is True for row in payload["selectedWallets"][1:])
+    assert all(row["recentActivityStatus"] == "unknown" for row in payload["selectedWallets"][1:])
+    assert any(row["staleActivityPenalty"] > 0 for row in payload["selectedWallets"][1:])
+    assert any(row["insufficientSamplePenalty"] > 0 for row in payload["selectedWallets"][1:])
+    assert payload["selectedWallets"][1]["signalWalletRosterScore"] < 35
+    assert "SMART_MONEY_WALLET_ROSTER_FALLBACK_USED" in output
+    assert "SMART_MONEY_WALLET_ROSTER_SELECTED count=6" in output
     shutil.rmtree(base, ignore_errors=True)

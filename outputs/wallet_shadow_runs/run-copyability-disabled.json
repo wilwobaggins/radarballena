@@ -1,6 +1,6 @@
 {
   "runId": "run-copyability-disabled",
-  "generatedAt": "2026-06-29T19:46:16.510844+00:00",
+  "generatedAt": "2026-06-29T20:15:10.044824+00:00",
   "engineVersion": "smart_money_shadow_v1",
   "walletsRequested": 8,
   "walletsCompleted": 8,
@@ -202,7 +202,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.503844+00:00",
+      "generatedAt": "2026-06-29T20:15:09.939672+00:00",
       "candidateScore": 33,
       "candidateStatus": "degraded",
       "replacementFor": null
@@ -398,7 +398,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.503844+00:00",
+      "generatedAt": "2026-06-29T20:15:09.940671+00:00",
       "candidateScore": 39,
       "candidateStatus": "degraded",
       "replacementFor": null
@@ -594,7 +594,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.503844+00:00",
+      "generatedAt": "2026-06-29T20:15:09.984604+00:00",
       "candidateScore": 40,
       "candidateStatus": "degraded",
       "replacementFor": null
@@ -790,7 +790,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.504842+00:00",
+      "generatedAt": "2026-06-29T20:15:09.995113+00:00",
       "candidateScore": 32,
       "candidateStatus": "degraded",
       "replacementFor": null
@@ -986,7 +986,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.504842+00:00",
+      "generatedAt": "2026-06-29T20:15:10.000107+00:00",
       "candidateScore": 32,
       "candidateStatus": "degraded",
       "replacementFor": null
@@ -1182,7 +1182,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.505842+00:00",
+      "generatedAt": "2026-06-29T20:15:10.003141+00:00",
       "candidateScore": 64,
       "candidateStatus": "watch",
       "replacementFor": null
@@ -1375,7 +1375,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.505842+00:00",
+      "generatedAt": "2026-06-29T20:15:10.004147+00:00",
       "candidateScore": 84,
       "candidateStatus": "candidate_high",
       "replacementFor": null
@@ -1568,7 +1568,7 @@
         "shadowRobustRecommendation": "robust_shadow_low"
       },
       "behaviorStatus": "insufficient_recent_activity",
-      "generatedAt": "2026-06-29T19:46:16.505842+00:00",
+      "generatedAt": "2026-06-29T20:15:10.008683+00:00",
       "candidateScore": 83,
       "candidateStatus": "candidate_high",
       "replacementFor": null
