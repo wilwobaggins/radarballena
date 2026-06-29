@@ -1,4 +1,185 @@
 {
-  "comparisons": [],
+  "comparisons": [
+    {
+      "activeWallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+      "candidateWallet": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+      "profile": "sports",
+      "activeScore": 54.9,
+      "candidateScore": 0.0,
+      "scoreGap": -54.9,
+      "activeRunCount": 9,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "shared_profiles=sports"
+      ]
+    },
+    {
+      "activeWallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+      "candidateWallet": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+      "profile": "sports",
+      "activeScore": 54.9,
+      "candidateScore": 0.0,
+      "scoreGap": -54.9,
+      "activeRunCount": 9,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "shared_profiles=sports"
+      ]
+    },
+    {
+      "activeWallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+      "candidateWallet": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+      "profile": "sports",
+      "activeScore": 71.1,
+      "candidateScore": 0.0,
+      "scoreGap": -71.1,
+      "activeRunCount": 9,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "shared_profiles=sports"
+      ]
+    },
+    {
+      "activeWallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+      "candidateWallet": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+      "profile": "sports",
+      "activeScore": 71.1,
+      "candidateScore": 0.0,
+      "scoreGap": -71.1,
+      "activeRunCount": 9,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "shared_profiles=sports"
+      ]
+    },
+    {
+      "activeWallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "candidateWallet": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+      "profile": "sports",
+      "activeScore": 62.1,
+      "candidateScore": 0.0,
+      "scoreGap": -62.1,
+      "activeRunCount": 9,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "no_shared_profile"
+      ]
+    },
+    {
+      "activeWallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "candidateWallet": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+      "profile": "sports",
+      "activeScore": 62.1,
+      "candidateScore": 0.0,
+      "scoreGap": -62.1,
+      "activeRunCount": 9,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "no_shared_profile"
+      ]
+    },
+    {
+      "activeWallet": "0xc8ab97a9089a9ff7e6ef0688e6e591a066946418",
+      "candidateWallet": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+      "profile": "sports",
+      "activeScore": 0.0,
+      "candidateScore": 0.0,
+      "scoreGap": 0.0,
+      "activeRunCount": 2,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "no_shared_profile"
+      ]
+    },
+    {
+      "activeWallet": "0xc8ab97a9089a9ff7e6ef0688e6e591a066946418",
+      "candidateWallet": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+      "profile": "sports",
+      "activeScore": 0.0,
+      "candidateScore": 0.0,
+      "scoreGap": 0.0,
+      "activeRunCount": 2,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "no_shared_profile"
+      ]
+    },
+    {
+      "activeWallet": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+      "candidateWallet": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+      "profile": "sports",
+      "activeScore": 0.0,
+      "candidateScore": 0.0,
+      "scoreGap": 0.0,
+      "activeRunCount": 2,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "no_shared_profile"
+      ]
+    },
+    {
+      "activeWallet": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+      "candidateWallet": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+      "profile": "sports",
+      "activeScore": 0.0,
+      "candidateScore": 0.0,
+      "scoreGap": 0.0,
+      "activeRunCount": 2,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "no_shared_profile"
+      ]
+    },
+    {
+      "activeWallet": "0x2663daca3cecf3767ca1c3b126002a8578a8ed1f",
+      "candidateWallet": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+      "profile": "sports",
+      "activeScore": 0.0,
+      "candidateScore": 0.0,
+      "scoreGap": 0.0,
+      "activeRunCount": 2,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "shared_profiles=sports"
+      ]
+    },
+    {
+      "activeWallet": "0x2663daca3cecf3767ca1c3b126002a8578a8ed1f",
+      "candidateWallet": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+      "profile": "sports",
+      "activeScore": 0.0,
+      "candidateScore": 0.0,
+      "scoreGap": 0.0,
+      "activeRunCount": 2,
+      "candidateRunCount": 2,
+      "comparisonStatus": "insufficient_history",
+      "shadowRecommendation": "continue_observation",
+      "reasons": [
+        "shared_profiles=sports"
+      ]
+    }
+  ],
   "sufficient": 0
 }

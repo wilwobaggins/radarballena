@@ -1213,9 +1213,16 @@ async def run_trade_copyability_shadow(
     wallet_scores: list[dict[str, Any]],
     shadow_phase: dict[str, Any] | None,
     deduped_trades: list[dict[str, Any]],
+    wallet_roster: dict[str, Any] | list[dict[str, Any]] | None = None,
     price_history_client: Any | None = None,
 ) -> dict[str, Any]:
-    selected_wallet_rows = list((shadow_phase or {}).get("cohort") or [])
+    if isinstance(wallet_roster, dict):
+        selected_wallet_rows = list(wallet_roster.get("selectedWallets") or [])
+    elif isinstance(wallet_roster, list):
+        selected_wallet_rows = list(wallet_roster)
+    else:
+        selected_wallet_rows = list((shadow_phase or {}).get("cohort") or [])
+
     if not selected_wallet_rows:
         selected_wallet_rows = [
             {

@@ -24,6 +24,10 @@ try:  # pragma: no cover - support package and script-style imports
         upsert_wallet_scores,
     )
     from .copyability_storage import write_trade_copyability_shadow
+    from .adaptive_wallet_roster import (
+        build_adaptive_signal_wallet_roster,
+        write_adaptive_signal_wallet_roster,
+    )
     from .category_utils import guess_category_from_title
     from .wallet_shadow_cohort import (
         build_shadow_wallet_cohort,
@@ -44,6 +48,7 @@ try:  # pragma: no cover - support package and script-style imports
         build_wallet_general_rankings,
     )
     from .trade_copyability import (
+        COPYABILITY_MAX_WALLETS_PER_RUN,
         COPYABILITY_SHADOW_ENABLED,
         run_trade_copyability_shadow,
     )
@@ -76,6 +81,10 @@ except ImportError:  # pragma: no cover
         upsert_wallet_scores,
     )
     from copyability_storage import write_trade_copyability_shadow
+    from adaptive_wallet_roster import (
+        build_adaptive_signal_wallet_roster,
+        write_adaptive_signal_wallet_roster,
+    )
     from category_utils import guess_category_from_title
     from wallet_shadow_cohort import (
         build_shadow_wallet_cohort,
@@ -96,6 +105,7 @@ except ImportError:  # pragma: no cover
         build_wallet_general_rankings,
     )
     from trade_copyability import (
+        COPYABILITY_MAX_WALLETS_PER_RUN,
         COPYABILITY_SHADOW_ENABLED,
         run_trade_copyability_shadow,
     )
@@ -139,6 +149,9 @@ SHADOW_BENCHMARK_WALLETS = os.getenv("SHADOW_BENCHMARK_WALLETS", "")
 SHADOW_MAX_CANDIDATES_PER_RUN = int(os.getenv("SHADOW_MAX_CANDIDATES_PER_RUN", "10"))
 SHADOW_MAX_TOTAL_WALLETS_PER_RUN = int(os.getenv("SHADOW_MAX_TOTAL_WALLETS_PER_RUN", "20"))
 SHADOW_MIN_CANDIDATE_SCORE = float(os.getenv("SHADOW_MIN_CANDIDATE_SCORE", "0"))
+SIGNAL_WALLET_ROSTER_ENABLED = os.getenv("SIGNAL_WALLET_ROSTER_ENABLED", "false").lower() == "true"
+SIGNAL_WALLET_ROSTER_SIZE = int(os.getenv("SIGNAL_WALLET_ROSTER_SIZE", "6"))
+SIGNAL_WALLET_BENCHMARK_WALLET = os.getenv("SIGNAL_WALLET_BENCHMARK_WALLET", "0x9d84ce0306f8551e02efef1680475fc0f1dc1344")
 
 
 def parse_float(value: Any, default: float = 0.0) -> float:
@@ -1121,6 +1134,23 @@ async def main() -> None:
             result["shadow_phase"] = shadow_phase
         except Exception as shadow_exc:
             print(f"SMART_MONEY_SHADOW_COHORT_FAILED error={_safe_error_message(shadow_exc)}")
+        adaptive_signal_wallet_roster = None
+        if COPYABILITY_SHADOW_ENABLED and SIGNAL_WALLET_ROSTER_ENABLED:
+            adaptive_signal_wallet_roster = build_adaptive_signal_wallet_roster(
+                benchmark_wallet=SIGNAL_WALLET_BENCHMARK_WALLET,
+                target_roster_size=SIGNAL_WALLET_ROSTER_SIZE,
+                priority_wallets=SKILL_PRIORITY_WALLETS,
+                wallet_scores=result["wallet_scores"],
+                shadow_rows=(result.get("shadow_phase") or {}).get("shadow_rows") or result.get("shadow_rows") or [],
+                output_dir=resolve_output_dir(),
+            )
+            write_adaptive_signal_wallet_roster(adaptive_signal_wallet_roster)
+            if COPYABILITY_MAX_WALLETS_PER_RUN < SIGNAL_WALLET_ROSTER_SIZE:
+                print(
+                    "SMART_MONEY_WALLET_ROSTER_LIMIT_WARNING "
+                    f"copyability_max={COPYABILITY_MAX_WALLETS_PER_RUN} "
+                    f"roster_size={SIGNAL_WALLET_ROSTER_SIZE}"
+                )
         if COPYABILITY_SHADOW_ENABLED:
             try:
                 copyability_phase = await run_trade_copyability_shadow(
@@ -1128,6 +1158,7 @@ async def main() -> None:
                     wallet_scores=result["wallet_scores"],
                     shadow_phase=result.get("shadow_phase"),
                     deduped_trades=result["deduped_trades"],
+                    wallet_roster=adaptive_signal_wallet_roster,
                 )
                 result["copyability_phase"] = copyability_phase
             except Exception as copyability_exc:

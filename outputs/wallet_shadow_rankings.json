@@ -8,19 +8,19 @@
     "profiles": [
       "sports"
     ],
-    "classification": "SPECIALIST_WALLET",
-    "behaviorQualityScore": 67,
-    "skillScore": 78,
-    "robustSkillScore": 76,
-    "shadowMetaScore": 79,
-    "shadowRobustMetaScore": 79,
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
     "longitudinalComparisonScore": 71.1,
     "comparisonConfidence": "sufficient",
     "runCount": 9,
     "stabilityScore": 0.0,
     "scoreTrend": "stable",
-    "dominantKnownCategory": "sports",
-    "knownCategoryCoverageScore": 87,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
     "pnlConcentrationLevel": "low",
     "recommendation": "shadow_strong",
     "rank": 1
@@ -29,26 +29,24 @@
     "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
     "displayName": "Everything Trader Zeta",
     "roles": [
-      "active",
-      "benchmark"
+      "active"
     ],
     "profiles": [
-      "mixed",
-      "priority"
+      "mixed"
     ],
-    "classification": "WHALE_BUT_NOISY",
-    "behaviorQualityScore": 64,
-    "skillScore": 85,
-    "robustSkillScore": 77,
-    "shadowMetaScore": 74,
-    "shadowRobustMetaScore": 69,
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
     "longitudinalComparisonScore": 62.1,
     "comparisonConfidence": "sufficient",
     "runCount": 9,
     "stabilityScore": 0.0,
     "scoreTrend": "stable",
-    "dominantKnownCategory": "geopolitics",
-    "knownCategoryCoverageScore": 54,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
     "pnlConcentrationLevel": "low",
     "recommendation": "shadow_watch",
     "rank": 2
@@ -62,21 +60,151 @@
     "profiles": [
       "sports"
     ],
-    "classification": "WHALE_BUT_NOISY",
-    "behaviorQualityScore": 62,
-    "skillScore": 30,
-    "robustSkillScore": 30,
-    "shadowMetaScore": 55,
-    "shadowRobustMetaScore": 61,
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
     "longitudinalComparisonScore": 54.9,
     "comparisonConfidence": "sufficient",
     "runCount": 9,
     "stabilityScore": 0.0,
     "scoreTrend": "stable",
-    "dominantKnownCategory": "sports",
-    "knownCategoryCoverageScore": 100,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
     "pnlConcentrationLevel": "low",
     "recommendation": "shadow_low",
     "rank": 3
+  },
+  {
+    "wallet": "0xc8ab97a9089a9ff7e6ef0688e6e591a066946418",
+    "displayName": "Macro Economics Whale",
+    "roles": [
+      "active"
+    ],
+    "profiles": [
+      "macro"
+    ],
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
+    "longitudinalComparisonScore": 0.0,
+    "comparisonConfidence": "limited",
+    "runCount": 2,
+    "stabilityScore": null,
+    "scoreTrend": null,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_low",
+    "rank": 4
+  },
+  {
+    "wallet": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+    "displayName": "Geopolitical Macro Whale",
+    "roles": [
+      "active"
+    ],
+    "profiles": [
+      "politics"
+    ],
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
+    "longitudinalComparisonScore": 0.0,
+    "comparisonConfidence": "limited",
+    "runCount": 2,
+    "stabilityScore": null,
+    "scoreTrend": null,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_low",
+    "rank": 5
+  },
+  {
+    "wallet": "0x2663daca3cecf3767ca1c3b126002a8578a8ed1f",
+    "displayName": "Soccer Esports Titan Alpha",
+    "roles": [
+      "active"
+    ],
+    "profiles": [
+      "sports"
+    ],
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
+    "longitudinalComparisonScore": 0.0,
+    "comparisonConfidence": "limited",
+    "runCount": 2,
+    "stabilityScore": null,
+    "scoreTrend": null,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_low",
+    "rank": 6
+  },
+  {
+    "wallet": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+    "displayName": "0xaebf3acc7c9add4928bd218f96de5cf64987e1ca",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "sports"
+    ],
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
+    "longitudinalComparisonScore": 0.0,
+    "comparisonConfidence": "limited",
+    "runCount": 2,
+    "stabilityScore": null,
+    "scoreTrend": null,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_low",
+    "rank": 7
+  },
+  {
+    "wallet": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+    "displayName": "0x012a64e1e9447bf3fb4ee701a154bcec23cec01d",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "sports"
+    ],
+    "classification": null,
+    "behaviorQualityScore": 0,
+    "skillScore": 20,
+    "robustSkillScore": 20,
+    "shadowMetaScore": 0,
+    "shadowRobustMetaScore": 0,
+    "longitudinalComparisonScore": 0.0,
+    "comparisonConfidence": "limited",
+    "runCount": 2,
+    "stabilityScore": null,
+    "scoreTrend": null,
+    "dominantKnownCategory": "unknown",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_low",
+    "rank": 8
   }
 ]

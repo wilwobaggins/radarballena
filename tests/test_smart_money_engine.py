@@ -207,6 +207,72 @@ def test_copyability_shadow_disabled_skips_phase(monkeypatch):
     assert called["copyability"] is False
 
 
+def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, capsys):
+    called = {}
+
+    async def fake_execute_engine():
+        return {
+            "trades": [],
+            "deduped_trades": [],
+            "wallet_scores": [{"wallet": "0x" + "1" * 40, "walletQualityScore": 81, "classification": SIGNAL_WALLET}],
+            "market_trails": [],
+            "estela_capital": [],
+            "shadow_rows": [{"wallet": "0x" + "1" * 40}],
+        }
+
+    async def fake_run_trade_copyability_shadow(*_args, **kwargs):
+        called["wallet_roster"] = kwargs.get("wallet_roster")
+        print(f"SMART_MONEY_COPYABILITY_STARTED wallets={len((kwargs.get('wallet_roster') or {}).get('selectedWallets') or [])}")
+        return {"clusters": [], "walletResults": []}
+
+    def fake_build_adaptive_signal_wallet_roster(*_args, **_kwargs):
+        return {
+            "generatedAt": "2026-06-29T00:00:00+00:00",
+            "benchmarkWallet": "0x" + "9" * 40,
+            "targetRosterSize": 6,
+            "candidatesFound": 3,
+            "selectedWallets": [
+                {"wallet": "0x" + "9" * 40, "rank": 1, "isBenchmark": True, "signalWalletRosterScore": 100, "primaryCategory": "mixed", "reason": "benchmark wallet"},
+                {"wallet": "0x" + "1" * 40, "rank": 2, "isBenchmark": False, "signalWalletRosterScore": 82, "primaryCategory": "macro", "reason": "strong robust skill score"},
+                {"wallet": "0x" + "2" * 40, "rank": 3, "isBenchmark": False, "signalWalletRosterScore": 79, "primaryCategory": "politics", "reason": "recent activity"},
+            ],
+            "rejectedWallets": [],
+        }
+
+    written = {}
+
+    def fake_write_adaptive_signal_wallet_roster(payload):
+        written["payload"] = payload
+        return Path("outputs/adaptive_signal_wallet_roster.json")
+
+    monkeypatch.setattr(smart_money_main, "execute_engine", fake_execute_engine)
+    monkeypatch.setattr(
+        smart_money_main,
+        "_run_shadow_cohort_phase",
+        lambda *_args, **_kwargs: asyncio.sleep(0, result={"cohort": [], "shadow_rows": []}),
+    )
+    monkeypatch.setattr(smart_money_main, "run_trade_copyability_shadow", fake_run_trade_copyability_shadow)
+    monkeypatch.setattr(smart_money_main, "build_adaptive_signal_wallet_roster", fake_build_adaptive_signal_wallet_roster)
+    monkeypatch.setattr(smart_money_main, "write_adaptive_signal_wallet_roster", fake_write_adaptive_signal_wallet_roster)
+    monkeypatch.setattr(smart_money_main, "start_engine_run", lambda: "run-adaptive-roster")
+    monkeypatch.setattr(smart_money_main, "COPYABILITY_SHADOW_ENABLED", True)
+    monkeypatch.setattr(smart_money_main, "SIGNAL_WALLET_ROSTER_ENABLED", True)
+    monkeypatch.setattr(smart_money_main, "COPYABILITY_MAX_WALLETS_PER_RUN", 6)
+    monkeypatch.setattr(smart_money_main, "SIGNAL_WALLET_ROSTER_SIZE", 6)
+    monkeypatch.setattr(smart_money_main, "upsert_wallet_scores", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "upsert_capital_trails", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "finish_engine_run", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "log_summary", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "log_market_trail_summary", lambda *_args, **_kwargs: None)
+
+    asyncio.run(smart_money_main.main())
+
+    output = capsys.readouterr().out
+    assert "SMART_MONEY_COPYABILITY_STARTED wallets=3" in output
+    assert written["payload"]["selectedWallets"][0]["wallet"] == "0x" + "9" * 40
+    assert len(called["wallet_roster"]["selectedWallets"]) == 3
+
+
 def test_main_copyability_failure_writes_diagnostic_shadow(monkeypatch, capsys):
     written = {}
 
