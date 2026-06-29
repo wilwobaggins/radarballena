@@ -1,0 +1,882 @@
+{
+  "110ad66ee8af9cde47c24b6bb543260040cc8afb": {
+    "clusterId": "110ad66ee8af9cde47c24b6bb543260040cc8afb",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 66.83,
+    "updatedAt": "2026-06-29T16:52:49.685232+00:00"
+  },
+  "c1aa0dd7974768c1572fa5ccffd8917ed3afeade": {
+    "clusterId": "c1aa0dd7974768c1572fa5ccffd8917ed3afeade",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 76.66,
+    "updatedAt": "2026-06-29T16:52:48.823310+00:00"
+  },
+  "3bd1a7a5cdfa2ad8068649379f887cfcc5926c9a": {
+    "clusterId": "3bd1a7a5cdfa2ad8068649379f887cfcc5926c9a",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 65.66,
+    "updatedAt": "2026-06-29T16:52:49.478262+00:00"
+  },
+  "c72578dae5109ad6d571efed9c7e23707ccb56f3": {
+    "clusterId": "c72578dae5109ad6d571efed9c7e23707ccb56f3",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 79.8,
+    "updatedAt": "2026-06-29T16:52:48.974072+00:00"
+  },
+  "6c6c69301a37891c586aff64f25786d6f966f3b3": {
+    "clusterId": "6c6c69301a37891c586aff64f25786d6f966f3b3",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 62.72,
+    "updatedAt": "2026-06-29T16:52:49.689858+00:00"
+  },
+  "885a21918339d4f2f9465d298f44136c086e5bdb": {
+    "clusterId": "885a21918339d4f2f9465d298f44136c086e5bdb",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 61.55,
+    "updatedAt": "2026-06-29T16:52:49.696037+00:00"
+  },
+  "e8962f8abfae3d1c0e8bcb5d5bef1a8c75025f61": {
+    "clusterId": "e8962f8abfae3d1c0e8bcb5d5bef1a8c75025f61",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 59.99,
+    "updatedAt": "2026-06-29T16:52:49.845682+00:00"
+  },
+  "a90d4cb91a7bc01137472fa7fb6c53b1d6465c22": {
+    "clusterId": "a90d4cb91a7bc01137472fa7fb6c53b1d6465c22",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 65.62,
+    "updatedAt": "2026-06-29T16:23:44.854335+00:00"
+  },
+  "bba41180f7dbd22cdd05fc389692d70941749b49": {
+    "clusterId": "bba41180f7dbd22cdd05fc389692d70941749b49",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 69.48,
+    "updatedAt": "2026-06-29T16:52:49.909169+00:00"
+  },
+  "abca6fbe35c4c0eda26175096160cac15ca3da19": {
+    "clusterId": "abca6fbe35c4c0eda26175096160cac15ca3da19",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 52.43,
+    "updatedAt": "2026-06-29T16:52:49.904152+00:00"
+  },
+  "3f25fa7697e72738a162464d4eabefd59a183564": {
+    "clusterId": "3f25fa7697e72738a162464d4eabefd59a183564",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 64.96,
+    "updatedAt": "2026-06-29T16:52:49.917760+00:00"
+  },
+  "08bd4afc080aff1618b50a7c5122631466f9612e": {
+    "clusterId": "08bd4afc080aff1618b50a7c5122631466f9612e",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 50.49,
+    "updatedAt": "2026-06-29T16:52:49.893082+00:00"
+  },
+  "a5fa7f9ffafc12021acd267089969479a590efb0": {
+    "clusterId": "a5fa7f9ffafc12021acd267089969479a590efb0",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 49.66,
+    "updatedAt": "2026-06-29T16:52:49.865345+00:00"
+  },
+  "6095da77fcb10bcfe120bdf47265e62647339a90": {
+    "clusterId": "6095da77fcb10bcfe120bdf47265e62647339a90",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 49.27,
+    "updatedAt": "2026-06-29T16:52:49.491721+00:00"
+  },
+  "3e2ea432e59e43ce06975edbad6559d0ea56fe6e": {
+    "clusterId": "3e2ea432e59e43ce06975edbad6559d0ea56fe6e",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 65.41,
+    "updatedAt": "2026-06-29T16:52:49.917760+00:00"
+  },
+  "724d59f9353f8ae782dc5e83ae492b27620345ef": {
+    "clusterId": "724d59f9353f8ae782dc5e83ae492b27620345ef",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 48.98,
+    "updatedAt": "2026-06-29T16:52:49.904152+00:00"
+  },
+  "58e16c7758ab6a869ef727b86eca160483fcfef6": {
+    "clusterId": "58e16c7758ab6a869ef727b86eca160483fcfef6",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 48.49,
+    "updatedAt": "2026-06-29T16:52:49.694470+00:00"
+  },
+  "a5af749cffad7b3cfca96cd29a2828942788aac6": {
+    "clusterId": "a5af749cffad7b3cfca96cd29a2828942788aac6",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:48.827005+00:00"
+  },
+  "c2b81ff7c1ba9effe309558233c8c9e2e7ed0ed4": {
+    "clusterId": "c2b81ff7c1ba9effe309558233c8c9e2e7ed0ed4",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:48.823310+00:00"
+  },
+  "186f936bd0dbf3c7b2a7e41e28ed83c0524cde0b": {
+    "clusterId": "186f936bd0dbf3c7b2a7e41e28ed83c0524cde0b",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:48.823310+00:00"
+  },
+  "a1538d87a0aeefd983e98a9eb10168c113e48c08": {
+    "clusterId": "a1538d87a0aeefd983e98a9eb10168c113e48c08",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:49.084685+00:00"
+  },
+  "c6ef0421f97fa072b052d8db4350b033041c5a2b": {
+    "clusterId": "c6ef0421f97fa072b052d8db4350b033041c5a2b",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:49.099489+00:00"
+  },
+  "87c6f757a8575bdc025fcb3589d249d0bf5ec418": {
+    "clusterId": "87c6f757a8575bdc025fcb3589d249d0bf5ec418",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 48.1,
+    "updatedAt": "2026-06-29T16:52:49.868696+00:00"
+  },
+  "42e96b06ff8116c3b9900d13bf3d2fadb05b3ecf": {
+    "clusterId": "42e96b06ff8116c3b9900d13bf3d2fadb05b3ecf",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:48.820133+00:00"
+  },
+  "7ce82094777a1344afc46ee0b0e940aadc274319": {
+    "clusterId": "7ce82094777a1344afc46ee0b0e940aadc274319",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 63.92,
+    "updatedAt": "2026-06-29T16:52:49.917760+00:00"
+  },
+  "fdc9fb8acb36851b9db7437967db723bb0b8f39c": {
+    "clusterId": "fdc9fb8acb36851b9db7437967db723bb0b8f39c",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 58.14,
+    "updatedAt": "2026-06-29T16:52:48.976268+00:00"
+  },
+  "369bd654a3e1296ad81d1be474194a2fd331340a": {
+    "clusterId": "369bd654a3e1296ad81d1be474194a2fd331340a",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 47.32,
+    "updatedAt": "2026-06-29T16:52:49.891082+00:00"
+  },
+  "259e94725b89ec7aaadbba828824f1405933ed85": {
+    "clusterId": "259e94725b89ec7aaadbba828824f1405933ed85",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 46.7,
+    "updatedAt": "2026-06-29T16:52:49.475869+00:00"
+  },
+  "3c9c9c065bc8a8037695cc84828a44d5b37cbc9c": {
+    "clusterId": "3c9c9c065bc8a8037695cc84828a44d5b37cbc9c",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:48.981774+00:00"
+  },
+  "731a9be17afc62482be370d9e6a1f4a526d11c4b": {
+    "clusterId": "731a9be17afc62482be370d9e6a1f4a526d11c4b",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 46.54,
+    "updatedAt": "2026-06-29T16:52:49.658932+00:00"
+  },
+  "a68233550a05818ccf0e34269d87879890bda749": {
+    "clusterId": "a68233550a05818ccf0e34269d87879890bda749",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 62.44,
+    "updatedAt": "2026-06-29T16:52:49.909169+00:00"
+  },
+  "3554cc38f8fd5086a6a34eb4f2979d85adbe7edc": {
+    "clusterId": "3554cc38f8fd5086a6a34eb4f2979d85adbe7edc",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:48.985247+00:00"
+  },
+  "416a8113d6eb055549c52e89d09c7e78eb6efa17": {
+    "clusterId": "416a8113d6eb055549c52e89d09c7e78eb6efa17",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:49.291921+00:00"
+  },
+  "72610e19ea2fcfa65c2da1be8442865172676a9d": {
+    "clusterId": "72610e19ea2fcfa65c2da1be8442865172676a9d",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 45.44,
+    "updatedAt": "2026-06-29T16:52:49.473578+00:00"
+  },
+  "938ec069eec1088f2480f7cf6c9b49b4d864c712": {
+    "clusterId": "938ec069eec1088f2480f7cf6c9b49b4d864c712",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 45.37,
+    "updatedAt": "2026-06-29T16:52:49.705307+00:00"
+  },
+  "dbad0d1c89fd95b7a58bcd13be5ef413b8413f17": {
+    "clusterId": "dbad0d1c89fd95b7a58bcd13be5ef413b8413f17",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 44.98,
+    "updatedAt": "2026-06-29T16:52:49.303988+00:00"
+  },
+  "bb1928e45028cc446b71bb1ec9b742061a2c0d10": {
+    "clusterId": "bb1928e45028cc446b71bb1ec9b742061a2c0d10",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 44.82,
+    "updatedAt": "2026-06-29T16:52:49.672006+00:00"
+  },
+  "a046624927db8322f1e39ff15dcc34af26c13ab8": {
+    "clusterId": "a046624927db8322f1e39ff15dcc34af26c13ab8",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 44.66,
+    "updatedAt": "2026-06-29T16:52:49.702561+00:00"
+  },
+  "b6dce0a8476dae6e82e03a17374ecff5492c3e76": {
+    "clusterId": "b6dce0a8476dae6e82e03a17374ecff5492c3e76",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 60.96,
+    "updatedAt": "2026-06-29T16:52:49.908166+00:00"
+  },
+  "51a68906ab5141f124c6fb128d579a4679ba2003": {
+    "clusterId": "51a68906ab5141f124c6fb128d579a4679ba2003",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 44.59,
+    "updatedAt": "2026-06-29T16:52:49.491721+00:00"
+  },
+  "f1a2ae2d53a8ec5ec01bc23be1bd4394cc058e9f": {
+    "clusterId": "f1a2ae2d53a8ec5ec01bc23be1bd4394cc058e9f",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 54.92,
+    "updatedAt": "2026-06-29T16:52:48.836269+00:00"
+  },
+  "67b625f5ba7fcc08b9de72684070f904c0b31f52": {
+    "clusterId": "67b625f5ba7fcc08b9de72684070f904c0b31f52",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 59.48,
+    "updatedAt": "2026-06-29T16:52:49.910169+00:00"
+  },
+  "bfd98fcb92e473566b4369d9beb1eb720d2efa09": {
+    "clusterId": "bfd98fcb92e473566b4369d9beb1eb720d2efa09",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 52.94,
+    "updatedAt": "2026-06-29T16:52:48.823310+00:00"
+  },
+  "4e3ec5fb8caa23ccff9afd139d941b7d4a196e7e": {
+    "clusterId": "4e3ec5fb8caa23ccff9afd139d941b7d4a196e7e",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 61.55,
+    "updatedAt": "2026-06-29T16:52:48.504413+00:00"
+  },
+  "06da1e007ec6c6d79ac243e5e243d9c5e3fd3e98": {
+    "clusterId": "06da1e007ec6c6d79ac243e5e243d9c5e3fd3e98",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 40.81,
+    "updatedAt": "2026-06-29T16:52:49.694975+00:00"
+  },
+  "4745750554ba880002963366e8f78668be3c8412": {
+    "clusterId": "4745750554ba880002963366e8f78668be3c8412",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 40.46,
+    "updatedAt": "2026-06-29T16:52:49.309412+00:00"
+  },
+  "b9991f1135cb43e13b89825db70a6a2c45abe26d": {
+    "clusterId": "b9991f1135cb43e13b89825db70a6a2c45abe26d",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 56.52,
+    "updatedAt": "2026-06-29T16:52:49.908166+00:00"
+  },
+  "20d39038d7f4db1df726e61ee218d888a29a7ead": {
+    "clusterId": "20d39038d7f4db1df726e61ee218d888a29a7ead",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 39.64,
+    "updatedAt": "2026-06-29T16:52:49.903152+00:00"
+  },
+  "245d4e6dfada1e5153464898f9be700b3c6ca9aa": {
+    "clusterId": "245d4e6dfada1e5153464898f9be700b3c6ca9aa",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 39.25,
+    "updatedAt": "2026-06-29T16:52:49.699562+00:00"
+  },
+  "bcb303d4eb5daeb36992b029a6a9685dbe62223a": {
+    "clusterId": "bcb303d4eb5daeb36992b029a6a9685dbe62223a",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.47,
+    "updatedAt": "2026-06-29T16:52:49.704300+00:00"
+  },
+  "89b31cee0094b8029bb6951c05348e32aafc7fc0": {
+    "clusterId": "89b31cee0094b8029bb6951c05348e32aafc7fc0",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 48.88,
+    "updatedAt": "2026-06-29T16:52:48.823310+00:00"
+  },
+  "0771a8939cbdf40cee7a6ffd50bc3815317d7c25": {
+    "clusterId": "0771a8939cbdf40cee7a6ffd50bc3815317d7c25",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.692623+00:00"
+  },
+  "f0fb22b5371ec4f7c1aab51495929645d40c1709": {
+    "clusterId": "f0fb22b5371ec4f7c1aab51495929645d40c1709",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.700960+00:00"
+  },
+  "8840bea4e11c21f9461faaf7101f61cd6cac1afd": {
+    "clusterId": "8840bea4e11c21f9461faaf7101f61cd6cac1afd",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.884452+00:00"
+  },
+  "de8bdff8ed7c905e04f5da676b2b2f5023de45c8": {
+    "clusterId": "de8bdff8ed7c905e04f5da676b2b2f5023de45c8",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.691556+00:00"
+  },
+  "53c10173e0fe3a63f21685cdbc765055d050e82d": {
+    "clusterId": "53c10173e0fe3a63f21685cdbc765055d050e82d",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.905656+00:00"
+  },
+  "66b11f2820f7aa3c65e20c83e9aa6e58fceea2bd": {
+    "clusterId": "66b11f2820f7aa3c65e20c83e9aa6e58fceea2bd",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.302982+00:00"
+  },
+  "3ae97cb49dc6b644b01a9c8f42b5a6d0cfc5ee4e": {
+    "clusterId": "3ae97cb49dc6b644b01a9c8f42b5a6d0cfc5ee4e",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.472578+00:00"
+  },
+  "d232cb1575329d6054b8e13ff941ccd7816022c8": {
+    "clusterId": "d232cb1575329d6054b8e13ff941ccd7816022c8",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 38.08,
+    "updatedAt": "2026-06-29T16:52:49.868696+00:00"
+  },
+  "456f25c092cac15ce04a6625b9fb7a3eea1b393a": {
+    "clusterId": "456f25c092cac15ce04a6625b9fb7a3eea1b393a",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 55,
+    "updatedAt": "2026-06-29T16:52:48.968544+00:00"
+  },
+  "7bfd1d3f1297065aee6ff29d3f113b54e4d0998d": {
+    "clusterId": "7bfd1d3f1297065aee6ff29d3f113b54e4d0998d",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 51.62,
+    "updatedAt": "2026-06-29T16:52:49.917760+00:00"
+  },
+  "7e5c1f26e6a754beb407c7989331a721fb626443": {
+    "clusterId": "7e5c1f26e6a754beb407c7989331a721fb626443",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 47.64,
+    "updatedAt": "2026-06-29T16:52:48.833289+00:00"
+  },
+  "b57a3fd53f664fe301187836fb757b082e101ccd": {
+    "clusterId": "b57a3fd53f664fe301187836fb757b082e101ccd",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 56.56,
+    "updatedAt": "2026-06-29T16:52:48.503886+00:00"
+  },
+  "c4aa239cd347f8494eab2dab3344ea45359fa820": {
+    "clusterId": "c4aa239cd347f8494eab2dab3344ea45359fa820",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 36.89,
+    "updatedAt": "2026-06-29T16:52:49.483588+00:00"
+  },
+  "9184f207485b7cd3354744e30815a38263da2f52": {
+    "clusterId": "9184f207485b7cd3354744e30815a38263da2f52",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 52.08,
+    "updatedAt": "2026-06-29T16:52:49.910169+00:00"
+  },
+  "2d9cfb7d43bee19125bf9d2a0a7794e8e841ef1c": {
+    "clusterId": "2d9cfb7d43bee19125bf9d2a0a7794e8e841ef1c",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 46.41,
+    "updatedAt": "2026-06-29T16:52:48.836269+00:00"
+  },
+  "3edfafdc2778c6cfd7e760c172a7ce92583aa532": {
+    "clusterId": "3edfafdc2778c6cfd7e760c172a7ce92583aa532",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 46.28,
+    "updatedAt": "2026-06-29T16:52:48.825498+00:00"
+  },
+  "46b315ab5bfa6589ea64d73423408ef3aba8fb4f": {
+    "clusterId": "46b315ab5bfa6589ea64d73423408ef3aba8fb4f",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 50.59,
+    "updatedAt": "2026-06-29T16:52:49.916252+00:00"
+  },
+  "c6393e8a3feaf4b4f9a4990ac0cd3a725b818766": {
+    "clusterId": "c6393e8a3feaf4b4f9a4990ac0cd3a725b818766",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 34.2,
+    "updatedAt": "2026-06-29T16:52:49.308906+00:00"
+  },
+  "108bc79d8ca56354e0b1a261e02b5ef81f44e45b": {
+    "clusterId": "108bc79d8ca56354e0b1a261e02b5ef81f44e45b",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 34.18,
+    "updatedAt": "2026-06-29T16:52:49.493176+00:00"
+  },
+  "cbf528c8013cf803ca64cd329b2be8424028d450": {
+    "clusterId": "cbf528c8013cf803ca64cd329b2be8424028d450",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 49.09,
+    "updatedAt": "2026-06-29T16:52:48.820133+00:00"
+  },
+  "164a2f69238ae0a5c15d3fee9be7c0b3aad90507": {
+    "clusterId": "164a2f69238ae0a5c15d3fee9be7c0b3aad90507",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 48.47,
+    "updatedAt": "2026-06-29T16:52:48.820133+00:00"
+  },
+  "dc95e4b0fb1b65b33add1082e789959b4c9ce92b": {
+    "clusterId": "dc95e4b0fb1b65b33add1082e789959b4c9ce92b",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 33.01,
+    "updatedAt": "2026-06-29T16:52:49.894081+00:00"
+  },
+  "79d3f9f79cb31b4c3ad1c35d235de04ca30774d8": {
+    "clusterId": "79d3f9f79cb31b4c3ad1c35d235de04ca30774d8",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 47.86,
+    "updatedAt": "2026-06-29T16:52:48.821390+00:00"
+  },
+  "8b603aad4ebd0ed392db26128ef2002982f4802d": {
+    "clusterId": "8b603aad4ebd0ed392db26128ef2002982f4802d",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.62,
+    "updatedAt": "2026-06-29T16:52:49.693850+00:00"
+  },
+  "b2061e2fb103f3279d5d923442bd3989aee77a64": {
+    "clusterId": "b2061e2fb103f3279d5d923442bd3989aee77a64",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.23,
+    "updatedAt": "2026-06-29T16:52:49.703795+00:00"
+  },
+  "11717044592b14b45e6bcf16397037c16d3fd472": {
+    "clusterId": "11717044592b14b45e6bcf16397037c16d3fd472",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.23,
+    "updatedAt": "2026-06-29T16:52:49.692623+00:00"
+  },
+  "11c47df3542b085f6369bcfe8664339c7faab876": {
+    "clusterId": "11c47df3542b085f6369bcfe8664339c7faab876",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.23,
+    "updatedAt": "2026-06-29T16:52:49.488710+00:00"
+  },
+  "8b9f981693891013291834dc49d0f9476de7968b": {
+    "clusterId": "8b9f981693891013291834dc49d0f9476de7968b",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.23,
+    "updatedAt": "2026-06-29T16:52:49.900152+00:00"
+  },
+  "3432083da75b87164cf42ba3f8ac44c8d1ee74db": {
+    "clusterId": "3432083da75b87164cf42ba3f8ac44c8d1ee74db",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.23,
+    "updatedAt": "2026-06-29T16:52:49.316520+00:00"
+  },
+  "0841e8e32d1be271fb76b98758dae18c4d28a251": {
+    "clusterId": "0841e8e32d1be271fb76b98758dae18c4d28a251",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.23,
+    "updatedAt": "2026-06-29T16:52:49.681749+00:00"
+  },
+  "cd19a3bda08455002e92e48afcb8f9e97af04dff": {
+    "clusterId": "cd19a3bda08455002e92e48afcb8f9e97af04dff",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.23,
+    "updatedAt": "2026-06-29T16:52:49.693144+00:00"
+  },
+  "6646aa506cfda695ecab1ab98e6e8f81afadf32c": {
+    "clusterId": "6646aa506cfda695ecab1ab98e6e8f81afadf32c",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 42.7,
+    "updatedAt": "2026-06-29T16:52:48.502881+00:00"
+  },
+  "66c0470daedb8bf396a8c8284a8d514d6a17a923": {
+    "clusterId": "66c0470daedb8bf396a8c8284a8d514d6a17a923",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 31.52,
+    "updatedAt": "2026-06-29T16:52:49.894584+00:00"
+  },
+  "74f85adfa66cc2d4ba8db84b08a9032b183c004c": {
+    "clusterId": "74f85adfa66cc2d4ba8db84b08a9032b183c004c",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 46.62,
+    "updatedAt": "2026-06-29T16:52:49.276565+00:00"
+  },
+  "b1126aeaf21339b6185fb72ddfd07ff6ad814a28": {
+    "clusterId": "b1126aeaf21339b6185fb72ddfd07ff6ad814a28",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 47.63,
+    "updatedAt": "2026-06-29T16:52:49.907163+00:00"
+  },
+  "fbc2c5077ddb5b98a0588b44f763436f47939cad": {
+    "clusterId": "fbc2c5077ddb5b98a0588b44f763436f47939cad",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 41.47,
+    "updatedAt": "2026-06-29T16:52:48.833289+00:00"
+  },
+  "da8b45f21b7291c3351bf78b805fe144af03ff06": {
+    "clusterId": "da8b45f21b7291c3351bf78b805fe144af03ff06",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 41.46,
+    "updatedAt": "2026-06-29T16:52:48.824490+00:00"
+  },
+  "d4411a61e86a01f791108df455b34dab81a6e1fa": {
+    "clusterId": "d4411a61e86a01f791108df455b34dab81a6e1fa",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 40.85,
+    "updatedAt": "2026-06-29T16:52:48.834755+00:00"
+  },
+  "abe523316e6255461ac3bbfc7af8992c29062b46": {
+    "clusterId": "abe523316e6255461ac3bbfc7af8992c29062b46",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 46.15,
+    "updatedAt": "2026-06-29T16:52:49.909169+00:00"
+  },
+  "45f5de7db91ebddfac6fcd15dc787bd6e51a63a9": {
+    "clusterId": "45f5de7db91ebddfac6fcd15dc787bd6e51a63a9",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 40.23,
+    "updatedAt": "2026-06-29T16:52:48.977316+00:00"
+  },
+  "da6cbf175d73f3ec410024b48891850ac61a5035": {
+    "clusterId": "da6cbf175d73f3ec410024b48891850ac61a5035",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 39.62,
+    "updatedAt": "2026-06-29T16:52:48.822694+00:00"
+  },
+  "05590f0d3be9866e8b3e0cf32eafd15eed5e1577": {
+    "clusterId": "05590f0d3be9866e8b3e0cf32eafd15eed5e1577",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 35,
+    "updatedAt": "2026-06-29T16:23:44.845832+00:00"
+  },
+  "25d3184aee42d42b4fe32492cd833024cd000986": {
+    "clusterId": "25d3184aee42d42b4fe32492cd833024cd000986",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 35,
+    "updatedAt": "2026-06-29T16:52:48.507958+00:00"
+  },
+  "cdfded73a3aaa5d9b4de7c07a7a2ca12056432b0": {
+    "clusterId": "cdfded73a3aaa5d9b4de7c07a7a2ca12056432b0",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 35,
+    "updatedAt": "2026-06-29T16:52:49.684534+00:00"
+  },
+  "134ddf33ec4a3a67b3407ff2d6b83af6fbe42dea": {
+    "clusterId": "134ddf33ec4a3a67b3407ff2d6b83af6fbe42dea",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 29.26,
+    "updatedAt": "2026-06-29T16:52:49.888461+00:00"
+  },
+  "0a47b3c7e720e4516d0ac9a4ff93c9872cc66cfd": {
+    "clusterId": "0a47b3c7e720e4516d0ac9a4ff93c9872cc66cfd",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 25.93,
+    "updatedAt": "2026-06-29T16:52:49.706307+00:00"
+  },
+  "f3e78264ad446fb31304335fbabff0ce53236bcb": {
+    "clusterId": "f3e78264ad446fb31304335fbabff0ce53236bcb",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 34.67,
+    "updatedAt": "2026-06-29T16:52:48.825498+00:00"
+  },
+  "878da28400e6465d4098bb6e12098438a2e86eb3": {
+    "clusterId": "878da28400e6465d4098bb6e12098438a2e86eb3",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 22.48,
+    "updatedAt": "2026-06-29T16:52:49.681244+00:00"
+  },
+  "1ae39e0525917ee027463fc7b17486c819a4ccff": {
+    "clusterId": "1ae39e0525917ee027463fc7b17486c819a4ccff",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 19.07,
+    "updatedAt": "2026-06-29T16:52:49.491721+00:00"
+  },
+  "149e884d11e140382e1e3dbce0c4e3d57af41085": {
+    "clusterId": "149e884d11e140382e1e3dbce0c4e3d57af41085",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 35.25,
+    "updatedAt": "2026-06-29T16:52:49.915250+00:00"
+  },
+  "991ad6fe3b96c59518e3ef981e4d70949ddb12ab": {
+    "clusterId": "991ad6fe3b96c59518e3ef981e4d70949ddb12ab",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 16.2,
+    "updatedAt": "2026-06-29T16:52:49.868696+00:00"
+  },
+  "7b7db16573226e8809d8729872241b0c661e0a62": {
+    "clusterId": "7b7db16573226e8809d8729872241b0c661e0a62",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 32.31,
+    "updatedAt": "2026-06-29T16:52:48.806901+00:00"
+  },
+  "f3a0fb9e0abf434b79cf242d4127e38af04dab3d": {
+    "clusterId": "f3a0fb9e0abf434b79cf242d4127e38af04dab3d",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 10.08,
+    "updatedAt": "2026-06-29T16:52:49.698000+00:00"
+  },
+  "1603571da3fb97f2a64a0e779a56118bbbcc67eb": {
+    "clusterId": "1603571da3fb97f2a64a0e779a56118bbbcc67eb",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 10.08,
+    "updatedAt": "2026-06-29T16:52:49.894584+00:00"
+  },
+  "5940579bed60c96a5c0bc1fe7fb8aa54bdc05bbb": {
+    "clusterId": "5940579bed60c96a5c0bc1fe7fb8aa54bdc05bbb",
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 26.36,
+    "updatedAt": "2026-06-29T16:52:49.916756+00:00"
+  },
+  "271250b03108946b461d90527bdf65122d7d9582": {
+    "clusterId": "271250b03108946b461d90527bdf65122d7d9582",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 4.23,
+    "updatedAt": "2026-06-29T16:52:49.692086+00:00"
+  },
+  "57a00f94371e642ca35f1b7fd600f0b2d9df4897": {
+    "clusterId": "57a00f94371e642ca35f1b7fd600f0b2d9df4897",
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 0.72,
+    "updatedAt": "2026-06-29T16:52:49.860844+00:00"
+  },
+  "705919a0683ef0e9963863cb55711db029b55d61": {
+    "clusterId": "705919a0683ef0e9963863cb55711db029b55d61",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 78.58,
+    "updatedAt": "2026-06-29T16:52:48.956588+00:00"
+  },
+  "89351d4fbb567eae8240e66cc42fce09815c17f6": {
+    "clusterId": "89351d4fbb567eae8240e66cc42fce09815c17f6",
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "validationStatus": "pending",
+    "copyabilityValidatedScore": null,
+    "copyabilityAtDetectionScore": 35,
+    "updatedAt": "2026-06-29T16:52:48.627473+00:00"
+  }
+}

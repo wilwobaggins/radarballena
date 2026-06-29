@@ -2,6 +2,7 @@ import asyncio
 import os
 from collections import Counter
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any, Optional
 
 import httpx
@@ -22,9 +23,33 @@ try:  # pragma: no cover - support package and script-style imports
         upsert_capital_trails,
         upsert_wallet_scores,
     )
+    from .copyability_storage import write_trade_copyability_shadow
     from .category_utils import guess_category_from_title
+    from .wallet_shadow_cohort import (
+        build_shadow_wallet_cohort,
+        load_whale_finder_outputs,
+    )
+    from .wallet_shadow_history import (
+        append_shadow_history,
+        build_shadow_history_record,
+        compute_longitudinal_metrics,
+        load_history_file,
+        iso_now,
+        resolve_history_paths,
+        write_shadow_run_snapshot,
+    )
+    from .wallet_shadow_rankings import (
+        build_wallet_category_rankings,
+        build_wallet_comparison_summary,
+        build_wallet_general_rankings,
+    )
+    from .trade_copyability import (
+        COPYABILITY_SHADOW_ENABLED,
+        run_trade_copyability_shadow,
+    )
     from .wallet_skill_score import (
         compute_shadow_meta_evaluation,
+        compute_shadow_robust_evaluation,
         compute_wallet_skill,
     )
     from .wallet_classifier import (
@@ -33,6 +58,7 @@ try:  # pragma: no cover - support package and script-style imports
         WHALE_BUT_NOISY,
     )
     from .wallet_metrics import compute_wallet_scores
+    from .time_utils import to_utc_datetime
 except ImportError:  # pragma: no cover
     from market_trail import (
         build_market_capital_trails,
@@ -48,9 +74,33 @@ except ImportError:  # pragma: no cover
         upsert_capital_trails,
         upsert_wallet_scores,
     )
+    from copyability_storage import write_trade_copyability_shadow
     from category_utils import guess_category_from_title
+    from wallet_shadow_cohort import (
+        build_shadow_wallet_cohort,
+        load_whale_finder_outputs,
+    )
+    from wallet_shadow_history import (
+        append_shadow_history,
+        build_shadow_history_record,
+        compute_longitudinal_metrics,
+        load_history_file,
+        iso_now,
+        resolve_history_paths,
+        write_shadow_run_snapshot,
+    )
+    from wallet_shadow_rankings import (
+        build_wallet_category_rankings,
+        build_wallet_comparison_summary,
+        build_wallet_general_rankings,
+    )
+    from trade_copyability import (
+        COPYABILITY_SHADOW_ENABLED,
+        run_trade_copyability_shadow,
+    )
     from wallet_skill_score import (
         compute_shadow_meta_evaluation,
+        compute_shadow_robust_evaluation,
         compute_wallet_skill,
     )
     from wallet_classifier import (
@@ -59,6 +109,7 @@ except ImportError:  # pragma: no cover
         WHALE_BUT_NOISY,
     )
     from wallet_metrics import compute_wallet_scores
+    from time_utils import to_utc_datetime
 
 
 load_dotenv()
@@ -73,6 +124,14 @@ SKILL_MAX_WALLETS_PER_RUN = int(os.getenv("SKILL_MAX_WALLETS_PER_RUN", "25"))
 SKILL_MAX_CLOSED_POSITIONS = int(os.getenv("SKILL_MAX_CLOSED_POSITIONS", "500"))
 SKILL_HTTP_CONCURRENCY = int(os.getenv("SKILL_HTTP_CONCURRENCY", "4"))
 SKILL_PRIORITY_WALLETS = os.getenv("SKILL_PRIORITY_WALLETS", "")
+SHADOW_COHORT_ENABLED = os.getenv("SHADOW_COHORT_ENABLED", "true").lower() == "true"
+SHADOW_INCLUDE_ACTIVE_WALLETS = os.getenv("SHADOW_INCLUDE_ACTIVE_WALLETS", "true").lower() == "true"
+SHADOW_INCLUDE_PRIORITY_WALLETS = os.getenv("SHADOW_INCLUDE_PRIORITY_WALLETS", "true").lower() == "true"
+SHADOW_INCLUDE_WHALE_FINDER_CANDIDATES = os.getenv("SHADOW_INCLUDE_WHALE_FINDER_CANDIDATES", "true").lower() == "true"
+SHADOW_BENCHMARK_WALLETS = os.getenv("SHADOW_BENCHMARK_WALLETS", "")
+SHADOW_MAX_CANDIDATES_PER_RUN = int(os.getenv("SHADOW_MAX_CANDIDATES_PER_RUN", "10"))
+SHADOW_MAX_TOTAL_WALLETS_PER_RUN = int(os.getenv("SHADOW_MAX_TOTAL_WALLETS_PER_RUN", "20"))
+SHADOW_MIN_CANDIDATE_SCORE = float(os.getenv("SHADOW_MIN_CANDIDATE_SCORE", "0"))
 
 
 def parse_float(value: Any, default: float = 0.0) -> float:
@@ -102,21 +161,7 @@ def pick_market_id(activity: dict[str, Any]) -> Optional[str]:
 
 def pick_timestamp(activity: dict[str, Any]) -> Optional[datetime]:
     value = activity.get("timestamp") or activity.get("time") or activity.get("createdAt")
-    if value is None:
-        return None
-
-    try:
-        if isinstance(value, (int, float)):
-            if value > 10_000_000_000:
-                value = value / 1000
-            return datetime.fromtimestamp(value, tz=timezone.utc)
-
-        if isinstance(value, str):
-            return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except Exception:
-        return None
-
-    return None
+    return to_utc_datetime(value)
 
 
 def normalize_title(title: Optional[str]) -> str:
@@ -442,28 +487,36 @@ async def _fetch_shadow_positions(
 
 async def _fetch_targeted_activity_for_wallet(wallet: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     raw_events: list[dict[str, Any]] = []
-    async with httpx.AsyncClient(timeout=float(os.getenv("SKILL_HTTP_TIMEOUT_SECONDS", "25"))) as http:
-        for offset in range(0, SKILL_MAX_CLOSED_POSITIONS, 50):
-            response = await http.get(
-                f"{DATA_API}/trades",
-                params={
-                    "user": wallet,
-                    "limit": 50,
-                    "offset": offset,
-                    "takerOnly": False,
-                },
-            )
-            response.raise_for_status()
-            data = response.json()
-            if isinstance(data, dict):
-                items = data.get("data") or data.get("items") or data.get("trades") or []
-            else:
-                items = data
-            if not isinstance(items, list) or not items:
-                break
-            raw_events.extend(item for item in items if isinstance(item, dict))
-            if len(items) < 50:
-                break
+    try:
+        async with httpx.AsyncClient(timeout=float(os.getenv("SKILL_HTTP_TIMEOUT_SECONDS", "25"))) as http:
+            for offset in range(0, SKILL_MAX_CLOSED_POSITIONS, 50):
+                response = await http.get(
+                    f"{DATA_API}/trades",
+                    params={
+                        "user": wallet,
+                        "limit": 50,
+                        "offset": offset,
+                        "takerOnly": False,
+                    },
+                )
+                response.raise_for_status()
+                data = response.json()
+                if isinstance(data, dict):
+                    items = data.get("data") or data.get("items") or data.get("trades") or []
+                else:
+                    items = data
+                if not isinstance(items, list) or not items:
+                    break
+                raw_events.extend(item for item in items if isinstance(item, dict))
+                if len(items) < 50:
+                    break
+    except Exception as error:
+        print(
+            "SMART_MONEY_SKILL_TARGETED_ACTIVITY_FAILED "
+            f"wallet={wallet} "
+            f"error={_safe_error_message(error)}"
+        )
+        return [], []
 
     normalized = []
     cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
@@ -572,6 +625,7 @@ def _attach_shadow_outputs(
                 "skillStatus": "error",
                 "error": shadow_error,
             }
+            shadow_robust = None
             shadow_rows.append(
                 {
                     "wallet": wallet,
@@ -580,6 +634,7 @@ def _attach_shadow_outputs(
                     "shadowSource": shadow_source,
                     "shadowSkill": shadow_skill,
                     "shadowMetaEvaluation": None,
+                    "shadowRobustEvaluation": None,
                     "behaviorStatus": "error",
                     "generatedAt": (score.get("generatedAt") if score else None) or datetime.now(timezone.utc).isoformat(),
                 }
@@ -588,7 +643,15 @@ def _attach_shadow_outputs(
 
         if not closed_positions:
             shadow_skill = {"skillStatus": "insufficient"}
-            shadow_meta = None if shadow_source == "targeted_wallet_activity" or score is None else compute_shadow_meta_evaluation(int(score.get("walletQualityScore") or 0), shadow_skill)
+            shadow_meta = (
+                None
+                if shadow_source == "targeted_wallet_activity" and behavior_status == "insufficient_recent_activity"
+                else (
+                    compute_shadow_meta_evaluation(int(score.get("walletQualityScore") or 0), shadow_skill)
+                    if score is not None
+                    else None
+                )
+            )
             behavior_status = target.get("behaviorStatus") or (
                 "insufficient_recent_activity" if shadow_source == "targeted_wallet_activity" else "insufficient"
             )
@@ -605,8 +668,39 @@ def _attach_shadow_outputs(
                 behavior_status = "error"
             else:
                 behavior_score = int(score.get("walletQualityScore") or 0) if score else 0
-                shadow_meta = compute_shadow_meta_evaluation(behavior_score, shadow_skill) if score is not None or shadow_source == "global_wallet_scores" else None
+                shadow_meta = (
+                    compute_shadow_meta_evaluation(behavior_score, shadow_skill)
+                    if score is not None
+                    else None
+                )
                 behavior_status = target.get("behaviorStatus") or ("sufficient" if shadow_skill.get("skillStatus") == "sufficient" else "limited")
+
+        behavior_score = int(score.get("walletQualityScore") or 0) if score else 0
+        try:
+            shadow_robust = compute_shadow_robust_evaluation(behavior_score, shadow_skill)
+        except Exception:
+            shadow_robust = None
+
+        if shadow_robust is not None:
+            print(
+                "SMART_MONEY_SKILL_SCORED "
+                f"wallet={wallet} "
+                f"behavior={behavior_score} "
+                f"skill={shadow_skill.get('skillScore', 0)} "
+                f"meta={shadow_meta.get('shadowMetaScore', 0) if shadow_meta else 0} "
+                f"status={shadow_skill.get('skillStatus')} "
+                f"recommendation={shadow_meta.get('shadowRecommendation') if shadow_meta else 'none'}"
+            )
+            print(
+                "SMART_MONEY_SKILL_ROBUST_SCORED "
+                f"wallet={wallet} "
+                f"raw_skill={shadow_skill.get('skillScore', 0)} "
+                f"robust_skill={shadow_robust.get('robustSkillScore', 0)} "
+                f"without_top={shadow_robust.get('skillScoreWithoutTopWinner', 0)} "
+                f"concentration={shadow_robust.get('pnlConcentrationLevel')} "
+                f"robust_meta={shadow_robust.get('shadowRobustMetaScore', 0)} "
+                f"recommendation={shadow_robust.get('shadowRobustRecommendation')}"
+            )
 
         shadow_rows.append(
             {
@@ -616,12 +710,271 @@ def _attach_shadow_outputs(
                 "shadowSource": shadow_source,
                 "shadowSkill": shadow_skill,
                 "shadowMetaEvaluation": shadow_meta,
+                "shadowRobustEvaluation": shadow_robust,
                 "behaviorStatus": behavior_status,
                 "generatedAt": (score.get("generatedAt") if score else None) or datetime.now(timezone.utc).isoformat(),
             }
         )
 
     return wallet_scores, shadow_rows
+
+
+async def _run_shadow_cohort_phase(
+    *,
+    run_id: str,
+    wallet_scores: list[dict[str, Any]],
+    phase_one_shadow_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    if not SHADOW_COHORT_ENABLED:
+        return {}
+
+    source_payloads = load_whale_finder_outputs()
+    cohort = build_shadow_wallet_cohort(
+        wallet_scores,
+        active_health=source_payloads.get("active_wallet_health") or [],
+        benchmark_wallets=SHADOW_BENCHMARK_WALLETS,
+        priority_wallets=SKILL_PRIORITY_WALLETS if SHADOW_INCLUDE_PRIORITY_WALLETS else "",
+        global_candidates=source_payloads.get("global_candidates") or [],
+        replacement_recommendations=source_payloads.get("replacement_recommendations") or [],
+        include_active_wallets=SHADOW_INCLUDE_ACTIVE_WALLETS,
+        include_priority_wallets=SHADOW_INCLUDE_PRIORITY_WALLETS,
+        include_w_finder_candidates=SHADOW_INCLUDE_WHALE_FINDER_CANDIDATES,
+        max_candidates_per_run=SHADOW_MAX_CANDIDATES_PER_RUN,
+        max_total_wallets_per_run=SHADOW_MAX_TOTAL_WALLETS_PER_RUN,
+        min_candidate_score=SHADOW_MIN_CANDIDATE_SCORE,
+    )
+
+    active_count = sum(1 for item in cohort if "active" in (item.get("roles") or []))
+    benchmark_count = sum(1 for item in cohort if "benchmark" in (item.get("roles") or []))
+    candidate_count = sum(
+        1
+        for item in cohort
+        if "candidate" in (item.get("roles") or []) or "replacement_candidate" in (item.get("roles") or [])
+    )
+    print(
+        "SMART_MONEY_SHADOW_COHORT_BUILT "
+        f"active={active_count} "
+        f"benchmark={benchmark_count} "
+        f"candidate={candidate_count} "
+        f"unique={len(cohort)}"
+    )
+
+    wallet_score_map = {
+        _normalize_wallet(score.get("wallet")): score
+        for score in wallet_scores
+        if score.get("wallet")
+    }
+    shadow_one_map = {
+        _normalize_wallet(row.get("wallet")): row
+        for row in phase_one_shadow_rows
+        if row.get("wallet")
+    }
+
+    missing_wallets = [
+        row
+        for row in cohort
+        if _normalize_wallet(row.get("wallet")) not in wallet_score_map
+        and _normalize_wallet(row.get("wallet")) not in shadow_one_map
+    ]
+    targeted_behaviors = await _fetch_targeted_wallet_behaviors(missing_wallets)
+
+    for row in cohort:
+        wallet = _normalize_wallet(row.get("wallet"))
+        if wallet in wallet_score_map:
+            row["behaviorQualityScore"] = wallet_score_map[wallet].get("walletQualityScore")
+            row["classification"] = wallet_score_map[wallet].get("classification")
+            row["behaviorStatus"] = "sufficient"
+            row["walletScore"] = wallet_score_map[wallet]
+        elif wallet in targeted_behaviors:
+            payload = targeted_behaviors[wallet]
+            row["behaviorQualityScore"] = (
+                payload.get("walletScore", {}) or {}
+            ).get("walletQualityScore")
+            row["classification"] = (
+                payload.get("walletScore", {}) or {}
+            ).get("classification")
+            row["behaviorStatus"] = payload.get("behaviorStatus") or "insufficient_recent_activity"
+            row["walletScore"] = payload.get("walletScore")
+        elif wallet in shadow_one_map:
+            phase_one_row = shadow_one_map[wallet]
+            row["behaviorQualityScore"] = phase_one_row.get("walletQualityScore")
+            row["classification"] = phase_one_row.get("classification")
+            row["behaviorStatus"] = phase_one_row.get("behaviorStatus")
+            row["walletScore"] = {
+                "walletQualityScore": phase_one_row.get("walletQualityScore"),
+                "classification": phase_one_row.get("classification"),
+                "generatedAt": phase_one_row.get("generatedAt"),
+            }
+        else:
+            row["behaviorStatus"] = row.get("behaviorStatus") or "insufficient_recent_activity"
+            row["walletScore"] = None
+
+    selected_wallets = [
+        {
+            "wallet": row.get("wallet"),
+            "walletScore": row.get("walletScore"),
+            "behaviorStatus": row.get("behaviorStatus"),
+            "source": (
+                "global_wallet_scores"
+                if row.get("wallet") in wallet_score_map
+                else "targeted_wallet_activity"
+            ),
+        }
+        for row in cohort
+    ]
+    shadow_positions = await _fetch_shadow_positions(selected_wallets)
+
+    shadow_rows: list[dict[str, Any]] = []
+    for row in cohort:
+        wallet = _normalize_wallet(row.get("wallet"))
+        score_record = wallet_score_map.get(wallet)
+        targeted_payload = targeted_behaviors.get(wallet) or {}
+        behavior_score = int(
+            (score_record or {}).get("walletQualityScore")
+            or ((targeted_payload.get("walletScore") or {}).get("walletQualityScore"))
+            or row.get("behaviorQualityScore")
+            or 0
+        )
+        closed_payload = shadow_positions.get(wallet) or {}
+        closed_positions = closed_payload.get("closed_positions") or []
+        print(
+            "SMART_MONEY_SHADOW_WALLET_STARTED "
+            f"wallet={wallet} "
+            f"roles={','.join(row.get('roles') or [])} "
+            f"source={','.join(row.get('sources') or [])}"
+        )
+        try:
+            shadow_skill = compute_wallet_skill(wallet, closed_positions)
+        except Exception as error:
+            shadow_rows.append(
+                {
+                    "wallet": wallet,
+                    "displayName": row.get("displayName"),
+                    "roles": row.get("roles") or [],
+                    "profiles": row.get("profiles") or [],
+                    "sources": row.get("sources") or [],
+                    "aliases": row.get("aliases") or [],
+                    "classification": row.get("classification"),
+                    "behaviorQualityScore": behavior_score,
+                    "shadowSource": "global_wallet_scores" if score_record else "targeted_wallet_activity",
+                    "shadowSkill": {
+                        "wallet": wallet,
+                        "skillStatus": "error",
+                        "error": _safe_error_message(error),
+                    },
+                    "shadowMetaEvaluation": None,
+                    "shadowRobustEvaluation": None,
+                    "behaviorStatus": "error",
+                    "generatedAt": iso_now(),
+                    "candidateScore": row.get("candidateScore"),
+                    "candidateStatus": row.get("candidateStatus"),
+                    "replacementFor": row.get("replacementFor"),
+                }
+            )
+            print(
+                "SMART_MONEY_SHADOW_WALLET_FAILED "
+                f"wallet={wallet} "
+                f"error={error.__class__.__name__}"
+            )
+            continue
+
+        shadow_meta = compute_shadow_meta_evaluation(behavior_score, shadow_skill)
+        shadow_robust = compute_shadow_robust_evaluation(behavior_score, shadow_skill)
+        shadow_rows.append(
+            {
+                "wallet": wallet,
+                "displayName": row.get("displayName"),
+                "roles": row.get("roles") or [],
+                "profiles": row.get("profiles") or [],
+                "sources": row.get("sources") or [],
+                "aliases": row.get("aliases") or [],
+                "classification": row.get("classification"),
+                "behaviorQualityScore": behavior_score,
+                "shadowSource": "global_wallet_scores" if score_record else "targeted_wallet_activity",
+                "shadowSkill": shadow_skill,
+                "shadowMetaEvaluation": shadow_meta,
+                "shadowRobustEvaluation": shadow_robust,
+                "behaviorStatus": row.get("behaviorStatus") or "sufficient",
+                "generatedAt": (
+                    (score_record or {}).get("generatedAt")
+                    or ((targeted_behaviors.get(wallet) or {}).get("walletScore") or {}).get("generatedAt")
+                    or iso_now()
+                ),
+                "candidateScore": row.get("candidateScore"),
+                "candidateStatus": row.get("candidateStatus"),
+                "replacementFor": row.get("replacementFor"),
+            }
+        )
+
+    history_paths = resolve_history_paths()
+    if history_paths["history_file"]:
+        history_records = [
+            build_shadow_history_record(run_id=run_id, wallet_row=row)
+            for row in shadow_rows
+        ]
+        append_shadow_history(history_paths["history_file"], history_records)
+        write_shadow_run_snapshot(
+            history_paths["runs_dir"],
+            run_id,
+            {
+                "runId": run_id,
+                "generatedAt": iso_now(),
+                "engineVersion": "smart_money_shadow_v1",
+                "walletsRequested": len(cohort),
+                "walletsCompleted": sum(1 for row in shadow_rows if (row.get("shadowSkill") or {}).get("skillStatus") != "error"),
+                "walletsFailed": sum(1 for row in shadow_rows if (row.get("shadowSkill") or {}).get("skillStatus") == "error"),
+                "config": {
+                    "maxWallets": SHADOW_MAX_TOTAL_WALLETS_PER_RUN,
+                    "maxClosedPositions": SKILL_MAX_CLOSED_POSITIONS,
+                    "maxCandidates": SHADOW_MAX_CANDIDATES_PER_RUN,
+                },
+                "wallets": shadow_rows,
+            },
+        )
+        print(
+            "SMART_MONEY_SHADOW_HISTORY_WRITTEN "
+            f"path={history_paths['history_file']} "
+            f"rows={len(history_records)}"
+        )
+
+    longitudinal = compute_longitudinal_metrics(load_history_file(history_paths["history_file"]))
+    for row in shadow_rows:
+        wallet = _normalize_wallet(row.get("wallet"))
+        metrics = longitudinal.get(wallet) or {}
+        print(
+            "SMART_MONEY_SHADOW_WALLET_COMPLETED "
+            f"wallet={wallet} "
+            f"robust_meta={(row.get('shadowRobustEvaluation') or {}).get('shadowRobustMetaScore', 0)} "
+            f"longitudinal={metrics.get('longitudinalComparisonScore')} "
+            f"runs={metrics.get('runCount', 0)}"
+        )
+
+    general_rankings = build_wallet_general_rankings(shadow_rows, longitudinal)
+    category_rankings = build_wallet_category_rankings(shadow_rows)
+    comparison_summary = build_wallet_comparison_summary(shadow_rows, longitudinal)
+
+    save_json("wallet_shadow_rankings.json", general_rankings)
+    save_json("wallet_category_rankings.json", category_rankings)
+    save_json("wallet_comparison_summary.json", comparison_summary)
+    print(
+        "SMART_MONEY_SHADOW_RANKINGS_WRITTEN "
+        f"general={len(general_rankings)} "
+        f"categories={sum(len(rows) for rows in category_rankings.values())}"
+    )
+    print(
+        "SMART_MONEY_SHADOW_COMPARISONS_WRITTEN "
+        f"comparisons={len(comparison_summary.get('comparisons') or [])} "
+        f"sufficient={comparison_summary.get('sufficient', 0)}"
+    )
+
+    return {
+        "cohort": cohort,
+        "shadow_rows": shadow_rows,
+        "longitudinal": longitudinal,
+        "general_rankings": general_rankings,
+        "category_rankings": category_rankings,
+        "comparison_summary": comparison_summary,
+    }
 
 
 def build_noise_scores(wallet_scores: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -752,6 +1105,43 @@ async def main() -> None:
 
     try:
         result = await execute_engine()
+        try:
+            shadow_phase = await _run_shadow_cohort_phase(
+                run_id=run_id,
+                wallet_scores=result["wallet_scores"],
+                phase_one_shadow_rows=result["shadow_rows"],
+            )
+            result["shadow_phase"] = shadow_phase
+        except Exception as shadow_exc:
+            print(f"SMART_MONEY_SHADOW_COHORT_FAILED error={_safe_error_message(shadow_exc)}")
+        if COPYABILITY_SHADOW_ENABLED:
+            try:
+                copyability_phase = await run_trade_copyability_shadow(
+                    run_id=run_id,
+                    wallet_scores=result["wallet_scores"],
+                    shadow_phase=result.get("shadow_phase"),
+                    deduped_trades=result["deduped_trades"],
+                )
+                result["copyability_phase"] = copyability_phase
+            except Exception as copyability_exc:
+                print(
+                    "SMART_MONEY_COPYABILITY_FAILED "
+                    f"error={copyability_exc.__class__.__name__} "
+                    f"run_id={run_id}"
+                )
+                copyability_shadow = {
+                    "runId": run_id,
+                    "generatedAt": datetime.now(timezone.utc).isoformat(),
+                    "phase": "2_full_shadow",
+                    "status": "failed",
+                    "error": _safe_error_message(copyability_exc),
+                    "walletsRequested": len((result.get("shadow_phase") or {}).get("cohort") or result.get("wallet_scores") or []),
+                    "walletsCompleted": 0,
+                    "walletsFailed": 0,
+                    "walletResults": [],
+                    "clusters": [],
+                }
+                write_trade_copyability_shadow(copyability_shadow)
         wallet_scores = result["wallet_scores"]
         market_trails = result["market_trails"]
         summary = build_run_summary(

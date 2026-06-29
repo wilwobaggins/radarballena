@@ -1,5 +1,6 @@
 import json
 import asyncio
+import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -38,6 +39,24 @@ def build_trade(
         "timestamp": datetime.now(timezone.utc) - timedelta(hours=1),
         "raw": {},
     }
+
+
+def _assert_no_nan_or_infinity(value):
+    if isinstance(value, dict):
+        for item in value.values():
+            _assert_no_nan_or_infinity(item)
+    elif isinstance(value, list):
+        for item in value:
+            _assert_no_nan_or_infinity(item)
+    elif isinstance(value, float):
+        assert value == value
+        assert value not in {float("inf"), float("-inf")}
+
+
+def _assert_utc_timestamp(value: str):
+    parsed = datetime.fromisoformat(value)
+    assert parsed.tzinfo is not None
+    assert parsed.utcoffset() == timedelta(0)
 
 
 def test_compute_wallet_scores_generates_expected_shape():
@@ -156,6 +175,86 @@ def test_main_shadow_disabled_preserves_productive_output(monkeypatch):
     assert result["wallet_scores"][0]["walletQualityScore"] == written["wallet_scores.json"][0]["walletQualityScore"]
 
 
+def test_copyability_shadow_disabled_skips_phase(monkeypatch):
+    async def fake_execute_engine():
+        return {
+            "trades": [],
+            "deduped_trades": [],
+            "wallet_scores": [],
+            "market_trails": [],
+            "estela_capital": [],
+            "shadow_rows": [],
+        }
+
+    called = {"copyability": False}
+
+    async def fake_run_trade_copyability_shadow(*_args, **_kwargs):
+        called["copyability"] = True
+        raise AssertionError("copyability shadow should be disabled")
+
+    monkeypatch.setattr(smart_money_main, "execute_engine", fake_execute_engine)
+    monkeypatch.setattr(smart_money_main, "run_trade_copyability_shadow", fake_run_trade_copyability_shadow)
+    monkeypatch.setattr(smart_money_main, "COPYABILITY_SHADOW_ENABLED", False)
+    monkeypatch.setattr(smart_money_main, "upsert_wallet_scores", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "upsert_capital_trails", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "finish_engine_run", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "log_summary", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "log_market_trail_summary", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "start_engine_run", lambda: "run-copyability-disabled")
+
+    asyncio.run(smart_money_main.main())
+
+    assert called["copyability"] is False
+
+
+def test_main_copyability_failure_writes_diagnostic_shadow(monkeypatch, capsys):
+    written = {}
+
+    async def fake_execute_engine():
+        return {
+            "trades": [],
+            "deduped_trades": [],
+            "wallet_scores": [{"wallet": "0x" + "1" * 40, "classification": SIGNAL_WALLET}],
+            "market_trails": [],
+            "estela_capital": [],
+            "shadow_rows": [{"wallet": "0x" + "1" * 40}],
+        }
+
+    async def fake_run_trade_copyability_shadow(*_args, **_kwargs):
+        raise ValueError("boom")
+
+    def fake_write_trade_copyability_shadow(payload):
+        written["payload"] = payload
+        return Path("outputs/trade_copyability_shadow.json")
+
+    monkeypatch.setattr(smart_money_main, "execute_engine", fake_execute_engine)
+    monkeypatch.setattr(
+        smart_money_main,
+        "_run_shadow_cohort_phase",
+        lambda *_args, **_kwargs: asyncio.sleep(0, result={"cohort": [], "shadow_rows": []}),
+    )
+    monkeypatch.setattr(smart_money_main, "run_trade_copyability_shadow", fake_run_trade_copyability_shadow)
+    monkeypatch.setattr(smart_money_main, "write_trade_copyability_shadow", fake_write_trade_copyability_shadow)
+    monkeypatch.setattr(smart_money_main, "start_engine_run", lambda: "run-copyability-failed")
+    monkeypatch.setattr(smart_money_main, "COPYABILITY_SHADOW_ENABLED", True)
+    monkeypatch.setattr(smart_money_main, "upsert_wallet_scores", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "upsert_capital_trails", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "finish_engine_run", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "log_summary", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(smart_money_main, "log_market_trail_summary", lambda *_args, **_kwargs: None)
+
+    asyncio.run(smart_money_main.main())
+
+    output = capsys.readouterr().out
+    assert "SMART_MONEY_COPYABILITY_FAILED" in output
+    assert "run_id=run-copyability-failed" in output
+    assert written["payload"]["runId"] == "run-copyability-failed"
+    assert written["payload"]["status"] == "failed"
+    assert written["payload"]["walletsRequested"] == 1
+    assert written["payload"]["walletResults"] == []
+    assert written["payload"]["clusters"] == []
+
+
 def test_shadow_fetch_failure_does_not_cancel_other_wallets(monkeypatch):
     async def fake_fetch(wallet, max_positions=500):
         if wallet.endswith("1"):
@@ -222,19 +321,32 @@ def test_priority_wallet_missing_uses_targeted_activity_and_shadow_only(monkeypa
 
     monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
     monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
-    monkeypatch.setattr(
-        smart_money_main,
-        "_fetch_targeted_activity_for_wallet",
-        lambda wallet: asyncio.sleep(0, result=(
+    async def fake_targeted_activity(wallet):
+        assert wallet == priority_wallet
+        return (
             [{"id": "evt-1"}],
-            [{"wallet": wallet, "market_id": "m1", "side": "BUY", "outcome": "Yes", "title": "election result", "category_guess": "politics", "size_usd": 1000, "price": 0.2, "timestamp": datetime.now(timezone.utc), "raw": {}}],
-        )),
-    )
-    monkeypatch.setattr(
-        smart_money_main,
-        "fetch_closed_positions",
-        lambda wallet, max_positions=500: asyncio.sleep(0, result=[{"avgPrice": 0.2, "totalBought": 10, "realizedPnl": 2, "title": "election result"}]),
-    )
+            [
+                {
+                    "wallet": wallet,
+                    "market_id": "m1",
+                    "side": "BUY",
+                    "outcome": "Yes",
+                    "title": "election result",
+                    "category_guess": "politics",
+                    "size_usd": 1000,
+                    "price": 0.2,
+                    "timestamp": datetime.now(timezone.utc),
+                    "raw": {},
+                }
+            ],
+        )
+
+    async def fake_closed_positions(wallet, max_positions=500):
+        assert wallet == priority_wallet
+        return [{"avgPrice": 0.2, "totalBought": 10, "realizedPnl": 2, "title": "election result"}]
+
+    monkeypatch.setattr(smart_money_main, "_fetch_targeted_activity_for_wallet", fake_targeted_activity)
+    monkeypatch.setattr(smart_money_main, "fetch_closed_positions", fake_closed_positions)
     monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", priority_wallet)
     monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
 
@@ -264,16 +376,16 @@ def test_priority_wallet_missing_without_activity_keeps_shadow_only(monkeypatch)
 
     monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
     monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
-    monkeypatch.setattr(
-        smart_money_main,
-        "_fetch_targeted_activity_for_wallet",
-        lambda wallet: asyncio.sleep(0, result=([], [])),
-    )
-    monkeypatch.setattr(
-        smart_money_main,
-        "fetch_closed_positions",
-        lambda wallet, max_positions=500: asyncio.sleep(0, result=[]),
-    )
+    async def fake_targeted_activity(wallet):
+        assert wallet == priority_wallet
+        return [], []
+
+    async def fake_closed_positions(wallet, max_positions=500):
+        assert wallet == priority_wallet
+        return []
+
+    monkeypatch.setattr(smart_money_main, "_fetch_targeted_activity_for_wallet", fake_targeted_activity)
+    monkeypatch.setattr(smart_money_main, "fetch_closed_positions", fake_closed_positions)
     monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", priority_wallet)
     monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
 
@@ -309,16 +421,14 @@ def test_priority_wallet_missing_does_not_enter_productive_wallet_scores(monkeyp
 
     monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
     monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
-    monkeypatch.setattr(
-        smart_money_main,
-        "_fetch_targeted_activity_for_wallet",
-        lambda wallet: asyncio.sleep(0, result=([], [])),
-    )
-    monkeypatch.setattr(
-        smart_money_main,
-        "fetch_closed_positions",
-        lambda wallet, max_positions=500: asyncio.sleep(0, result=[]),
-    )
+    async def fake_targeted_activity(wallet):
+        return [], []
+
+    async def fake_closed_positions(wallet, max_positions=500):
+        return []
+
+    monkeypatch.setattr(smart_money_main, "_fetch_targeted_activity_for_wallet", fake_targeted_activity)
+    monkeypatch.setattr(smart_money_main, "fetch_closed_positions", fake_closed_positions)
     monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", priority_wallet)
     monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
     monkeypatch.setattr(smart_money_main, "SKILL_SHADOW_ENABLED", True)
@@ -331,6 +441,224 @@ def test_priority_wallet_missing_does_not_enter_productive_wallet_scores(monkeyp
     assert all(entry["wallet"] != priority_wallet for entry in written["wallet_scores.json"])
     assert any(entry["wallet"] == priority_wallet for entry in written["wallet_skill_shadow.json"])
     assert result["wallet_scores"] == written["wallet_scores.json"]
+
+
+def test_shadow_logs_include_scored_before_robust(monkeypatch, capsys):
+    wallet = "0x" + "a" * 40
+    trades = [
+        build_trade(wallet, "m1", price=0.2, size_usd=1200, category_guess="macro"),
+        build_trade(wallet, "m2", price=0.25, size_usd=1500, category_guess="macro"),
+        build_trade(wallet, "m3", price=0.3, size_usd=900, category_guess="macro"),
+        build_trade(wallet, "m4", price=0.55, size_usd=1100, category_guess="macro"),
+        build_trade(wallet, "m5", price=0.45, size_usd=1000, category_guess="macro"),
+        build_trade(wallet, "m6", price=0.5, size_usd=1300, category_guess="macro"),
+    ]
+
+    async def fake_fetch_recent_activity():
+        return trades
+
+    async def fake_closed_positions(_wallet, max_positions=500):
+        return [{"avgPrice": 0.2, "totalBought": 10, "realizedPnl": 2, "title": "Will Trump win election?"}]
+
+    monkeypatch.setattr(smart_money_main, "fetch_recent_activity", fake_fetch_recent_activity)
+    monkeypatch.setattr(smart_money_main, "dedupe_trades", lambda items: items)
+    async def fake_targeted_activity(_wallet):
+        return [], []
+
+    monkeypatch.setattr(smart_money_main, "_fetch_targeted_activity_for_wallet", fake_targeted_activity)
+    monkeypatch.setattr(smart_money_main, "fetch_closed_positions", fake_closed_positions)
+    monkeypatch.setattr(smart_money_main, "SKILL_PRIORITY_WALLETS", wallet)
+    monkeypatch.setattr(smart_money_main, "SKILL_MAX_WALLETS_PER_RUN", 1)
+
+    selected = smart_money_main.build_shadow_wallet_targets(compute_wallet_scores(trades))
+    targeted_behaviors = asyncio.run(smart_money_main._fetch_targeted_wallet_behaviors([selected[0]]))
+    selected[0]["behaviorStatus"] = targeted_behaviors[wallet]["behaviorStatus"]
+    selected[0]["walletScore"] = targeted_behaviors[wallet]["walletScore"]
+
+    shadow_positions = asyncio.run(smart_money_main._fetch_shadow_positions(selected))
+    smart_money_main._attach_shadow_outputs(compute_wallet_scores(trades), selected, shadow_positions)
+
+    output = capsys.readouterr().out.splitlines()
+    scored_index = next(i for i, line in enumerate(output) if "SMART_MONEY_SKILL_SCORED" in line)
+    robust_index = next(i for i, line in enumerate(output) if "SMART_MONEY_SKILL_ROBUST_SCORED" in line)
+
+    assert scored_index < robust_index
+
+
+def test_shadow_cohort_phase_writes_valid_utc_artifacts_without_nameerror(monkeypatch, capsys):
+    base = Path.cwd() / "tests" / "_shadow_phase_tmp"
+    shutil.rmtree(base, ignore_errors=True)
+    base.mkdir(parents=True, exist_ok=True)
+    active_wallet = "0x" + "1" * 40
+    candidate_wallet = "0x" + "2" * 40
+    third_wallet = "0x" + "3" * 40
+    wallet_scores = [
+        {
+            "wallet": active_wallet,
+            "walletQualityScore": 72,
+            "classification": SIGNAL_WALLET,
+            "generatedAt": "2026-06-29T00:00:00+00:00",
+        }
+    ]
+    cohort = [
+        {
+            "wallet": active_wallet,
+            "displayName": "Active Wallet",
+            "roles": ["active"],
+            "profiles": ["sports"],
+            "sources": ["active_wallet_config"],
+            "aliases": [],
+            "classification": SIGNAL_WALLET,
+            "behaviorQualityScore": 72,
+            "candidateScore": None,
+            "candidateStatus": None,
+            "replacementFor": None,
+        },
+        {
+            "wallet": candidate_wallet,
+            "displayName": "Candidate Wallet",
+            "roles": ["candidate"],
+            "profiles": ["sports"],
+            "sources": ["whale_finder"],
+            "aliases": [],
+            "classification": SIGNAL_WALLET,
+            "behaviorQualityScore": 63,
+            "candidateScore": 91,
+            "candidateStatus": "candidate",
+            "replacementFor": None,
+        },
+        {
+            "wallet": third_wallet,
+            "displayName": "Third Wallet",
+            "roles": ["candidate"],
+            "profiles": ["sports"],
+            "sources": ["whale_finder"],
+            "aliases": [],
+            "classification": SIGNAL_WALLET,
+            "behaviorQualityScore": 61,
+            "candidateScore": 88,
+            "candidateStatus": "candidate",
+            "replacementFor": None,
+        },
+    ]
+
+    async def fake_targeted_behaviors(_wallets):
+        return {}
+
+    async def fake_shadow_positions(selected_wallets):
+        return {
+            active_wallet: {
+                "wallet": active_wallet,
+                "closed_positions": [{"avgPrice": 0.2, "totalBought": 10, "realizedPnl": 2}],
+            },
+            candidate_wallet: {
+                "wallet": candidate_wallet,
+                "closed_positions": [{"avgPrice": 0.25, "totalBought": 8, "realizedPnl": 1.5}],
+            },
+            third_wallet: {
+                "wallet": third_wallet,
+                "closed_positions": [{"avgPrice": 0.3, "totalBought": 6, "realizedPnl": 1.0}],
+            },
+        }
+
+    def fake_shadow_skill(wallet, closed_positions):
+        return {
+            "wallet": wallet,
+            "skillStatus": "sufficient",
+            "skillScore": 79.5,
+            "sampleConfidence": 84,
+            "knownCategoryCoverageScore": 61,
+            "dominantKnownCategory": "sports",
+            "closedPositionsCount": len(closed_positions),
+            "categorySkillScores": {
+                "sports": {
+                    "closedPositionsCount": len(closed_positions),
+                    "skillScore": 78.5,
+                    "skillStatus": "sufficient",
+                }
+            },
+        }
+
+    def fake_shadow_meta(behavior_score, shadow_skill):
+        return {"shadowMetaScore": behavior_score + 1}
+
+    def fake_shadow_robust(behavior_score, shadow_skill):
+        return {
+            "shadowRobustMetaScore": behavior_score + 2,
+            "robustSkillScore": behavior_score + 3,
+            "pnlConcentrationLevel": "moderate",
+        }
+
+    def fake_load_whale_finder_outputs():
+        return {}
+
+    def fake_build_cohort(*_args, **_kwargs):
+        return [row.copy() for row in cohort]
+
+    def fake_resolve_history_paths():
+        history_file = base / "wallet_shadow_history.jsonl"
+        runs_dir = base / "runs"
+        output_dir = base / "outputs"
+        return {
+            "history_file": history_file,
+            "runs_dir": runs_dir,
+            "output_dir": output_dir,
+        }
+
+    def fake_save_json(filename, data):
+        target = base / "outputs" / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        return target
+
+    monkeypatch.setattr(smart_money_main, "load_whale_finder_outputs", fake_load_whale_finder_outputs)
+    monkeypatch.setattr(smart_money_main, "build_shadow_wallet_cohort", fake_build_cohort)
+    monkeypatch.setattr(smart_money_main, "_fetch_targeted_wallet_behaviors", fake_targeted_behaviors)
+    monkeypatch.setattr(smart_money_main, "_fetch_shadow_positions", fake_shadow_positions)
+    monkeypatch.setattr(smart_money_main, "compute_wallet_skill", fake_shadow_skill)
+    monkeypatch.setattr(smart_money_main, "compute_shadow_meta_evaluation", fake_shadow_meta)
+    monkeypatch.setattr(smart_money_main, "compute_shadow_robust_evaluation", fake_shadow_robust)
+    monkeypatch.setattr(smart_money_main, "resolve_history_paths", fake_resolve_history_paths)
+    monkeypatch.setattr(smart_money_main, "save_json", fake_save_json)
+
+    result = asyncio.run(
+        smart_money_main._run_shadow_cohort_phase(
+            run_id="run-1",
+            wallet_scores=wallet_scores,
+            phase_one_shadow_rows=[],
+        )
+    )
+
+    output = capsys.readouterr().out
+    assert "SMART_MONEY_SHADOW_COHORT_FAILED" not in output
+    assert "SMART_MONEY_SHADOW_HISTORY_WRITTEN" in output
+    assert "SMART_MONEY_SHADOW_RANKINGS_WRITTEN" in output
+    assert "SMART_MONEY_SHADOW_COMPARISONS_WRITTEN" in output
+
+    try:
+        snapshot = json.loads((base / "runs" / "run-1.json").read_text(encoding="utf-8"))
+        assert snapshot["generatedAt"].endswith("+00:00")
+        _assert_utc_timestamp(snapshot["generatedAt"])
+        _assert_no_nan_or_infinity(snapshot)
+
+        history_lines = (base / "wallet_shadow_history.jsonl").read_text(encoding="utf-8").splitlines()
+        assert len(history_lines) == 3
+        history = [json.loads(line) for line in history_lines]
+        assert len({(row["runId"], row["wallet"]) for row in history}) == 3
+        for row in history:
+            assert row["generatedAt"].endswith("+00:00")
+            _assert_utc_timestamp(row["generatedAt"])
+
+        rankings = json.loads((base / "outputs" / "wallet_shadow_rankings.json").read_text(encoding="utf-8"))
+        comparisons = json.loads((base / "outputs" / "wallet_comparison_summary.json").read_text(encoding="utf-8"))
+        _assert_no_nan_or_infinity(rankings)
+        _assert_no_nan_or_infinity(comparisons)
+
+        assert result["shadow_rows"]
+        assert len(result["shadow_rows"]) == 3
+        assert all(row["generatedAt"].endswith("+00:00") for row in result["shadow_rows"])
+    finally:
+        shutil.rmtree(base, ignore_errors=True)
 
 
 def test_high_noise_high_volume_wallet_is_demoted_to_whale_but_noisy():

@@ -1,0 +1,186 @@
+{
+  "sports": [
+    {
+      "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+      "displayName": "Global Sports Arb Lambda",
+      "roles": [
+        "active"
+      ],
+      "profiles": [
+        "sports"
+      ],
+      "classification": "SPECIALIST_WALLET",
+      "closedPositionsCount": 87,
+      "totalRealizedPnl": 133608.647206,
+      "roi": 0.255532,
+      "winRate": 0.9125,
+      "profitFactor": 4.811257,
+      "payoffRatio": 0.461353,
+      "categorySkillScore": 79,
+      "categorySkillStatus": "sufficient",
+      "rankingEligible": true,
+      "categorySampleConfidence": 100.0,
+      "categoryRankingScore": 79.0,
+      "rank": 1
+    },
+    {
+      "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+      "displayName": "NBA Volume Trader Theta",
+      "roles": [
+        "active"
+      ],
+      "profiles": [
+        "sports"
+      ],
+      "classification": "WHALE_BUT_NOISY",
+      "closedPositionsCount": 100,
+      "totalRealizedPnl": 0.0,
+      "roi": 0.0,
+      "winRate": 0.0,
+      "profitFactor": 0.0,
+      "payoffRatio": 0.0,
+      "categorySkillScore": 30,
+      "categorySkillStatus": "sufficient",
+      "rankingEligible": true,
+      "categorySampleConfidence": 100.0,
+      "categoryRankingScore": 30.0,
+      "rank": 2
+    },
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "displayName": "Everything Trader Zeta",
+      "roles": [
+        "active",
+        "benchmark"
+      ],
+      "profiles": [
+        "mixed",
+        "priority"
+      ],
+      "classification": "WHALE_BUT_NOISY",
+      "closedPositionsCount": 4,
+      "totalRealizedPnl": 1110.302952,
+      "roi": 0.050434,
+      "winRate": 0.666667,
+      "profitFactor": 2.927408,
+      "payoffRatio": 1.463704,
+      "categorySkillScore": 65,
+      "categorySkillStatus": "unranked",
+      "rankingEligible": false,
+      "categorySampleConfidence": 13.33,
+      "categoryRankingScore": 48.1,
+      "rank": null
+    }
+  ],
+  "esports": [],
+  "politics": [
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "displayName": "Everything Trader Zeta",
+      "roles": [
+        "active",
+        "benchmark"
+      ],
+      "profiles": [
+        "mixed",
+        "priority"
+      ],
+      "classification": "WHALE_BUT_NOISY",
+      "closedPositionsCount": 14,
+      "totalRealizedPnl": 4934.24871,
+      "roi": 0.331869,
+      "winRate": 0.714286,
+      "profitFactor": 2.366604,
+      "payoffRatio": 0.946641,
+      "categorySkillScore": 75,
+      "categorySkillStatus": "limited",
+      "rankingEligible": true,
+      "categorySampleConfidence": 46.67,
+      "categoryRankingScore": 63.0,
+      "rank": 1
+    }
+  ],
+  "geopolitics": [
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "displayName": "Everything Trader Zeta",
+      "roles": [
+        "active",
+        "benchmark"
+      ],
+      "profiles": [
+        "mixed",
+        "priority"
+      ],
+      "classification": "WHALE_BUT_NOISY",
+      "closedPositionsCount": 19,
+      "totalRealizedPnl": 232426.642632,
+      "roi": 0.562461,
+      "winRate": 0.842105,
+      "profitFactor": 5.0,
+      "payoffRatio": 5.0,
+      "categorySkillScore": 94,
+      "categorySkillStatus": "limited",
+      "rankingEligible": true,
+      "categorySampleConfidence": 63.33,
+      "categoryRankingScore": 83.66,
+      "rank": 1
+    }
+  ],
+  "macro": [
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "displayName": "Everything Trader Zeta",
+      "roles": [
+        "active",
+        "benchmark"
+      ],
+      "profiles": [
+        "mixed",
+        "priority"
+      ],
+      "classification": "WHALE_BUT_NOISY",
+      "closedPositionsCount": 14,
+      "totalRealizedPnl": 44593.097806,
+      "roi": 0.223226,
+      "winRate": 0.928571,
+      "profitFactor": 5.0,
+      "payoffRatio": 5.0,
+      "categorySkillScore": 85,
+      "categorySkillStatus": "limited",
+      "rankingEligible": true,
+      "categorySampleConfidence": 46.67,
+      "categoryRankingScore": 71.4,
+      "rank": 1
+    }
+  ],
+  "crypto": [
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "displayName": "Everything Trader Zeta",
+      "roles": [
+        "active",
+        "benchmark"
+      ],
+      "profiles": [
+        "mixed",
+        "priority"
+      ],
+      "classification": "WHALE_BUT_NOISY",
+      "closedPositionsCount": 3,
+      "totalRealizedPnl": 434.8058,
+      "roi": 0.034253,
+      "winRate": 0.666667,
+      "profitFactor": 1.108701,
+      "payoffRatio": 0.554351,
+      "categorySkillScore": 49,
+      "categorySkillStatus": "unranked",
+      "rankingEligible": false,
+      "categorySampleConfidence": 10.0,
+      "categoryRankingScore": 35.77,
+      "rank": null
+    }
+  ],
+  "culture_awards": [],
+  "technology": []
+}

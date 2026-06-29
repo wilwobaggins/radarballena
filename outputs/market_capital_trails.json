@@ -1,34 +1,366 @@
 [
   {
-    "marketId": "0xb3fabd2cb9b814b6eab02a1afb1d56369b147ad812a2595c235c1a5a729a533e",
-    "title": "Bosnia-Herzegovina vs. Qatar: 1st Half O/U 1.5",
+    "marketId": "0xf3d63225f11dd8ece7ce66db69b2a59fc11dd7eb4696bebb13db4930b34fbff5",
+    "title": "Exact Score: Brazil 3 - 3 Japan?",
+    "qualifiedWalletCount": 3,
+    "smartMoneyVolume": 3587.96,
+    "weightedYesFlow": 844.59,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 65,
+    "freshnessScore": 100,
+    "status": "DIRECT_STRONG",
+    "headline": "Actividad directa fuerte de Smart Money hacia YES",
+    "interpretation": "Hay varias wallets calificadas empujando flujo direccional hacia YES con convicción suficiente.",
+    "riskFlags": [],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x085e6d64dbcc4a308e7477c3bda16b8c3c62ec37f7df7a06dcafb6ab08396401",
+    "title": "Will Japan win on 2026-06-29?",
     "qualifiedWalletCount": 1,
-    "smartMoneyVolume": 2910.78,
+    "smartMoneyVolume": 8571.63,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 4371.53,
+    "smartBias": -1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 69,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xf8dd1badd9ffd6dd614ed70db6576ae952ed30a8ab5fcf892fb3645c818b89d0",
+    "title": "Brazil leading at halftime?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 4380.76,
+    "weightedYesFlow": 2720.45,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 59,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x8eb933271beaafebafc8f7615e69e6a20bdd61ef25f99f78f1e21486340f6570",
+    "title": "Will Brazil vs. Japan end in a draw?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 2858.0,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 1457.58,
+    "smartBias": -1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 55,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xdd07af894f13cd33f1ecefb3fde2eb79ede89b9060adc98aedb61eec58b550a6",
+    "title": "Exact Score: Brazil 3 - 1 Japan?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1973.57,
+    "weightedYesFlow": 899.56,
+    "weightedNoFlow": 254.22,
+    "smartBias": 0.559,
+    "consensusScore": 78,
+    "divergenceScore": 44,
+    "convictionScore": 44,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xf7e66e31e79d3585fb6c265256910044de6e861c7ee95a4135157882515ce929",
+    "title": "Exact Score: Brazil 0 - 2 Japan?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1582.19,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 382.1,
+    "smartBias": -1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 52,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xf95968b1334c35a5c17867680d783d1d592bb8648b014f7365d03e40e37c99fb",
+    "title": "Will Brazil win on 2026-06-29?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 1323.91,
+    "weightedYesFlow": 822.15,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 51,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x0189df05ed7bf84d799213b01a79571e305c03b2ac5359cfbb3a323448ba20fa",
+    "title": "Will Japan win the 2026 FIFA World Cup?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 830.77,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 197.72,
+    "smartBias": -1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 50,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x1e5dc0e2685bd175300b41f3c06e59d3c59ec30b2420d2a750bd4eae43ef66c1",
+    "title": "Brazil to win the second half?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 552.6,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 381.29,
+    "smartBias": -1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 50,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x66e672b765507d2371c92f1c74a6abf1ed16421049076e7b6ce254e79d49d66d",
+    "title": "Exact Score: Brazil 2 - 1 Japan?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 529.55,
+    "weightedYesFlow": 328.85,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 49,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xc7836687f05398298aedd1666456d00c735bce3fbfc0cf3db9357da7bb01602a",
+    "title": "Exact Score: Brazil 2 - 3 Japan?",
+    "qualifiedWalletCount": 1,
+    "smartMoneyVolume": 518.33,
+    "weightedYesFlow": 112.66,
+    "weightedNoFlow": 0.0,
+    "smartBias": 1.0,
+    "consensusScore": 100,
+    "divergenceScore": 0,
+    "convictionScore": 49,
+    "freshnessScore": 100,
+    "status": "DIRECT_WEAK",
+    "headline": "Actividad directa débil de Smart Money",
+    "interpretation": "Hay actividad directa en este mercado, pero el consenso todavía no es suficientemente fuerte.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_conviction"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x46abfdead852f9cd12fbd348b4255cbe09485410626b9d95fe2d36d1f72f4604",
+    "title": "Brazil vs. Japan: Brazil O/U 1.5",
+    "qualifiedWalletCount": 4,
+    "smartMoneyVolume": 34156.69,
     "weightedYesFlow": 0.0,
     "weightedNoFlow": 0.0,
     "smartBias": 0.0,
     "consensusScore": 0,
     "divergenceScore": 0,
-    "convictionScore": 34,
+    "convictionScore": 76,
     "freshnessScore": 100,
     "status": "NO_RELIABLE_TRAIL",
     "headline": "No hay trail confiable de Smart Money",
     "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
     "riskFlags": [
-      "low_wallet_count",
+      "low_consensus",
+      "neutral_events_present",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xf9b6b82f2d64af8b1af14ee9e89c1de0345c1c603f637f22032ff9e67792a2af",
+    "title": "Brazil vs. Japan: O/U 2.5",
+    "qualifiedWalletCount": 3,
+    "smartMoneyVolume": 9379.08,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 59,
+    "freshnessScore": 100,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
       "low_consensus",
       "low_conviction",
       "neutral_events_present",
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xa6ab4ca41e6b39c86dee00221bef1a26a5e9aaed32c255631edaccae9e896168",
-    "title": "ITF Rome: Ariana Arseneault vs Monika Ekstrand",
+    "marketId": "0xa116c6a9338996dbf3d361a4bca75531f4d7c0ed86c15e4cd5a6c2e8010e381d",
+    "title": "Brazil vs. Japan: O/U 1.5",
+    "qualifiedWalletCount": 3,
+    "smartMoneyVolume": 3500.0,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 45,
+    "freshnessScore": 100,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
+      "low_consensus",
+      "low_conviction",
+      "neutral_events_present",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x92ea3b6a5f5f43ad592ddef5aa169892e0bce349da751eac9086717e178f7a7e",
+    "title": "Brazil vs. Japan: Team to Advance",
+    "qualifiedWalletCount": 2,
+    "smartMoneyVolume": 2728.48,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 39,
+    "freshnessScore": 100,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
+      "low_consensus",
+      "low_conviction",
+      "neutral_events_present",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xa6e22b7a1a29ebfcbecd5c5f5375c16981c58c297dfca8a2e9cf29ed071e8ad2",
+    "title": "Brazil vs. Japan: Japan O/U 1.5",
+    "qualifiedWalletCount": 3,
+    "smartMoneyVolume": 2469.69,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 42,
+    "freshnessScore": 100,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
+      "low_consensus",
+      "low_conviction",
+      "neutral_events_present",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x63407575e7f0a2ac5b423adb97aaab566cc6a5609a828c6744ac3949f86327ea",
+    "title": "Spread: Brazil (-1.5)",
     "qualifiedWalletCount": 1,
-    "smartMoneyVolume": 1556.5,
+    "smartMoneyVolume": 1413.0,
     "weightedYesFlow": 0.0,
     "weightedNoFlow": 0.0,
     "smartBias": 0.0,
@@ -47,19 +379,19 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x5f415bcac22c009770f46628d6c1f04dc1c69dfdff39dd3a983fe7ac3eadd647",
-    "title": "Bosnia-Herzegovina vs. Qatar: 1st Half O/U 0.5",
+    "marketId": "0xf1c215b6038f2290110e65366460cf561b6e53679d35107b766ca749d15ef45d",
+    "title": "San Diego Padres vs. Chicago Cubs: O/U 11.5",
     "qualifiedWalletCount": 1,
-    "smartMoneyVolume": 1389.89,
+    "smartMoneyVolume": 737.0,
     "weightedYesFlow": 0.0,
     "weightedNoFlow": 0.0,
     "smartBias": 0.0,
     "consensusScore": 0,
     "divergenceScore": 0,
-    "convictionScore": 31,
+    "convictionScore": 29,
     "freshnessScore": 100,
     "status": "NO_RELIABLE_TRAIL",
     "headline": "No hay trail confiable de Smart Money",
@@ -72,19 +404,19 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x2a77a51a3ac57ab5caddf6cee3f0229eff248817b14c84b228c81315b9cc32dc",
-    "title": "Switzerland vs. Canada: O/U 2.5",
+    "marketId": "0x79803a2ac7a79d72f069a92fdf768dfc6336d8f5bcf8dff53fa95d2cbafe07ad",
+    "title": "Spread: Japan (-3.5)",
     "qualifiedWalletCount": 1,
-    "smartMoneyVolume": 468.75,
+    "smartMoneyVolume": 731.06,
     "weightedYesFlow": 0.0,
     "weightedNoFlow": 0.0,
     "smartBias": 0.0,
     "consensusScore": 0,
     "divergenceScore": 0,
-    "convictionScore": 28,
+    "convictionScore": 30,
     "freshnessScore": 100,
     "status": "NO_RELIABLE_TRAIL",
     "headline": "No hay trail confiable de Smart Money",
@@ -97,36 +429,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xb1379afc6c4584c90615bdec331b63686c29b6d8de6610886ff108d663d3ae2a",
-    "title": "Counter-Strike: Betclic Apogee Esports vs OG - Map 1 Winner",
-    "qualifiedWalletCount": 1,
-    "smartMoneyVolume": 280.0,
-    "weightedYesFlow": 0.0,
-    "weightedNoFlow": 0.0,
-    "smartBias": 0.0,
-    "consensusScore": 0,
-    "divergenceScore": 0,
-    "convictionScore": 28,
-    "freshnessScore": 100,
-    "status": "NO_RELIABLE_TRAIL",
-    "headline": "No hay trail confiable de Smart Money",
-    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
-    "riskFlags": [
-      "low_wallet_count",
-      "low_consensus",
-      "low_conviction",
-      "neutral_events_present",
-      "no_reliable_signal"
-    ],
-    "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
-  },
-  {
-    "marketId": "0xba6e97d07d52faafdc4d5b0b88cc4e2d34da8be44e55b71be629a40c509e39ff",
-    "title": "Switzerland vs. Canada: 1st Half O/U 1.5",
+    "marketId": "0x8e3d050a0a366afbe8cb83ad420c638a7905dd2629f4eed15f3c638ace8f0bd6",
+    "title": "Valorant: Mandatory vs Beşiktaş Esports (BO3) - VCL EMEA: Stage 3 Group A",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -147,11 +454,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x20aa2aca6d76d29cf9ed13a252d8b5a2544e3b46d2611cd092fba37ffb0de374",
-    "title": "Will Elon Musk post 90-114 tweets from June 25 to June 27, 2026?",
+    "marketId": "0x2164f77d45bce0f43d99e0067b23512e1d97c309580f34e1610653ebd2824c46",
+    "title": "Wimbledon WTA: Lanlana Tararudee vs Lilli Tagger",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -172,11 +479,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xd606180b4ec9ca68af348517c5985da412a7c21d9560d27c1401ec1a9ce742e6",
-    "title": "Switzerland vs. Canada: Switzerland 1st Half O/U 1.5",
+    "marketId": "0x1a01bf78f56a507fcb666d564d8c8b91b0750679163ed6e96746102c9b7d285d",
+    "title": "Will Flávio Bolsonaro win the 2026 Brazilian presidential election?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -197,11 +504,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x0215bf336dac9fa0ec09c9c810c9301ea7f897ecdedfb3e4b1901ff6f0b7e978",
-    "title": "Wimbledon, Qualification WTA: Caroline Werner vs Alina Charaeva",
+    "marketId": "0x1be62d973dc8fb45de714eb2113118b6ac3e47694f8b0801c0c41d992d0b7c9f",
+    "title": "Will Trump agree to Iranian transit fees in the Strait of Hormuz by June 30?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -222,11 +529,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x83cc69d81d0fb419565eb5fa2592bbc6367ace6a92dc1faffb93b28388fe4396",
-    "title": "Scotland vs. Brazil: O/U 9.5 Total Corners",
+    "marketId": "0x125c399641397f7b7cc111f3729999e32154a916deb1161527af031decde1f77",
+    "title": "Will France reach the 2026 FIFA World Cup final?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -247,11 +554,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x9b6f8ae4adea0a0f9396cff98b2d5d22299ecf2d3008e12817cacffbc1bfbb43",
-    "title": "Wimbledon, Qualification WTA: Xiyu Wang vs Marina Bassols Ribera",
+    "marketId": "0x5ccfe1b69a582d2985db08a8481a0d74c314b1fce9b4711ae2efb2c6467fe6aa",
+    "title": "Will Mexico win the 2026 FIFA World Cup?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -272,11 +579,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x31fbc0f21e473ab1f5087ab5574dc80ca80836ef44e54994eb4103b066c8f4dc",
-    "title": "Switzerland vs. Canada: Switzerland O/U 0.5",
+    "marketId": "0xacec7e5b90ccb1ac4c950e3aff18156d6ce1bb7b0c87c001a281279412dca784",
+    "title": "Will Bitcoin reach $95,000 by December 31, 2026?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -297,11 +604,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xed810c73894bd78057aa1915feeae2ffd295968dffcf1b7d33510a703b97f167",
-    "title": "Bosnia-Herzegovina vs. Qatar: Qatar O/U 0.5",
+    "marketId": "0x1b5e5ebc0cf5c7c55d557f2be51276efbddb59ff5c038692be4501f17fa53944",
+    "title": "Will Trump say \"Mutilation\" during Faith & Freedom Coalition Conference?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -322,11 +629,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x060f4b969fc1f6b09682c1e7d9ae218273fe3f197977d1db22ccea01f42d895b",
-    "title": "Will Haiti win on 2026-06-24?",
+    "marketId": "0xf1d18b8f8296cfb295c8b9414157291aefb665ad94f384e3ec870e7a15fd9b1c",
+    "title": "Wimbledon ATP: Yibing Wu vs Novak Djokovic",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -347,11 +654,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x5db999fad322cea2914535aae5517060c3f80ad6d8c0231cde2124a434d16846",
-    "title": "Will the U.S. invade Iran before 2027?",
+    "marketId": "0xae9433e408d779f7aa5b1d3d7eb9ef269fbb6d415d3699c119e60c4445e13159",
+    "title": "Germany vs. Paraguay: Team to Advance",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -372,11 +679,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xfd5e6d361391c4faae67ca9f55576238125d345a2f0a7d276b101a26d38b9541",
-    "title": "Wimbledon, Qualification WTA: Polina Iatcenko vs Zhuoxuan Bai",
+    "marketId": "0x1aee5eb0c1a25cbbed39a0f7312188af40ea636e0a9bd0cfffedc703b838fa40",
+    "title": "GPT-5.6 released by July 17, 2026?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -397,11 +704,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x2229903e23d4eb334685bf3edffb8066ad69cbe7d1809acd36c95e4c6ce4aa4a",
-    "title": "Will NVIDIA (NVDA) hit (LOW) $184 in June?",
+    "marketId": "0x53eedb207bd0ce310b19fa66d50f873a2275bfd3e3a3d5e027a95d26a99953ea",
+    "title": "Exact Score: Any Other Score?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -422,11 +729,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x2f224fca80a6a6b3a2a200406473fc8b33da6bcf5af83dc3fe9021a541c0519d",
-    "title": "Will Reza Pahlavi enter Iran by December 31?",
+    "marketId": "0x0d2fe844f0ac554b38430d6f2ecb41ee0dfe42c2ca6c0ef69efa54d56edf1bcf",
+    "title": "Brazil vs. Japan: O/U 6.5 Total Corners",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -447,11 +754,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x1f5cd4d1a23c11229b2781303dd39fb60ec6ee369dd173cedef8a7f7a1a27298",
-    "title": "Will Mexico win on 2026-06-24?",
+    "marketId": "0x145ebd5f3abfa471088c0ceacb1d86fad63a97bcad882d56535eab1c2dcbc180",
+    "title": "Will the price of Ethereum be above $1,400 on July 4?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -472,11 +779,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x9bfe6966da5da12dc39dec67b22375fd5bf21f3c6e9cbaae28d926708eac222f",
-    "title": "Will Bitcoin reach $85,000 in June?",
+    "marketId": "0xf426c69674c6637f2b458c76d9920faa814d4daa8c308e0b8ba554dda509cb8b",
+    "title": "Will Shimelis Abdisa be the next Prime Minister of Ethiopia?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -497,11 +804,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x44a0f6adbea52acf0a97b90870a637a0bf577dc09b9b376ea56a0fbe86f68e12",
-    "title": "Will Bosnia and Herzegovina vs. Qatar end in a draw?",
+    "marketId": "0x3de79c1170eed092b638b95ba3ed9e21ec2eff956032bbeaa3acabfbb123932d",
+    "title": "Wimbledon ATP: Thiago Agustin Tirante vs Fabian Marozsan",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -522,11 +829,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x386d1e55e61c1e7c8d86c0d67b580efe4b81a231c78bde9c93bb30f65a38b72d",
-    "title": "Bosnia and Herzegovina vs. Qatar: O/U 3.5",
+    "marketId": "0xc4a26ee77fc5777d5036854f3835bf7ce44b42a61e3c6325c22b444627757eca",
+    "title": "Will Colombia win on 2026-07-03?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -547,11 +854,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x57733ab80dff870e27436f4c529a5a1d57a0713440edac2ff319ec26e6046569",
-    "title": "Wimbledon, Qualification WTA: Maria Lourdes Carle vs Jeline Vandromme",
+    "marketId": "0xb5e95cecd39975d5c3681a8e8c1c248bb0d7bd2b0f9a7d6772c8a9a79753e99c",
+    "title": "Will the price of Bitcoin be above $58,000 on June 30?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -572,11 +879,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x10b4a49cc233715e3b2154533c654fcbdcac6c03b3b415611c5c014872e80b3b",
-    "title": "Will Switzerland vs. Canada end in a draw?",
+    "marketId": "0x67240dc957088af32bc8d159e1af1a0598fe8b9fcc6bd38ac5f08cf50c24b625",
+    "title": "Wimbledon WTA: Claire Liu vs Hanne Vandewinkel",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -597,11 +904,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xe1953a0f479de0ff3efabb7dff6116ff6cb9d7fe2d7ee6526c5d68da9cf09767",
-    "title": "Will Switzerland win on 2026-06-24?",
+    "marketId": "0x66df82929b8f0062f8f9e82258f8d36c65c848924ba64dffad13afa920766166",
+    "title": "Wimbledon ATP: Jan-Lennard Struff vs Sebastian Baez",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -622,11 +929,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x1cb039e393075179f0e67b968ec0dbaa01ea1ecc91a933d7d77e59401e7fb9c7",
-    "title": "Scotland vs. Brazil: O/U 8.5 Total Corners",
+    "marketId": "0x6e84193d33a6a3c1f592c36b91c03bbeeeafb1bd56d8aa306dbb3f66827298dd",
+    "title": "Valorant: Joblife vs Barça eSports - Map 2 Winner",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -647,11 +954,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x3bc69cb672591e4fcd2ef856b64b219a906e15d4601b50066ac81a446574dfaf",
-    "title": "Will Cape Verde win the 2026 FIFA World Cup?",
+    "marketId": "0x51a562ad73e485b9fe3aaf7c3b1a1a471b2caea185e595844bec20c36b721d79",
+    "title": "San Diego Padres vs. Chicago Cubs: O/U 12.5",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -672,11 +979,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x253108d1876c9d55c1d7a7cfd4490245a7fc050da30a0395ca2fa380f76050f4",
-    "title": "Will the next Google Gemini Pro model be released by June 26, 2026?",
+    "marketId": "0x4f3421fb2daf5cca7430ed8d8132463963081572d75434393a1808fdb8829fe8",
+    "title": "Will Portugal win the 2026 FIFA World Cup?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -697,11 +1004,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xd14544ac7360f37de17eb6a442694de21a8c5ea01714323be6409b002c4d7d7d",
-    "title": "Will Brazil win on 2026-06-24?",
+    "marketId": "0x8ec1344d38fb55aa4adf043a3d81899bda2762b89bebec5769a81a50c3b9c25f",
+    "title": "Will Netherlands win on 2026-06-29?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -722,11 +1029,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0xf224cac9c315d3693bbcbd8406460b8052ecc40df364f7e2bc6079c072cfe219",
-    "title": "Will Bosnia and Herzegovina win on 2026-06-24?",
+    "marketId": "0xa4ddc18895cc7b14810283ef8f113939abffd3969c6a0e37f1897110c67e6f73",
+    "title": "Hantavirus pandemic in 2026?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -747,11 +1054,11 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   },
   {
-    "marketId": "0x211cc9763666374780fb2878ee245a1cb4e27f867ab6caeed579747a5ebacf1f",
-    "title": "Spread: Bosnia and Herzegovina (-1.5)",
+    "marketId": "0x02feb5122ad9e116565dc8243b1be7cc35bf2ba1da5d1cd8511272974dc0d98c",
+    "title": "Exact Score: Germany 1 - 2 Paraguay?",
     "qualifiedWalletCount": 0,
     "smartMoneyVolume": 0.0,
     "weightedYesFlow": 0.0,
@@ -772,6 +1079,106 @@
       "no_reliable_signal"
     ],
     "events": [],
-    "generatedAt": "2026-06-24T19:25:42.406893+00:00"
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0xf76c79fc9e1f2508db1212b8e6c278ef8597f430eb9dbd4dfe530f97748028ee",
+    "title": "Will Lorenzo Sonego be the 2026 Men’s Wimbledon winner?",
+    "qualifiedWalletCount": 0,
+    "smartMoneyVolume": 0.0,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 0,
+    "freshnessScore": 0,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_consensus",
+      "low_conviction",
+      "stale_flow",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x064d10bf45774ed4c791c6ad150a794017e2357ac188b83d01adedd0b503d84f",
+    "title": "Brazil vs. Japan: O/U 0.5",
+    "qualifiedWalletCount": 0,
+    "smartMoneyVolume": 0.0,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 0,
+    "freshnessScore": 0,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_consensus",
+      "low_conviction",
+      "stale_flow",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x4c325469d9b516ef4e6b8f73a81a12607dec075e3c2fd454f91765aaeafc4760",
+    "title": "Will Pete Buttigieg win the 2028 Democratic presidential nomination?",
+    "qualifiedWalletCount": 0,
+    "smartMoneyVolume": 0.0,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 0,
+    "freshnessScore": 0,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_consensus",
+      "low_conviction",
+      "stale_flow",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
+  },
+  {
+    "marketId": "0x30d55d8124ee1e12dabe89201badc45669b81dff69e4ce44d961f32878ec178a",
+    "title": "Will Brazil win the 2026 FIFA World Cup?",
+    "qualifiedWalletCount": 0,
+    "smartMoneyVolume": 0.0,
+    "weightedYesFlow": 0.0,
+    "weightedNoFlow": 0.0,
+    "smartBias": 0.0,
+    "consensusScore": 0,
+    "divergenceScore": 0,
+    "convictionScore": 0,
+    "freshnessScore": 0,
+    "status": "NO_RELIABLE_TRAIL",
+    "headline": "No hay trail confiable de Smart Money",
+    "interpretation": "No existe suficiente capital calificado o la señal actual es demasiado débil para una lectura confiable.",
+    "riskFlags": [
+      "low_wallet_count",
+      "low_consensus",
+      "low_conviction",
+      "stale_flow",
+      "no_reliable_signal"
+    ],
+    "events": [],
+    "generatedAt": "2026-06-29T16:51:03.541905+00:00"
   }
 ]

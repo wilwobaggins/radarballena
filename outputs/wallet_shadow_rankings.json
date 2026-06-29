@@ -1,0 +1,82 @@
+[
+  {
+    "wallet": "0x479e330b07822ee28e20bac5e504f1b7c6b591c3",
+    "displayName": "Global Sports Arb Lambda",
+    "roles": [
+      "active"
+    ],
+    "profiles": [
+      "sports"
+    ],
+    "classification": "SPECIALIST_WALLET",
+    "behaviorQualityScore": 67,
+    "skillScore": 78,
+    "robustSkillScore": 76,
+    "shadowMetaScore": 79,
+    "shadowRobustMetaScore": 79,
+    "longitudinalComparisonScore": 71.1,
+    "comparisonConfidence": "sufficient",
+    "runCount": 9,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "sports",
+    "knownCategoryCoverageScore": 87,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_strong",
+    "rank": 1
+  },
+  {
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "displayName": "Everything Trader Zeta",
+    "roles": [
+      "active",
+      "benchmark"
+    ],
+    "profiles": [
+      "mixed",
+      "priority"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 64,
+    "skillScore": 85,
+    "robustSkillScore": 77,
+    "shadowMetaScore": 74,
+    "shadowRobustMetaScore": 69,
+    "longitudinalComparisonScore": 62.1,
+    "comparisonConfidence": "sufficient",
+    "runCount": 9,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "geopolitics",
+    "knownCategoryCoverageScore": 54,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 2
+  },
+  {
+    "wallet": "0x32ed517a571c01b6e9adecf61ba81ca48ff2f960",
+    "displayName": "NBA Volume Trader Theta",
+    "roles": [
+      "active"
+    ],
+    "profiles": [
+      "sports"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 62,
+    "skillScore": 30,
+    "robustSkillScore": 30,
+    "shadowMetaScore": 55,
+    "shadowRobustMetaScore": 61,
+    "longitudinalComparisonScore": 54.9,
+    "comparisonConfidence": "sufficient",
+    "runCount": 9,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "sports",
+    "knownCategoryCoverageScore": 100,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_low",
+    "rank": 3
+  }
+]
