@@ -9,8 +9,10 @@ from pathlib import Path
 from statistics import mean, median, pstdev
 from typing import Any
 
-
-DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[3] / "outputs"
+try:  # pragma: no cover - support package and script-style imports
+    from .path_utils import resolve_output_dir
+except ImportError:  # pragma: no cover
+    from path_utils import resolve_output_dir
 
 
 def iso_now() -> str:
@@ -42,7 +44,7 @@ def _resolve_path(value: str | os.PathLike[str] | None, default: Path) -> Path:
 
 
 def resolve_history_paths() -> dict[str, Path]:
-    output_dir = _resolve_path(os.getenv("SMART_MONEY_ENGINE_OUTPUT_DIR"), DEFAULT_OUTPUT_DIR)
+    output_dir = _resolve_path(os.getenv("SMART_MONEY_ENGINE_OUTPUT_DIR"), resolve_output_dir())
     runs_dir = _resolve_path(os.getenv("SHADOW_RUNS_DIR"), output_dir / "wallet_shadow_runs")
     history_file = Path(os.getenv("SHADOW_HISTORY_FILE") or (output_dir / "wallet_shadow_history.jsonl"))
     if not history_file.is_absolute():

@@ -2,25 +2,15 @@ from __future__ import annotations
 
 import json
 import math
-import os
 from pathlib import Path
 from typing import Any
 
+try:  # pragma: no cover - support package and script-style imports
+    from .path_utils import resolve_copyability_output_dir
+except ImportError:  # pragma: no cover
+    from path_utils import resolve_copyability_output_dir
 
-def _resolve_output_dir() -> Path:
-    configured = os.getenv("SMART_MONEY_ENGINE_OUTPUT_DIR")
-    if not configured:
-        output_dir = Path(__file__).resolve().parents[3] / "outputs"
-        output_dir.mkdir(parents=True, exist_ok=True)
-        return output_dir
-    output_dir = Path(configured)
-    if not output_dir.is_absolute():
-        output_dir = Path.cwd() / output_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
-    return output_dir
-
-
-OUTPUT_DIR = _resolve_output_dir()
+OUTPUT_DIR = resolve_copyability_output_dir()
 
 TRADE_COPYABILITY_SHADOW_FILE = OUTPUT_DIR / "trade_copyability_shadow.json"
 TRADE_COPYABILITY_HISTORY_FILE = OUTPUT_DIR / "trade_copyability_history.jsonl"

@@ -59,6 +59,7 @@ try:  # pragma: no cover - support package and script-style imports
     )
     from .wallet_metrics import compute_wallet_scores
     from .time_utils import to_utc_datetime
+    from .path_utils import resolve_output_dir
 except ImportError:  # pragma: no cover
     from market_trail import (
         build_market_capital_trails,
@@ -110,9 +111,15 @@ except ImportError:  # pragma: no cover
     )
     from wallet_metrics import compute_wallet_scores
     from time_utils import to_utc_datetime
+    from path_utils import resolve_output_dir
 
 
 load_dotenv()
+print(
+    "SMART_MONEY_OUTPUT_DIR_RESOLVED "
+    f"path={resolve_output_dir()} "
+    f"source={'COPYABILITY_OUTPUTS_DIR' if os.getenv('COPYABILITY_OUTPUTS_DIR') else 'SMART_MONEY_ENGINE_OUTPUT_DIR' if os.getenv('SMART_MONEY_ENGINE_OUTPUT_DIR') else 'fallback'}"
+)
 
 DATA_API = "https://data-api.polymarket.com"
 MIN_TRADE_USD = float(os.getenv("MIN_TRADE_USD", "250"))
