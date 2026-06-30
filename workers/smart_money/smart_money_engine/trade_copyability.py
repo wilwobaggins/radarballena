@@ -299,6 +299,7 @@ async def fetch_copyability_trades_for_wallet(
                 "wallet": wallet,
                 "status": "completed",
                 "reason": "cache_hit",
+                "fetchSource": "wallet_trade_cache",
                 "rawTrades": len(cached),
                 "normalizedTrades": len(cached),
                 "trades": cached,
@@ -312,6 +313,7 @@ async def fetch_copyability_trades_for_wallet(
                 "wallet": wallet,
                 "status": "completed",
                 "reason": "cache_hit",
+                "fetchSource": "copyability_activity_cache",
                 "rawTrades": len(cached),
                 "normalizedTrades": len(cached),
                 "trades": cached,
@@ -386,6 +388,7 @@ async def fetch_copyability_trades_for_wallet(
             "wallet": wallet,
             "status": status,
             "reason": reason,
+            "fetchSource": "wallet_api_fetch" if status != "failed" else "wallet_api_fetch_failed",
             "rawTrades": len(collected),
             "normalizedTrades": len(deduped),
             "trades": deduped,
@@ -1298,6 +1301,7 @@ async def run_trade_copyability_shadow(
                     "wallet": wallet,
                     "status": "completed",
                     "reason": "cache_hit",
+                    "fetchSource": "deduped_trades_cache",
                     "rawTrades": len(raw_trades),
                     "normalizedTrades": len(raw_trades),
                     "trades": raw_trades,
@@ -1317,6 +1321,7 @@ async def run_trade_copyability_shadow(
                         "wallet": wallet,
                         "status": "completed",
                         "reason": "cache_hit",
+                        "fetchSource": "wallet_trade_cache",
                         "rawTrades": len(fetch_result),
                         "normalizedTrades": len(fetch_result),
                         "trades": list(fetch_result),
@@ -1325,6 +1330,13 @@ async def run_trade_copyability_shadow(
             normalized = list(fetch_result.get("trades") or [])
             raw_trade_count = int(fetch_result.get("rawTrades") or len(raw_trades) or len(normalized))
             normalized_trade_count = int(fetch_result.get("normalizedTrades") or len(normalized))
+            print(
+                "SMART_MONEY_COPYABILITY_FETCH_SOURCE "
+                f"source={fetch_result.get('fetchSource') or 'wallet_api_fetch'} "
+                f"wallet={wallet} "
+                f"rawTrades={raw_trade_count} "
+                f"normalizedTrades={normalized_trade_count}"
+            )
             clusters = build_trade_clusters(normalized)
             cluster_rows.extend(clusters)
             if str(fetch_result.get("status") or "") == "failed":

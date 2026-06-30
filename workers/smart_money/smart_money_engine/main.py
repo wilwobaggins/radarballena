@@ -1143,6 +1143,7 @@ async def main() -> None:
                 priority_wallets=SKILL_PRIORITY_WALLETS,
                 wallet_scores=result["wallet_scores"],
                 shadow_rows=(result.get("shadow_phase") or {}).get("shadow_rows") or result.get("shadow_rows") or [],
+                copyability_seed_trades=result["deduped_trades"],
                 output_dir=resolve_output_dir(),
             )
             write_adaptive_signal_wallet_roster(adaptive_signal_wallet_roster)

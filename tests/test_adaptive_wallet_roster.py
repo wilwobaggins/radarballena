@@ -584,6 +584,15 @@ def test_adaptive_signal_wallet_roster_selects_six_wallets_and_writes_output(mon
         target_roster_size=6,
         wallet_scores=[],
         shadow_rows=[],
+        copyability_seed_trades=(
+            _good_preflight_trades(BENCHMARK)
+            + _good_preflight_trades(WALLETS["macro"])
+            + _good_preflight_trades(WALLETS["politics"])
+            + _good_preflight_trades(WALLETS["geopolitics"])
+            + _good_preflight_trades(WALLETS["crypto"])
+            + _good_preflight_trades(WALLETS["technology"])
+            + _weak_preflight_trades(WALLETS["rejected"])
+        ),
         output_dir=base,
     )
     path = roster.write_adaptive_signal_wallet_roster(payload)
@@ -630,6 +639,7 @@ def test_adaptive_signal_wallet_roster_keeps_benchmark_when_no_candidates(monkey
         target_roster_size=6,
         wallet_scores=[],
         shadow_rows=[],
+        copyability_seed_trades=_good_preflight_trades(BENCHMARK) + _good_preflight_trades(WALLETS["macro"]) + _weak_preflight_trades(WALLETS["rejected"]),
         output_dir=base,
     )
 
@@ -840,6 +850,7 @@ def test_high_hedge_and_not_copyable_penalize_roster_score(monkeypatch):
         target_roster_size=2,
         wallet_scores=[],
         shadow_rows=[],
+        copyability_seed_trades=_good_preflight_trades(BENCHMARK) + _good_preflight_trades(WALLETS["macro"]) + _weak_preflight_trades(WALLETS["rejected"]),
         output_dir=base,
     )
 
@@ -875,4 +886,92 @@ def test_adaptive_signal_wallet_roster_fallback_fills_to_target_and_marks_probat
     assert payload["selectedWallets"][0]["probationaryCandidate"] is False
     assert "SMART_MONEY_WALLET_ROSTER_INSUFFICIENT_LIVE_QUALITY" in output
     assert "SMART_MONEY_WALLET_ROSTER_SELECTED count=1" in output
+    shutil.rmtree(base, ignore_errors=True)
+
+
+def test_adaptive_signal_wallet_roster_prefers_copyability_seed_source_over_api(monkeypatch, capsys):
+    base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp_parity"
+    shutil.rmtree(base, ignore_errors=True)
+    base.mkdir(parents=True, exist_ok=True)
+
+    _write_json(
+        base / "wallet_shadow_rankings.json",
+        [
+            {
+                "wallet": BENCHMARK,
+                "displayName": "Ken",
+                "roles": ["benchmark"],
+                "profiles": ["mixed"],
+                "classification": "WHALE_BUT_NOISY",
+                "robustSkillScore": 75,
+                "shadowRobustMetaScore": 69,
+                "longitudinalComparisonScore": 61,
+                "comparisonConfidence": "sufficient",
+                "runCount": 6,
+                "dominantKnownCategory": "geopolitics",
+                "knownCategoryCoverageScore": 50,
+                "pnlConcentrationLevel": "low",
+                "recommendation": "shadow_watch",
+                "rank": 1,
+            },
+            {
+                "wallet": WALLETS["macro"],
+                "displayName": "Macro Wallet",
+                "roles": ["candidate"],
+                "profiles": ["macro"],
+                "classification": "SPECIALIST_WALLET",
+                "robustSkillScore": 88,
+                "shadowRobustMetaScore": 84,
+                "longitudinalComparisonScore": 79,
+                "comparisonConfidence": "sufficient",
+                "runCount": 8,
+                "dominantKnownCategory": "macro",
+                "knownCategoryCoverageScore": 88,
+                "pnlConcentrationLevel": "low",
+                "recommendation": "shadow_strong",
+                "rank": 2,
+            },
+        ],
+    )
+    _write_json(base / "wallet_category_rankings.json", {})
+    _write_history(base / "wallet_shadow_history.jsonl", [])
+    _write_json(base / "wallet_copyability_summary.json", {})
+    _write_json(base / "wallet_comparison_summary.json", {"comparisons": [], "sufficient": 0})
+    _write_json(base / "trade_copyability_shadow.json", {"clusters": [], "walletResults": []})
+
+    async def fake_fetch_copyability_trades_for_wallet(wallet, limit, lookback_hours, *, return_details=False, **_kwargs):
+        normalized = [_normalized_copyability_trade(wallet, market="m1", index=1, category="macro", size_usd=500)]
+        payload = {
+            "wallet": wallet,
+            "status": "completed",
+            "reason": "clusters_generated",
+            "fetchSource": "wallet_api_fetch",
+            "rawTrades": len(normalized),
+            "normalizedTrades": len(normalized),
+            "trades": normalized,
+            "error": None,
+        }
+        return payload if return_details else normalized
+
+    monkeypatch.setattr(roster, "fetch_copyability_trades_for_wallet", fake_fetch_copyability_trades_for_wallet)
+    monkeypatch.setattr(roster, "OUTPUT_DIR", base)
+    monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+
+    seed_trades = [_normalized_copyability_trade(BENCHMARK, market=f"m{i}", index=i, category="macro", size_usd=500) for i in range(1, 101)]
+    seed_trades.append(_normalized_copyability_trade(WALLETS["macro"], market="m1", index=1, category="macro", size_usd=500))
+
+    payload = roster.build_adaptive_signal_wallet_roster(
+        benchmark_wallet=BENCHMARK,
+        target_roster_size=2,
+        wallet_scores=[],
+        shadow_rows=[],
+        copyability_seed_trades=seed_trades,
+        output_dir=base,
+    )
+    output = capsys.readouterr().out
+
+    assert len(payload["selectedWallets"]) == 1
+    assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
+    assert "SMART_MONEY_WALLET_ROSTER_PREFLIGHT_SOURCE source=copyability_seed_trades" in output
+    assert f"SMART_MONEY_WALLET_ROSTER_PREFLIGHT_COPYABILITY_PARITY wallet={WALLETS['macro']} preflightRaw=1 copyabilityRawEstimate=1" in output
     shutil.rmtree(base, ignore_errors=True)

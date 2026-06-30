@@ -12,13 +12,23 @@ from typing import Any
 try:  # pragma: no cover - support package and script-style imports
     from .copyability_storage import sanitize_payload
     from .path_utils import resolve_output_dir
-    from .trade_copyability import COPYABILITY_MAX_TRADES_PER_WALLET, build_trade_clusters, fetch_copyability_trades_for_wallet
+    from .trade_copyability import (
+        COPYABILITY_LOOKBACK_HOURS,
+        COPYABILITY_MAX_TRADES_PER_WALLET,
+        build_trade_clusters,
+        fetch_copyability_trades_for_wallet,
+    )
     from .time_utils import to_utc_datetime
     from .wallet_shadow_cohort import parse_wallet_specifiers
 except ImportError:  # pragma: no cover
     from copyability_storage import sanitize_payload
     from path_utils import resolve_output_dir
-    from trade_copyability import COPYABILITY_MAX_TRADES_PER_WALLET, build_trade_clusters, fetch_copyability_trades_for_wallet
+    from trade_copyability import (
+        COPYABILITY_LOOKBACK_HOURS,
+        COPYABILITY_MAX_TRADES_PER_WALLET,
+        build_trade_clusters,
+        fetch_copyability_trades_for_wallet,
+    )
     from time_utils import to_utc_datetime
     from wallet_shadow_cohort import parse_wallet_specifiers
 
@@ -760,10 +770,16 @@ def _prepare_candidates(
 async def _prefetch_fallback_activity(
     candidates: list[dict[str, Any]],
     *,
+    copyability_seed_trades: list[dict[str, Any]] | None,
     output_dir: str | os.PathLike[str] | None,
 ) -> dict[str, dict[str, Any]]:
     del output_dir
     profiles: dict[str, dict[str, Any]] = {}
+    seed_trade_map: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for trade in copyability_seed_trades or []:
+        wallet = _normalize_wallet(trade.get("wallet"))
+        if wallet:
+            seed_trade_map[wallet].append(trade)
     if not candidates:
         return profiles
     print(f"SMART_MONEY_WALLET_ROSTER_PREFLIGHT_STARTED candidates={len(candidates)}")
@@ -772,18 +788,43 @@ async def _prefetch_fallback_activity(
         if not wallet or wallet in profiles:
             continue
         prior_score = _safe_float(candidate.get("signalWalletRosterScore"))
-        fetch_result = await fetch_copyability_trades_for_wallet(
-            wallet,
-            COPYABILITY_MAX_TRADES_PER_WALLET,
-            168,
-            return_details=True,
-        )
-        trades = list((fetch_result or {}).get("trades") or [])
+        if wallet in seed_trade_map and seed_trade_map[wallet]:
+            trades = list(seed_trade_map[wallet])
+            fetch_result = {
+                "wallet": wallet,
+                "status": "completed",
+                "reason": "seed_cache_hit",
+                "rawTrades": len(trades),
+                "normalizedTrades": len(trades),
+                "trades": trades,
+                "error": None,
+                "fetchSource": "copyability_seed_trades",
+            }
+        else:
+            fetch_result = await fetch_copyability_trades_for_wallet(
+                wallet,
+                COPYABILITY_MAX_TRADES_PER_WALLET,
+                COPYABILITY_LOOKBACK_HOURS,
+                return_details=True,
+            )
+            trades = list((fetch_result or {}).get("trades") or [])
         profile = _build_preflight_profile(trades, prior_score)
         profile["wallet"] = wallet
         profile["fetchStatus"] = str((fetch_result or {}).get("status") or "completed")
         profile["fetchReason"] = str((fetch_result or {}).get("reason") or "no_valid_trades")
         profile["fetchError"] = (fetch_result or {}).get("error")
+        profile["preflightSource"] = str((fetch_result or {}).get("fetchSource") or ("copyability_seed_trades" if wallet in seed_trade_map and seed_trade_map[wallet] else "copyability_api_fetch"))
+        print(
+            "SMART_MONEY_WALLET_ROSTER_PREFLIGHT_SOURCE "
+            f"source={profile['preflightSource']} "
+            f"wallet={wallet}"
+        )
+        print(
+            "SMART_MONEY_WALLET_ROSTER_PREFLIGHT_COPYABILITY_PARITY "
+            f"wallet={wallet} "
+            f"preflightRaw={profile['recentRawTrades']} "
+            f"copyabilityRawEstimate={int((fetch_result or {}).get('rawTrades') or len(trades))}"
+        )
         profile["livePreflightRejected"] = (
             profile["fetchStatus"] == "failed"
             or profile["clusterViabilityScore"] <= 0
@@ -814,6 +855,7 @@ async def _build_adaptive_signal_wallet_roster_async(
     priority_wallets: str | list[str] | None = None,
     wallet_scores: list[dict[str, Any]] | None = None,
     shadow_rows: list[dict[str, Any]] | None = None,
+    copyability_seed_trades: list[dict[str, Any]] | None = None,
     output_dir: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any]:
     prepared = _prepare_candidates(
@@ -911,7 +953,11 @@ async def _build_adaptive_signal_wallet_roster_async(
         for candidate in remaining_candidates
         if candidate["wallet"] not in selected_wallets and candidate not in pool
     ]
-    preflight_profiles = await _prefetch_fallback_activity(preflight_candidates, output_dir=output_dir)
+    preflight_profiles = await _prefetch_fallback_activity(
+        preflight_candidates,
+        copyability_seed_trades=copyability_seed_trades,
+        output_dir=output_dir,
+    )
     fallback_pool: list[dict[str, Any]] = []
     for candidate in preflight_candidates:
         wallet = candidate["wallet"]
@@ -1087,6 +1133,7 @@ def build_adaptive_signal_wallet_roster(
     priority_wallets: str | list[str] | None = None,
     wallet_scores: list[dict[str, Any]] | None = None,
     shadow_rows: list[dict[str, Any]] | None = None,
+    copyability_seed_trades: list[dict[str, Any]] | None = None,
     output_dir: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any]:
     return asyncio.run(
@@ -1096,6 +1143,7 @@ def build_adaptive_signal_wallet_roster(
             priority_wallets=priority_wallets,
             wallet_scores=wallet_scores,
             shadow_rows=shadow_rows,
+            copyability_seed_trades=copyability_seed_trades,
             output_dir=output_dir,
         )
     )
