@@ -223,7 +223,9 @@ def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, cap
 
     async def fake_run_trade_copyability_shadow(*_args, **kwargs):
         called["wallet_roster"] = kwargs.get("wallet_roster")
-        print(f"SMART_MONEY_COPYABILITY_STARTED wallets={len((kwargs.get('wallet_roster') or {}).get('selectedWallets') or [])}")
+        roster_payload = kwargs.get("wallet_roster") or {}
+        wallet_rows = list(roster_payload.get("walletsForCopyability") or roster_payload.get("selectedWallets") or [])
+        print(f"SMART_MONEY_COPYABILITY_STARTED wallets={len(wallet_rows)}")
         return {"clusters": [], "walletResults": []}
 
     def fake_build_adaptive_signal_wallet_quality(*_args, **kwargs):
@@ -250,10 +252,22 @@ def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, cap
             "candidatesFound": 3,
             "selectedWallets": [
                 {"wallet": "0x" + "9" * 40, "rank": 1, "isBenchmark": True, "signalWalletRosterScore": 100, "primaryCategory": "mixed", "reason": "benchmark wallet"},
+            ],
+            "explorationWallets": [
+                {"wallet": "0x" + "1" * 40, "rank": 1, "explorationReason": "fallback reused despite previous REPLACE_CANDIDATE", "previousQualityRecommendation": "REPLACE_CANDIDATE", "probationaryCandidate": True},
+                {"wallet": "0x" + "2" * 40, "rank": 2, "explorationReason": "fallback reused despite previous REPLACE_CANDIDATE", "previousQualityRecommendation": "REPLACE_CANDIDATE", "probationaryCandidate": True},
+            ],
+            "walletsForCopyability": [
+                {"wallet": "0x" + "9" * 40, "rank": 1, "isBenchmark": True, "signalWalletRosterScore": 100, "primaryCategory": "mixed", "reason": "benchmark wallet"},
                 {"wallet": "0x" + "1" * 40, "rank": 2, "isBenchmark": False, "signalWalletRosterScore": 82, "primaryCategory": "macro", "reason": "strong robust skill score"},
                 {"wallet": "0x" + "2" * 40, "rank": 3, "isBenchmark": False, "signalWalletRosterScore": 79, "primaryCategory": "politics", "reason": "recent activity"},
             ],
             "rejectedWallets": [],
+            "selectedCount": 1,
+            "explorationCount": 2,
+            "walletsForCopyabilityCount": 3,
+            "needsMoreDiscovery": True,
+            "needsMoreDiscoveryReason": "insufficient quality candidates",
         }
 
     written = {}
@@ -294,9 +308,11 @@ def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, cap
     output = capsys.readouterr().out
     assert "SMART_MONEY_COPYABILITY_STARTED wallets=3" in output
     assert written["payload"]["selectedWallets"][0]["wallet"] == "0x" + "9" * 40
+    assert len(written["payload"]["selectedWallets"]) == 1
+    assert len(written["payload"]["walletsForCopyability"]) == 3
     assert quality_written["payload"]["benchmarkWallet"] == "0x" + "9" * 40
     assert quality_called["copyability_phase"]["clusters"] == []
-    assert len(called["wallet_roster"]["selectedWallets"]) == 3
+    assert len(called["wallet_roster"]["walletsForCopyability"]) == 3
 
 
 def test_main_copyability_failure_writes_diagnostic_shadow(monkeypatch, capsys):

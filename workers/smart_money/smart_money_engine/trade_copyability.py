@@ -1220,7 +1220,7 @@ async def run_trade_copyability_shadow(
     price_history_client: Any | None = None,
 ) -> dict[str, Any]:
     if isinstance(wallet_roster, dict):
-        selected_wallet_rows = list(wallet_roster.get("selectedWallets") or [])
+        selected_wallet_rows = list(wallet_roster.get("walletsForCopyability") or wallet_roster.get("selectedWallets") or [])
     elif isinstance(wallet_roster, list):
         selected_wallet_rows = list(wallet_roster)
     else:

@@ -15,6 +15,7 @@ try:  # pragma: no cover - support package and script-style imports
     from .trade_copyability import (
         COPYABILITY_LOOKBACK_HOURS,
         COPYABILITY_MAX_TRADES_PER_WALLET,
+        COPYABILITY_MAX_WALLETS_PER_RUN,
         build_trade_clusters,
         fetch_copyability_trades_for_wallet,
     )
@@ -26,6 +27,7 @@ except ImportError:  # pragma: no cover
     from trade_copyability import (
         COPYABILITY_LOOKBACK_HOURS,
         COPYABILITY_MAX_TRADES_PER_WALLET,
+        COPYABILITY_MAX_WALLETS_PER_RUN,
         build_trade_clusters,
         fetch_copyability_trades_for_wallet,
     )
@@ -1149,6 +1151,21 @@ async def _build_adaptive_signal_wallet_roster_async(
         wallet_row["reason"] = wallet_row.get("reason") or _build_reason(wallet_row)
         wallet_row["selectionReason"] = wallet_row.get("selectionReason") or wallet_row["reason"]
         wallet_row["probationaryCandidate"] = bool(wallet_row.get("probationaryCandidate"))
+
+    selected_wallet_rows: list[dict[str, Any]] = []
+    exploration_wallet_rows: list[dict[str, Any]] = []
+    for wallet_row in selected:
+        is_exploration = (
+            str(wallet_row.get("previousQualityRecommendation") or "") == "REPLACE_CANDIDATE"
+            or str(wallet_row.get("selectionReason") or "") == "fallback reused despite previous REPLACE_CANDIDATE"
+        )
+        if wallet_row.get("isBenchmark") or not is_exploration:
+            selected_wallet_rows.append(wallet_row)
+        else:
+            exploration_wallet_rows.append(wallet_row)
+
+    for index, wallet_row in enumerate(selected_wallet_rows, start=1):
+        wallet_row["rank"] = index
         print(
             "SMART_MONEY_WALLET_ROSTER_SELECTED_WALLET "
             f"wallet={wallet_row['wallet']} "
@@ -1158,6 +1175,17 @@ async def _build_adaptive_signal_wallet_roster_async(
             f"reason={wallet_row['selectionReason']}"
         )
 
+    for index, wallet_row in enumerate(exploration_wallet_rows, start=1):
+        print(
+            "SMART_MONEY_WALLET_ROSTER_EXPLORATION_WALLET "
+            f"wallet={wallet_row['wallet']} "
+            f"rank={index} "
+            f"score={wallet_row['signalWalletRosterScore']} "
+            f"probationary={'true' if wallet_row['probationaryCandidate'] else 'false'} "
+            f"reason={wallet_row['selectionReason']}"
+        )
+
+    wallets_for_copyability = list(selected[:COPYABILITY_MAX_WALLETS_PER_RUN])
     selected_wallet_set = {row["wallet"] for row in selected}
     for candidate in candidates.values():
         if candidate["wallet"] in selected_wallet_set:
@@ -1186,7 +1214,16 @@ async def _build_adaptive_signal_wallet_roster_async(
             }
         )
 
-    print(f"SMART_MONEY_WALLET_ROSTER_SELECTED count={len(selected)}")
+    selected_count = len(selected_wallet_rows)
+    exploration_count = len(exploration_wallet_rows)
+    wallets_for_copyability_count = len(wallets_for_copyability)
+    needs_more_discovery = selected_count < target_roster_size
+    print(f"SMART_MONEY_WALLET_ROSTER_SELECTED_VALID count={selected_count}")
+    print(f"SMART_MONEY_WALLET_ROSTER_EXPLORATION_SELECTED count={exploration_count}")
+    print(f"SMART_MONEY_WALLET_ROSTER_COPYABILITY_WALLETS count={wallets_for_copyability_count}")
+    print(f"SMART_MONEY_WALLET_ROSTER_SELECTED count={selected_count}")
+    if needs_more_discovery:
+        print("SMART_MONEY_WALLET_ROSTER_NEEDS_MORE_DISCOVERY reason=insufficient_quality_candidates")
     for row in rejected:
         print(f"SMART_MONEY_WALLET_ROSTER_REJECTED wallet={row['wallet']} reason={row['reason']}")
 
@@ -1195,6 +1232,11 @@ async def _build_adaptive_signal_wallet_roster_async(
         "benchmarkWallet": benchmark_wallet,
         "targetRosterSize": target_roster_size,
         "candidatesFound": len(candidates),
+        "selectedCount": selected_count,
+        "explorationCount": exploration_count,
+        "walletsForCopyabilityCount": wallets_for_copyability_count,
+        "needsMoreDiscovery": needs_more_discovery,
+        "needsMoreDiscoveryReason": "insufficient quality candidates" if needs_more_discovery else None,
         "selectedWallets": [
             {
                 "wallet": row["wallet"],
@@ -1229,7 +1271,36 @@ async def _build_adaptive_signal_wallet_roster_async(
                 "reason": row["reason"],
                 "scoreBreakdown": row.get("scoreBreakdown") or {},
             }
-            for row in selected
+            for row in selected_wallet_rows
+        ],
+        "explorationWallets": [
+            {
+                "wallet": row["wallet"],
+                "rank": index,
+                "explorationReason": row.get("selectionReason") or row.get("reason") or "exploration",
+                "previousQualityRecommendation": row.get("previousQualityRecommendation"),
+                "previousActionableSignalScore": _safe_float(row.get("previousActionableSignalScore"), default=0.0) if row.get("previousActionableSignalScore") is not None else None,
+                "previousRoutineClusterRate": _safe_float(row.get("previousRoutineClusterRate"), default=0.0) if row.get("previousRoutineClusterRate") is not None else None,
+                "previousMicroMarketClusterRate": _safe_float(row.get("previousMicroMarketClusterRate"), default=0.0) if row.get("previousMicroMarketClusterRate") is not None else None,
+                "qualityPenaltyApplied": round(_safe_float(row.get("qualityPenaltyApplied")), 2),
+                "probationaryCandidate": bool(row.get("probationaryCandidate")),
+            }
+            for index, row in enumerate(exploration_wallet_rows, start=1)
+        ],
+        "walletsForCopyability": [
+            {
+                "wallet": row["wallet"],
+                "rank": row["rank"],
+                "isBenchmark": bool(row.get("isBenchmark")),
+                "probationaryCandidate": bool(row.get("probationaryCandidate")),
+                "signalWalletRosterScore": row["signalWalletRosterScore"],
+                "primaryCategory": row.get("primaryCategory") or "mixed",
+                "recentActivityStatus": row.get("recentActivityStatus") or "unknown",
+                "selectionReason": row.get("selectionReason") or row["reason"],
+                "reason": row["reason"],
+                "scoreBreakdown": row.get("scoreBreakdown") or {},
+            }
+            for row in wallets_for_copyability
         ],
         "rejectedWallets": rejected,
     }

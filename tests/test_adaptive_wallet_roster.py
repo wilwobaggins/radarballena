@@ -615,6 +615,12 @@ def test_adaptive_signal_wallet_roster_selects_six_wallets_and_writes_output(mon
     assert payload["targetRosterSize"] == 6
     assert payload["candidatesFound"] >= 6
     assert len(payload["selectedWallets"]) == 6
+    assert len(payload["explorationWallets"]) == 0
+    assert len(payload["walletsForCopyability"]) == 3
+    assert payload["selectedCount"] == 6
+    assert payload["explorationCount"] == 0
+    assert payload["walletsForCopyabilityCount"] == 3
+    assert payload["needsMoreDiscovery"] is False
     assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
     assert payload["selectedWallets"][0]["isBenchmark"] is True
     assert payload["selectedWallets"][0]["signalWalletRosterScore"] == 100
@@ -665,6 +671,10 @@ def test_adaptive_signal_wallet_roster_keeps_benchmark_when_no_candidates(monkey
     assert payload["selectedWallets"][0]["reason"] == "benchmark wallet"
     assert payload["selectedWallets"][0]["selectionReason"] == "benchmark wallet"
     assert payload["selectedWallets"][0]["probationaryCandidate"] is False
+    assert payload["selectedCount"] == 1
+    assert payload["explorationCount"] == 0
+    assert payload["walletsForCopyabilityCount"] == 1
+    assert payload["needsMoreDiscovery"] is True
     assert payload["rejectedWallets"] == []
     shutil.rmtree(base, ignore_errors=True)
 
@@ -894,12 +904,16 @@ def test_adaptive_signal_wallet_roster_fallback_fills_to_target_and_marks_probat
 
     assert payload["candidatesFound"] == 196
     assert len(payload["selectedWallets"]) == 1
+    assert len(payload["explorationWallets"]) == 0
+    assert len(payload["walletsForCopyability"]) == 1
     assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
     assert payload["selectedWallets"][0]["rank"] == 1
     assert payload["selectedWallets"][0]["probationaryCandidate"] is False
     assert "SMART_MONEY_WALLET_ROSTER_QUALITY_FEEDBACK_LOADED rows=0" in output
     assert "SMART_MONEY_WALLET_ROSTER_INSUFFICIENT_LIVE_QUALITY" in output
-    assert "SMART_MONEY_WALLET_ROSTER_SELECTED count=1" in output
+    assert "SMART_MONEY_WALLET_ROSTER_SELECTED_VALID count=1" in output
+    assert "SMART_MONEY_WALLET_ROSTER_EXPLORATION_SELECTED count=0" in output
+    assert "SMART_MONEY_WALLET_ROSTER_COPYABILITY_WALLETS count=" in output
     shutil.rmtree(base, ignore_errors=True)
 
 
@@ -1131,11 +1145,13 @@ def test_adaptive_signal_wallet_roster_reuses_replacement_candidate_only_when_ne
     )
     output = capsys.readouterr().out
 
-    assert len(payload["selectedWallets"]) == 2
-    selected = payload["selectedWallets"][1]
+    assert len(payload["selectedWallets"]) == 1
+    assert len(payload["explorationWallets"]) == 1
+    assert len(payload["walletsForCopyability"]) == 2
+    selected = payload["explorationWallets"][0]
     assert selected["wallet"] == WALLETS["macro"]
     assert selected["probationaryCandidate"] is True
-    assert selected["selectionReason"] == "fallback reused despite previous REPLACE_CANDIDATE"
+    assert selected["explorationReason"] == "fallback reused despite previous REPLACE_CANDIDATE"
     assert selected["previousQualityRecommendation"] == "REPLACE_CANDIDATE"
     assert selected["qualityPenaltyApplied"] > 0
     assert "SMART_MONEY_WALLET_ROSTER_REPLACE_CANDIDATE_SKIPPED wallet=" in output

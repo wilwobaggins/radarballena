@@ -359,7 +359,7 @@ def build_adaptive_signal_wallet_quality(
 
     roster_rows: list[dict[str, Any]]
     if isinstance(wallet_roster, dict):
-        roster_rows = list(wallet_roster.get("selectedWallets") or [])
+        roster_rows = list(wallet_roster.get("walletsForCopyability") or wallet_roster.get("selectedWallets") or [])
     elif isinstance(wallet_roster, list):
         roster_rows = list(wallet_roster)
     else:
