@@ -1071,14 +1071,35 @@ def test_adaptive_signal_wallet_roster_uses_discovery_v2_candidate_pool(monkeypa
     output = capsys.readouterr().out
 
     selected_wallets = [row["wallet"] for row in payload["selectedWallets"]]
+    exploration_wallets = [row["wallet"] for row in payload["explorationWallets"]]
+    copyability_wallets = payload["walletsForCopyability"]
     assert BENCHMARK in selected_wallets
-    assert WALLETS["macro"] in selected_wallets
-    assert WALLETS["rejected"] not in selected_wallets
+    assert WALLETS["macro"] not in selected_wallets
+    assert WALLETS["macro"] in exploration_wallets
+    assert WALLETS["rejected"] not in exploration_wallets
     assert payload["discoveryV2Enabled"] is True
     assert payload["discoveryV2CandidateCount"] == 2
-    assert payload["discoveryV2CandidatesUsed"] >= 1
+    assert payload["discoveryV2CandidatesUsed"] == 1
+    assert payload["explorationCount"] == 1
+    assert payload["walletsForCopyabilityCount"] == 2
+    assert payload["selectedCount"] == 1
+    assert payload["needsMoreDiscovery"] is True
+    assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
+    assert payload["selectedWallets"][0]["rank"] == 1
+    assert payload["explorationWallets"][0]["fromDiscoveryV2"] is True
+    assert payload["explorationWallets"][0]["candidateRecommendation"] == "STRONG_CANDIDATE"
+    assert payload["explorationWallets"][0]["selectionReason"] == "discovery_v2_exploration_candidate"
+    assert payload["explorationWallets"][0]["rosterSource"] == "exploration"
+    assert payload["walletsForCopyability"][1]["fromDiscoveryV2"] is True
+    assert payload["walletsForCopyability"][1]["candidateRecommendation"] == "STRONG_CANDIDATE"
+    assert payload["walletsForCopyability"][1]["rosterSource"] == "exploration"
+    assert payload["walletsForCopyability"][1]["selectionReason"] == "discovery_v2_exploration_candidate"
+    assert all(row["candidateRecommendation"] != "REJECT" for row in payload["explorationWallets"])
+    assert all(row["candidateRecommendation"] != "REJECT" for row in copyability_wallets[1:])
     assert "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_LOADED candidates=2" in output
-    assert f"SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_USED wallet={WALLETS['macro']}" in output
+    assert f"SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_CONSIDERED wallet={WALLETS['macro']}" in output
+    assert f"SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_USED wallet={WALLETS['macro']} rosterSource=exploration" in output
+    assert f"SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_SKIPPED wallet={WALLETS['rejected']} reason=reject_or_duplicate_or_low_priority" in output
     shutil.rmtree(base, ignore_errors=True)
 
 

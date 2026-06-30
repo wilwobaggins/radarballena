@@ -401,6 +401,44 @@ def _merge_candidate_pool(candidate: dict[str, Any], row: dict[str, Any]) -> Non
     _merge_non_empty(candidate, "copyabilityPotentialScore", row.get("copyabilityPotentialScore"))
 
 
+def _discovery_v2_priority(row: dict[str, Any]) -> tuple[int, float, float, float, float]:
+    recommendation = str(row.get("candidateRecommendation") or "")
+    priority_map = {
+        "STRONG_CANDIDATE": 4,
+        "CANDIDATE": 3,
+        "WATCHLIST_CANDIDATE": 2,
+        "WEAK_CANDIDATE": 1,
+    }
+    return (
+        priority_map.get(recommendation, 0),
+        _safe_float(row.get("candidateQualityScore")),
+        _safe_float(row.get("recentRawTrades")),
+        _safe_float(row.get("recentNormalizedTrades")),
+        _safe_float(row.get("uniqueMarketsCount")),
+    )
+
+
+def _discovery_v2_wallet_fields(candidate: dict[str, Any], *, roster_source: str) -> dict[str, Any]:
+    return {
+        "fromDiscoveryV2": True,
+        "rosterSource": roster_source,
+        "candidateRecommendation": candidate.get("discoveryV2CandidateRecommendation"),
+        "candidateQualityScore": _safe_float(candidate.get("discoveryV2CandidateQualityScore"), default=0.0) if candidate.get("discoveryV2CandidateQualityScore") is not None else None,
+        "discoverySources": candidate.get("discoveryV2DiscoverySources") or [],
+        "strategicMarketExposureScore": round(_safe_float(candidate.get("strategicMarketExposureScore")), 2),
+        "microMarketExposureScore": round(_safe_float(candidate.get("microMarketExposureScore")), 2),
+        "routineRiskScore": round(_safe_float(candidate.get("routineRiskScore")), 2),
+        "recentRawTrades": int(candidate.get("recentRawTrades") or 0),
+        "recentNormalizedTrades": int(candidate.get("recentNormalizedTrades") or 0),
+        "uniqueMarketsCount": int(candidate.get("uniqueMarketsCount") or 0),
+        "totalRecentUsdc": round(_safe_float(candidate.get("totalRecentUsdc")), 2),
+        "copyabilityPotentialScore": round(_safe_float(candidate.get("copyabilityPotentialScore")), 2),
+        "candidateReasons": list(candidate.get("discoveryV2CandidateReasons") or []),
+        "candidateRisks": list(candidate.get("discoveryV2CandidateRisks") or []),
+        "selectionReason": "discovery_v2_exploration_candidate",
+    }
+
+
 def _merge_comparison_summary(candidate: dict[str, Any], comparison_summary: dict[str, Any]) -> None:
     comparisons = comparison_summary.get("comparisons") if isinstance(comparison_summary, dict) else None
     if not isinstance(comparisons, list):
@@ -1310,8 +1348,84 @@ async def _build_adaptive_signal_wallet_roster_async(
     ]
     _select_from_pool(preferred_pool)
 
-    selected_before_fallback = len(selected)
     selected_wallets = {row["wallet"] for row in selected}
+    discovery_candidate_rows: list[dict[str, Any]] = []
+    discovery_used_wallets: set[str] = set()
+    for row in candidate_pool_rows:
+        wallet = _normalize_wallet(row.get("wallet"))
+        recommendation = str(row.get("candidateRecommendation") or "")
+        print(
+            "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_CONSIDERED "
+            f"wallet={wallet or 'unknown'} "
+            f"score={row.get('candidateQualityScore')} "
+            f"recommendation={recommendation}"
+        )
+        if not wallet:
+            print("SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_SKIPPED wallet=unknown reason=invalid_wallet")
+            continue
+        if wallet == benchmark_wallet or wallet in selected_wallets or wallet in discovery_used_wallets:
+            print(
+                "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_SKIPPED "
+                f"wallet={wallet} "
+                f"reason=duplicate"
+            )
+            continue
+        if recommendation == "REJECT":
+            print(
+                "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_SKIPPED "
+                f"wallet={wallet} "
+                f"reason=reject_or_duplicate_or_low_priority"
+            )
+            continue
+        if recommendation not in {"STRONG_CANDIDATE", "CANDIDATE", "WATCHLIST_CANDIDATE", "WEAK_CANDIDATE"}:
+            print(
+                "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_SKIPPED "
+                f"wallet={wallet} "
+                f"reason=reject_or_duplicate_or_low_priority"
+            )
+            continue
+        if _safe_float(row.get("candidateQualityScore")) <= 0:
+            print(
+                "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_SKIPPED "
+                f"wallet={wallet} "
+                f"reason=reject_or_duplicate_or_low_priority"
+            )
+            continue
+        discovery_candidate_rows.append(row)
+
+    discovery_candidate_rows.sort(key=_discovery_v2_priority, reverse=True)
+    discovery_slots = max(0, target_roster_size - len(selected))
+    for row in discovery_candidate_rows:
+        if discovery_slots <= 0:
+            break
+        wallet = _normalize_wallet(row.get("wallet"))
+        if not wallet or wallet in selected_wallets or wallet in discovery_used_wallets:
+            continue
+        candidate = candidates.get(wallet)
+        if candidate is None:
+            continue
+        candidate.update(_discovery_v2_wallet_fields(candidate, roster_source="exploration"))
+        candidate["fromDiscoveryV2"] = True
+        candidate["candidateRecommendation"] = row.get("candidateRecommendation")
+        candidate["candidateQualityScore"] = _safe_float(row.get("candidateQualityScore"), default=0.0) if row.get("candidateQualityScore") is not None else None
+        candidate["discoverySources"] = row.get("discoverySources") or []
+        candidate["discoveryV2Used"] = True
+        candidate["selectionReason"] = "discovery_v2_exploration_candidate"
+        candidate["probationaryCandidate"] = True
+        candidate["reason"] = candidate.get("reason") or "discovery v2 exploration candidate"
+        selected.append(candidate)
+        selected_wallets.add(wallet)
+        discovery_used_wallets.add(wallet)
+        discovery_slots -= 1
+        print(
+            "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_USED "
+            f"wallet={wallet} "
+            f"rosterSource=exploration "
+            f"score={row.get('candidateQualityScore')} "
+            f"recommendation={row.get('candidateRecommendation')}"
+        )
+
+    selected_before_fallback = len(selected)
     preflight_candidates = [
         candidate
         for candidate in preferred_candidates
@@ -1428,7 +1542,10 @@ async def _build_adaptive_signal_wallet_roster_async(
     exploration_wallet_rows: list[dict[str, Any]] = []
     for wallet_row in selected:
         is_exploration = (
-            str(wallet_row.get("previousQualityRecommendation") or "") == "REPLACE_CANDIDATE"
+            bool(wallet_row.get("fromDiscoveryV2"))
+            or str(wallet_row.get("rosterSource") or "") == "exploration"
+            or str(wallet_row.get("selectionReason") or "") == "discovery_v2_exploration_candidate"
+            or str(wallet_row.get("previousQualityRecommendation") or "") == "REPLACE_CANDIDATE"
             or str(wallet_row.get("selectionReason") or "") == "fallback reused despite previous REPLACE_CANDIDATE"
         )
         if wallet_row.get("isBenchmark") or not is_exploration:
@@ -1457,7 +1574,7 @@ async def _build_adaptive_signal_wallet_roster_async(
             f"reason={wallet_row['selectionReason']}"
         )
 
-    wallets_for_copyability = list(selected[:COPYABILITY_MAX_WALLETS_PER_RUN])
+    wallets_for_copyability = list((selected_wallet_rows + exploration_wallet_rows)[:COPYABILITY_MAX_WALLETS_PER_RUN])
     selected_wallet_set = {row["wallet"] for row in selected}
     rejected_candidates = [
         candidate
@@ -1530,8 +1647,8 @@ async def _build_adaptive_signal_wallet_roster_async(
     needs_more_discovery = selected_count < target_roster_size
     discovery_v2_used_wallets = {
         row["wallet"]
-        for row in selected_wallet_rows + exploration_wallet_rows
-        if row.get("discoveryV2CandidateRecommendation")
+        for row in selected_wallet_rows + exploration_wallet_rows + wallets_for_copyability
+        if row.get("fromDiscoveryV2") or row.get("discoveryV2CandidateRecommendation")
     }
     print(f"SMART_MONEY_WALLET_ROSTER_SELECTED_VALID count={selected_count}")
     print(f"SMART_MONEY_WALLET_ROSTER_EXPLORATION_SELECTED count={exploration_count}")
@@ -1612,15 +1729,28 @@ async def _build_adaptive_signal_wallet_roster_async(
                 "wallet": row["wallet"],
                 "rank": index,
                 "explorationReason": row.get("selectionReason") or row.get("reason") or "exploration",
+                "fromDiscoveryV2": bool(row.get("fromDiscoveryV2")),
+                "rosterSource": row.get("rosterSource") or ("exploration" if row.get("fromDiscoveryV2") else None),
+                "candidateRecommendation": row.get("candidateRecommendation"),
+                "candidateQualityScore": _safe_float(row.get("candidateQualityScore"), default=0.0) if row.get("candidateQualityScore") is not None else None,
+                "discoverySources": row.get("discoverySources") or [],
+                "strategicMarketExposureScore": round(_safe_float(row.get("strategicMarketExposureScore")), 2),
+                "microMarketExposureScore": round(_safe_float(row.get("microMarketExposureScore")), 2),
+                "routineRiskScore": round(_safe_float(row.get("routineRiskScore")), 2),
+                "recentRawTrades": int(row.get("recentRawTrades") or 0),
+                "recentNormalizedTrades": int(row.get("recentNormalizedTrades") or 0),
+                "uniqueMarketsCount": int(row.get("uniqueMarketsCount") or 0),
+                "totalRecentUsdc": round(_safe_float(row.get("totalRecentUsdc")), 2),
+                "copyabilityPotentialScore": round(_safe_float(row.get("copyabilityPotentialScore")), 2),
+                "candidateReasons": row.get("candidateReasons") or [],
+                "candidateRisks": row.get("candidateRisks") or [],
+                "selectionReason": row.get("selectionReason") or row.get("explorationReason") or "exploration",
                 "previousQualityRecommendation": row.get("previousQualityRecommendation"),
                 "previousActionableSignalScore": _safe_float(row.get("previousActionableSignalScore"), default=0.0) if row.get("previousActionableSignalScore") is not None else None,
                 "previousRoutineClusterRate": _safe_float(row.get("previousRoutineClusterRate"), default=0.0) if row.get("previousRoutineClusterRate") is not None else None,
                 "previousMicroMarketClusterRate": _safe_float(row.get("previousMicroMarketClusterRate"), default=0.0) if row.get("previousMicroMarketClusterRate") is not None else None,
                 "qualityPenaltyApplied": round(_safe_float(row.get("qualityPenaltyApplied")), 2),
                 "probationaryCandidate": bool(row.get("probationaryCandidate")),
-                "discoveryV2CandidateRecommendation": row.get("discoveryV2CandidateRecommendation"),
-                "discoveryV2CandidateQualityScore": _safe_float(row.get("discoveryV2CandidateQualityScore"), default=0.0) if row.get("discoveryV2CandidateQualityScore") is not None else None,
-                "discoveryV2DiscoverySources": row.get("discoveryV2DiscoverySources") or [],
             }
             for index, row in enumerate(exploration_wallet_rows, start=1)
         ],
@@ -1630,9 +1760,14 @@ async def _build_adaptive_signal_wallet_roster_async(
                 "rank": row["rank"],
                 "isBenchmark": bool(row.get("isBenchmark")),
                 "probationaryCandidate": bool(row.get("probationaryCandidate")),
+                "fromDiscoveryV2": bool(row.get("fromDiscoveryV2")),
+                "rosterSource": row.get("rosterSource") or ("exploration" if row.get("fromDiscoveryV2") else None),
+                "candidateRecommendation": row.get("candidateRecommendation"),
+                "candidateQualityScore": _safe_float(row.get("candidateQualityScore"), default=0.0) if row.get("candidateQualityScore") is not None else None,
                 "signalWalletRosterScore": row["signalWalletRosterScore"],
                 "primaryCategory": row.get("primaryCategory") or "mixed",
                 "recentActivityStatus": row.get("recentActivityStatus") or "unknown",
+                "discoverySources": row.get("discoverySources") or [],
                 "selectionReason": row.get("selectionReason") or row["reason"],
                 "reason": row["reason"],
                 "scoreBreakdown": row.get("scoreBreakdown") or {},
