@@ -987,6 +987,101 @@ def test_adaptive_signal_wallet_roster_diagnostic_preflight_respects_top_n(monke
     shutil.rmtree(base, ignore_errors=True)
 
 
+def test_adaptive_signal_wallet_roster_uses_discovery_v2_candidate_pool(monkeypatch, capsys):
+    base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp_discovery_v2"
+    shutil.rmtree(base, ignore_errors=True)
+    base.mkdir(parents=True, exist_ok=True)
+    _write_json(
+        base / "wallet_shadow_rankings.json",
+        [
+            {
+                "wallet": BENCHMARK,
+                "displayName": "Ken",
+                "robustSkillScore": 80,
+                "categorySkillScore": 70,
+                "dominantKnownCategory": "geopolitics",
+                "recommendation": "shadow_watch",
+                "rank": 1,
+            }
+        ],
+    )
+    _write_json(base / "wallet_category_rankings.json", {})
+    _write_history(base / "wallet_shadow_history.jsonl", [])
+    _write_json(base / "wallet_copyability_summary.json", {})
+    _write_json(base / "wallet_comparison_summary.json", {"comparisons": [], "sufficient": 0})
+    _write_json(base / "trade_copyability_shadow.json", {"clusters": [], "walletResults": []})
+    _write_json(base / "adaptive_signal_wallet_quality.json", {"wallets": [], "walletQualityRows": [], "walletResults": []})
+    _write_json(
+        base / "adaptive_signal_candidate_pool.json",
+        {
+            "generatedAt": "2026-06-29T00:00:00+00:00",
+            "sourceStatus": "ok",
+            "candidateCount": 2,
+            "strongCandidateCount": 1,
+            "watchlistCandidateCount": 0,
+            "weakCandidateCount": 0,
+            "rejectedCandidateCount": 1,
+            "candidates": [
+                {
+                    "wallet": WALLETS["macro"],
+                    "candidateQualityScore": 78,
+                    "candidateRecommendation": "STRONG_CANDIDATE",
+                    "discoverySources": ["wallet_shadow_rankings", "market_seeded_copyability"],
+                    "sourceCount": 2,
+                    "seenInPreviousRoster": False,
+                    "candidateReasons": ["sufficient_recent_activity", "multi_market_activity"],
+                    "candidateRisks": [],
+                },
+                {
+                    "wallet": WALLETS["rejected"],
+                    "candidateQualityScore": 14,
+                    "candidateRecommendation": "REJECT",
+                    "discoverySources": ["wallet_shadow_rankings"],
+                    "sourceCount": 1,
+                    "seenInPreviousRoster": True,
+                    "candidateReasons": ["low_skill_score"],
+                    "candidateRisks": ["previous_replace_candidate"],
+                },
+            ],
+            "rejectedCandidates": [],
+            "reasonSummary": {"sufficient_recent_activity": 1},
+        },
+    )
+
+    monkeypatch.setattr(roster, "OUTPUT_DIR", base)
+    monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+    monkeypatch.setattr(roster, "SIGNAL_WALLET_DIAGNOSTIC_PREFLIGHT_TOP_N", 0)
+    monkeypatch.setattr(
+        roster,
+        "fetch_copyability_trades_for_wallet",
+        _fake_fetch_copyability_trades_for_wallet_factory(
+            {
+                WALLETS["macro"]: _good_preflight_trades(WALLETS["macro"]),
+            }
+        ),
+    )
+
+    payload = roster.build_adaptive_signal_wallet_roster(
+        benchmark_wallet=BENCHMARK,
+        target_roster_size=2,
+        wallet_scores=[],
+        shadow_rows=[],
+        output_dir=base,
+    )
+    output = capsys.readouterr().out
+
+    selected_wallets = [row["wallet"] for row in payload["selectedWallets"]]
+    assert BENCHMARK in selected_wallets
+    assert WALLETS["macro"] in selected_wallets
+    assert WALLETS["rejected"] not in selected_wallets
+    assert payload["discoveryV2Enabled"] is True
+    assert payload["discoveryV2CandidateCount"] == 2
+    assert payload["discoveryV2CandidatesUsed"] >= 1
+    assert "SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_LOADED candidates=2" in output
+    assert f"SMART_MONEY_WALLET_ROSTER_DISCOVERY_V2_USED wallet={WALLETS['macro']}" in output
+    shutil.rmtree(base, ignore_errors=True)
+
+
 def test_adaptive_signal_wallet_roster_prefers_copyability_seed_source_over_api(monkeypatch, capsys):
     base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp_parity"
     shutil.rmtree(base, ignore_errors=True)

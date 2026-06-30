@@ -210,6 +210,7 @@ def test_copyability_shadow_disabled_skips_phase(monkeypatch):
 def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, capsys):
     called = {}
     quality_called = {}
+    discovery_called = {}
 
     async def fake_execute_engine():
         return {
@@ -242,6 +243,34 @@ def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, cap
                 {"wallet": "0x" + "2" * 40, "displayName": "Wallet 2", "keepInRosterRecommendation": "REPLACE_CANDIDATE"},
             ],
             "walletResults": [],
+        }
+
+    def fake_build_adaptive_signal_candidate_pool(*_args, **kwargs):
+        discovery_called["wallet_scores"] = kwargs.get("wallet_scores")
+        discovery_called["shadow_rows"] = kwargs.get("shadow_rows")
+        discovery_called["copyability_seed_trades"] = kwargs.get("copyability_seed_trades")
+        return {
+            "generatedAt": "2026-06-29T00:00:00+00:00",
+            "sourceStatus": "ok",
+            "candidateCount": 1,
+            "strongCandidateCount": 0,
+            "watchlistCandidateCount": 1,
+            "weakCandidateCount": 0,
+            "rejectedCandidateCount": 0,
+            "candidates": [
+                {
+                    "wallet": "0x" + "1" * 40,
+                    "candidateQualityScore": 55,
+                    "candidateRecommendation": "WATCHLIST_CANDIDATE",
+                    "discoverySources": ["wallet_shadow_rankings"],
+                    "sourceCount": 1,
+                    "seenInPreviousRoster": False,
+                    "candidateReasons": ["sufficient_recent_activity"],
+                    "candidateRisks": [],
+                }
+            ],
+            "rejectedCandidates": [],
+            "reasonSummary": {"sufficient_recent_activity": 1},
         }
 
     def fake_build_adaptive_signal_wallet_roster(*_args, **_kwargs):
@@ -281,6 +310,10 @@ def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, cap
         quality_written["payload"] = payload
         return Path("outputs/adaptive_signal_wallet_quality.json")
 
+    def fake_write_adaptive_signal_candidate_pool(payload):
+        discovery_called["written"] = payload
+        return Path("outputs/adaptive_signal_candidate_pool.json")
+
     monkeypatch.setattr(smart_money_main, "execute_engine", fake_execute_engine)
     monkeypatch.setattr(
         smart_money_main,
@@ -288,6 +321,8 @@ def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, cap
         lambda *_args, **_kwargs: asyncio.sleep(0, result={"cohort": [], "shadow_rows": []}),
     )
     monkeypatch.setattr(smart_money_main, "run_trade_copyability_shadow", fake_run_trade_copyability_shadow)
+    monkeypatch.setattr(smart_money_main, "build_adaptive_signal_candidate_pool", fake_build_adaptive_signal_candidate_pool)
+    monkeypatch.setattr(smart_money_main, "write_adaptive_signal_candidate_pool", fake_write_adaptive_signal_candidate_pool)
     monkeypatch.setattr(smart_money_main, "build_adaptive_signal_wallet_quality", fake_build_adaptive_signal_wallet_quality)
     monkeypatch.setattr(smart_money_main, "build_adaptive_signal_wallet_roster", fake_build_adaptive_signal_wallet_roster)
     monkeypatch.setattr(smart_money_main, "write_adaptive_signal_wallet_roster", fake_write_adaptive_signal_wallet_roster)
@@ -307,6 +342,7 @@ def test_main_uses_adaptive_roster_for_copyability_when_enabled(monkeypatch, cap
 
     output = capsys.readouterr().out
     assert "SMART_MONEY_COPYABILITY_STARTED wallets=3" in output
+    assert discovery_called["written"]["candidateCount"] == 1
     assert written["payload"]["selectedWallets"][0]["wallet"] == "0x" + "9" * 40
     assert len(written["payload"]["selectedWallets"]) == 1
     assert len(written["payload"]["walletsForCopyability"]) == 3

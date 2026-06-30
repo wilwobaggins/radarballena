@@ -32,6 +32,10 @@ try:  # pragma: no cover - support package and script-style imports
         build_adaptive_signal_wallet_quality,
         write_adaptive_signal_wallet_quality,
     )
+    from .adaptive_wallet_discovery_v2 import (
+        build_adaptive_signal_candidate_pool,
+        write_adaptive_signal_candidate_pool,
+    )
     from .category_utils import guess_category_from_title
     from .wallet_shadow_cohort import (
         build_shadow_wallet_cohort,
@@ -92,6 +96,10 @@ except ImportError:  # pragma: no cover
     from adaptive_wallet_quality import (
         build_adaptive_signal_wallet_quality,
         write_adaptive_signal_wallet_quality,
+    )
+    from adaptive_wallet_discovery_v2 import (
+        build_adaptive_signal_candidate_pool,
+        write_adaptive_signal_candidate_pool,
     )
     from category_utils import guess_category_from_title
     from wallet_shadow_cohort import (
@@ -1142,6 +1150,23 @@ async def main() -> None:
             result["shadow_phase"] = shadow_phase
         except Exception as shadow_exc:
             print(f"SMART_MONEY_SHADOW_COHORT_FAILED error={_safe_error_message(shadow_exc)}")
+        adaptive_signal_candidate_pool = None
+        if os.getenv("SIGNAL_WALLET_DISCOVERY_V2_ENABLED", "true").lower() == "true":
+            try:
+                adaptive_signal_candidate_pool = await asyncio.to_thread(
+                    build_adaptive_signal_candidate_pool,
+                    wallet_scores=result["wallet_scores"],
+                    shadow_rows=(result.get("shadow_phase") or {}).get("shadow_rows") or result.get("shadow_rows") or [],
+                    copyability_seed_trades=result["deduped_trades"],
+                    output_dir=resolve_output_dir(),
+                )
+                write_adaptive_signal_candidate_pool(adaptive_signal_candidate_pool)
+            except Exception as discovery_exc:
+                print(
+                    "SMART_MONEY_DISCOVERY_V2_FAILED "
+                    f"error={_safe_error_message(discovery_exc)} "
+                    f"run_id={run_id}"
+                )
         adaptive_signal_wallet_roster = None
         if COPYABILITY_SHADOW_ENABLED and SIGNAL_WALLET_ROSTER_ENABLED:
             adaptive_signal_wallet_roster = await asyncio.to_thread(
