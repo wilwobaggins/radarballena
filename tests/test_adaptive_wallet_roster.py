@@ -621,13 +621,31 @@ def test_adaptive_signal_wallet_roster_selects_six_wallets_and_writes_output(mon
     assert payload["explorationCount"] == 0
     assert payload["walletsForCopyabilityCount"] == 3
     assert payload["needsMoreDiscovery"] is False
+    assert payload["diagnosticCandidatesAnalyzed"] == 0
+    assert payload["diagnosticPreflightTopN"] == 0
+    assert "rejectedReasonSummary" in payload
     assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
     assert payload["selectedWallets"][0]["isBenchmark"] is True
     assert payload["selectedWallets"][0]["signalWalletRosterScore"] == 100
     assert all(row["probationaryCandidate"] is False for row in payload["selectedWallets"][1:])
     assert any(row["wallet"] == WALLETS["rejected"] for row in payload["rejectedWallets"])
     rejected = next(row for row in payload["rejectedWallets"] if row["wallet"] == WALLETS["rejected"])
-    assert rejected["rejectionReason"] in {"extreme hedge risk", "high concentration penalty", "low copyability", "lower signal score than selected roster", "stale activity verified"}
+    assert rejected["rejectionReason"] in {
+        "low_actionable_score",
+        "low_skill_score",
+        "insufficient_live_trades",
+        "insufficient_normalized_trades",
+        "low_unique_markets",
+        "low_cluster_viability",
+        "high_routine_rate",
+        "high_micro_market_rate",
+        "high_hedge_rate",
+        "previous_replace_candidate",
+        "unknown_quality_no_preflight",
+        "missing_required_metrics",
+    }
+    assert isinstance(rejected["rejectionReasons"], list)
+    assert rejected["rejectionReasons"]
     selected_scores = {row["wallet"]: row["signalWalletRosterScore"] for row in payload["selectedWallets"]}
     assert selected_scores[WALLETS["macro"]] > rejected["signalWalletRosterScore"]
     shutil.rmtree(base, ignore_errors=True)
@@ -675,6 +693,7 @@ def test_adaptive_signal_wallet_roster_keeps_benchmark_when_no_candidates(monkey
     assert payload["explorationCount"] == 0
     assert payload["walletsForCopyabilityCount"] == 1
     assert payload["needsMoreDiscovery"] is True
+    assert payload["diagnosticCandidatesAnalyzed"] == 0
     assert payload["rejectedWallets"] == []
     shutil.rmtree(base, ignore_errors=True)
 
@@ -880,7 +899,22 @@ def test_high_hedge_and_not_copyable_penalize_roster_score(monkeypatch):
     macro = next(row for row in payload["selectedWallets"] if row["wallet"] == WALLETS["macro"])
     rejected = next(row for row in payload["rejectedWallets"] if row["wallet"] == WALLETS["rejected"])
     assert macro["signalWalletRosterScore"] > rejected["signalWalletRosterScore"]
-    assert rejected["rejectionReason"] in {"extreme hedge risk", "high concentration penalty", "low copyability", "lower signal score than selected roster", "stale activity verified"}
+    assert rejected["rejectionReason"] in {
+        "previous_replace_candidate",
+        "low_actionable_score",
+        "low_skill_score",
+        "insufficient_live_trades",
+        "insufficient_normalized_trades",
+        "low_unique_markets",
+        "low_cluster_viability",
+        "high_routine_rate",
+        "high_micro_market_rate",
+        "high_hedge_rate",
+        "unknown_quality_no_preflight",
+        "missing_required_metrics",
+    }
+    assert isinstance(rejected["rejectionReasons"], list)
+    assert rejected["rejectionReasons"]
     shutil.rmtree(base, ignore_errors=True)
 
 
@@ -914,6 +948,42 @@ def test_adaptive_signal_wallet_roster_fallback_fills_to_target_and_marks_probat
     assert "SMART_MONEY_WALLET_ROSTER_SELECTED_VALID count=1" in output
     assert "SMART_MONEY_WALLET_ROSTER_EXPLORATION_SELECTED count=0" in output
     assert "SMART_MONEY_WALLET_ROSTER_COPYABILITY_WALLETS count=" in output
+    assert payload["rejectedReasonSummary"]
+    shutil.rmtree(base, ignore_errors=True)
+
+
+def test_adaptive_signal_wallet_roster_diagnostic_preflight_respects_top_n(monkeypatch, capsys):
+    base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp_diagnostic"
+    shutil.rmtree(base, ignore_errors=True)
+    base.mkdir(parents=True, exist_ok=True)
+    _write_low_signal_candidate_sources(base, candidate_count=20)
+
+    monkeypatch.setattr(roster, "OUTPUT_DIR", base)
+    monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+    monkeypatch.setattr(roster, "SIGNAL_WALLET_DIAGNOSTIC_PREFLIGHT_TOP_N", 2)
+    fetch_map = {
+        BENCHMARK: _good_preflight_trades(BENCHMARK),
+        **{
+            f"0x{index + 1:040x}": _weak_preflight_trades(f"0x{index + 1:040x}")
+            for index in range(20)
+        },
+    }
+    monkeypatch.setattr(roster, "fetch_copyability_trades_for_wallet", _fake_fetch_copyability_trades_for_wallet_factory(fetch_map))
+
+    payload = roster.build_adaptive_signal_wallet_roster(
+        benchmark_wallet=BENCHMARK,
+        target_roster_size=6,
+        wallet_scores=[],
+        shadow_rows=[],
+        output_dir=base,
+    )
+    output = capsys.readouterr().out
+
+    assert payload["diagnosticPreflightTopN"] == 2
+    assert payload["diagnosticCandidatesAnalyzed"] == 2
+    assert "SMART_MONEY_WALLET_ROSTER_DIAGNOSTIC_PREFLIGHT_STARTED topN=2" in output
+    assert "SMART_MONEY_WALLET_ROSTER_DIAGNOSTIC_PREFLIGHT_COMPLETED analyzed=2" in output
+    assert sum(1 for row in payload["rejectedWallets"] if row["diagnosticPreflightAnalyzed"]) == 2
     shutil.rmtree(base, ignore_errors=True)
 
 

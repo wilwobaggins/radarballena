@@ -37,6 +37,7 @@ except ImportError:  # pragma: no cover
 
 OUTPUT_DIR = resolve_output_dir()
 ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE = OUTPUT_DIR / "adaptive_signal_wallet_roster.json"
+SIGNAL_WALLET_DIAGNOSTIC_PREFLIGHT_TOP_N = int(os.getenv("SIGNAL_WALLET_DIAGNOSTIC_PREFLIGHT_TOP_N", "0"))
 
 
 def _normalize_wallet(value: Any) -> str:
@@ -424,12 +425,114 @@ def _build_rejection_reason(candidate: dict[str, Any]) -> str:
     return "lower signal score than selected roster"
 
 
+def _has_live_diagnostic_metrics(candidate: dict[str, Any]) -> bool:
+    return any(
+        (
+            int(candidate.get("recentRawTrades") or 0) > 0,
+            int(candidate.get("recentNormalizedTrades") or 0) > 0,
+            int(candidate.get("uniqueMarketsCount") or 0) > 0,
+            _safe_float(candidate.get("clusterViabilityScore")) > 0,
+        )
+    )
+
+
+def _collect_rejection_reasons(candidate: dict[str, Any]) -> list[str]:
+    reasons: list[str] = []
+    score = _safe_float(candidate.get("signalWalletRosterScore"))
+    robust = _safe_float(candidate.get("robustSkillScore"))
+    category = _safe_float(candidate.get("categorySkillScore"))
+    raw_trades = int(candidate.get("recentRawTrades") or 0)
+    normalized_trades = int(candidate.get("recentNormalizedTrades") or 0)
+    unique_markets = int(candidate.get("uniqueMarketsCount") or 0)
+    cluster_viability = _safe_float(candidate.get("clusterViabilityScore"))
+    previous_quality = str(candidate.get("previousQualityRecommendation") or "")
+    previous_actionable = candidate.get("previousActionableSignalScore")
+    previous_routine = candidate.get("previousRoutineClusterRate")
+    previous_micro = candidate.get("previousMicroMarketClusterRate")
+    quality_penalty = _safe_float(candidate.get("qualityPenaltyApplied"))
+    hedge_rate = _safe_float(candidate.get("hedgeRate70"))
+    hedge_penalty = _safe_float(candidate.get("hedgePenalty"))
+    copyability_clusters = int(candidate.get("copyabilityClustersCount") or 0)
+    has_quality_feedback = previous_quality == "REPLACE_CANDIDATE" or previous_actionable is not None or quality_penalty > 0
+    has_live_metrics = _has_live_diagnostic_metrics(candidate)
+    has_any_metrics = any(
+        (
+            raw_trades > 0,
+            normalized_trades > 0,
+            unique_markets > 0,
+            cluster_viability > 0,
+            copyability_clusters > 0,
+            _safe_float(candidate.get("recentActivityScore")) > 0,
+            robust > 0,
+            category > 0,
+        )
+    )
+
+    if not _normalize_wallet(candidate.get("wallet")):
+        reasons.append("invalid_wallet")
+    if previous_quality == "REPLACE_CANDIDATE":
+        reasons.append("previous_replace_candidate")
+    if not has_quality_feedback and not has_live_metrics:
+        reasons.append("unknown_quality_no_preflight")
+    if not has_any_metrics:
+        reasons.append("missing_required_metrics")
+    if score < 45:
+        reasons.append("low_actionable_score")
+    if robust < 55 or category < 45 or score < 35:
+        reasons.append("low_skill_score")
+    if raw_trades and raw_trades < 10:
+        reasons.append("insufficient_live_trades")
+    if normalized_trades and normalized_trades < 10:
+        reasons.append("insufficient_normalized_trades")
+    if unique_markets and unique_markets < 2:
+        reasons.append("low_unique_markets")
+    if cluster_viability <= 0 or (cluster_viability < 25 and has_live_metrics):
+        reasons.append("low_cluster_viability")
+    if previous_routine is not None and _safe_float(previous_routine) >= 0.45:
+        reasons.append("high_routine_rate")
+    if previous_micro is not None and _safe_float(previous_micro) >= 0.25:
+        reasons.append("high_micro_market_rate")
+    if hedge_rate >= 0.5 or hedge_penalty >= 20:
+        reasons.append("high_hedge_rate")
+
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for reason in reasons:
+        if reason in seen:
+            continue
+        seen.add(reason)
+        deduped.append(reason)
+    return deduped
+
+
+def _build_rejection_breakdown(candidate: dict[str, Any], reasons: list[str]) -> dict[str, Any]:
+    quality_penalty = _safe_float(candidate.get("qualityPenaltyApplied"))
+    previous_replace_penalty = 18.0 if str(candidate.get("previousQualityRecommendation") or "") == "REPLACE_CANDIDATE" else 0.0
+    previous_routine = _safe_float(candidate.get("previousRoutineClusterRate"), default=0.0)
+    previous_micro = _safe_float(candidate.get("previousMicroMarketClusterRate"), default=0.0)
+    routine_penalty = 6.0 if previous_routine >= 0.45 else 0.0
+    micro_market_penalty = 6.0 if previous_micro >= 0.25 else 0.0
+    return {
+        "baseScore": round(_safe_float(candidate.get("signalWalletRosterScore")) + quality_penalty, 2),
+        "qualityPenalty": round(quality_penalty, 2),
+        "routinePenalty": round(routine_penalty, 2),
+        "microMarketPenalty": round(micro_market_penalty, 2),
+        "hedgePenalty": round(_safe_float(candidate.get("hedgePenalty")), 2),
+        "previousReplacePenalty": round(previous_replace_penalty, 2),
+        "liveActivityScore": round(_safe_float(candidate.get("recentActivityScore")), 2),
+        "clusterViabilityScore": round(_safe_float(candidate.get("clusterViabilityScore")), 2),
+        "finalScore": round(_safe_float(candidate.get("signalWalletRosterScore")), 2),
+        "rejectionReason": reasons[0] if reasons else "low_actionable_score",
+        "rejectionReasons": reasons,
+    }
+
+
 def _validate_candidate(candidate: dict[str, Any]) -> str | None:
     wallet = _normalize_wallet(candidate.get("wallet"))
     if not wallet or not wallet.startswith("0x") or len(wallet) != 42:
         return "invalid wallet"
     if _safe_float(candidate.get("signalWalletRosterScore")) <= 0 and not candidate.get("sources"):
-        return "no useful metrics"
+        return "missing_required_metrics"
     hedge_rate = _safe_float(candidate.get("hedgeRate70"))
     not_copyable = int(candidate.get("notCopyableCount") or 0)
     clusters_count = max(0, int(candidate.get("copyabilityClustersCount") or 0))
@@ -912,6 +1015,65 @@ async def _prefetch_fallback_activity(
     return profiles
 
 
+def _apply_preflight_profile(candidate: dict[str, Any], profile: dict[str, Any], *, diagnostic: bool = False) -> None:
+    candidate["recentRawTrades"] = profile["recentRawTrades"]
+    candidate["recentNormalizedTrades"] = profile["recentNormalizedTrades"]
+    candidate["estimatedTradeCount"] = profile["estimatedTradeCount"]
+    candidate["totalRecentUsdc"] = profile["totalRecentUsdc"]
+    candidate["uniqueMarketsCount"] = profile["uniqueMarketsCount"]
+    candidate["categoryHints"] = profile["categoryHints"]
+    candidate["sportsOnlyPenalty"] = profile["sportsOnlyPenalty"]
+    candidate["microBetPenalty"] = profile["microBetPenalty"]
+    candidate["exactScorePropPenalty"] = profile["exactScorePropPenalty"]
+    candidate["noClusterViabilityPenalty"] = profile["noClusterViabilityPenalty"]
+    candidate["insufficientRecentTradesPenalty"] = profile["insufficientRecentTradesPenalty"]
+    candidate["clusterViabilityScore"] = profile["clusterViabilityScore"]
+    candidate["livePreflightRejected"] = profile.get("livePreflightRejected")
+    if diagnostic:
+        candidate["diagnosticPreflightAnalyzed"] = True
+
+
+async def _diagnostic_prefetch_rejected_activity(
+    candidates: list[dict[str, Any]],
+    *,
+    top_n: int,
+) -> dict[str, dict[str, Any]]:
+    if top_n <= 0 or not candidates:
+        return {}
+    print(f"SMART_MONEY_WALLET_ROSTER_DIAGNOSTIC_PREFLIGHT_STARTED topN={top_n}")
+    profiles: dict[str, dict[str, Any]] = {}
+    analyzed = 0
+    for candidate in candidates[:top_n]:
+        wallet = _normalize_wallet(candidate.get("wallet"))
+        if not wallet or wallet in profiles:
+            continue
+        fetch_result = await fetch_copyability_trades_for_wallet(
+            wallet,
+            COPYABILITY_MAX_TRADES_PER_WALLET,
+            COPYABILITY_LOOKBACK_HOURS,
+            return_details=True,
+        )
+        trades = list((fetch_result or {}).get("trades") or [])
+        profile = _build_preflight_profile(trades, _safe_float(candidate.get("signalWalletRosterScore")))
+        profile["wallet"] = wallet
+        profile["fetchStatus"] = str((fetch_result or {}).get("status") or "completed")
+        profile["fetchReason"] = str((fetch_result or {}).get("reason") or "no_valid_trades")
+        profile["fetchError"] = (fetch_result or {}).get("error")
+        profile["preflightSource"] = "diagnostic_copyability_api_fetch"
+        profiles[wallet] = profile
+        analyzed += 1
+        print(
+            "SMART_MONEY_WALLET_ROSTER_DIAGNOSTIC_PREFLIGHT_WALLET "
+            f"wallet={wallet} "
+            f"raw={profile['recentRawTrades']} "
+            f"normalized={profile['recentNormalizedTrades']} "
+            f"markets={profile['uniqueMarketsCount']} "
+            f"viability={profile['clusterViabilityScore']}"
+        )
+    print(f"SMART_MONEY_WALLET_ROSTER_DIAGNOSTIC_PREFLIGHT_COMPLETED analyzed={analyzed}")
+    return profiles
+
+
 async def _build_adaptive_signal_wallet_roster_async(
     *,
     benchmark_wallet: str,
@@ -1187,10 +1349,39 @@ async def _build_adaptive_signal_wallet_roster_async(
 
     wallets_for_copyability = list(selected[:COPYABILITY_MAX_WALLETS_PER_RUN])
     selected_wallet_set = {row["wallet"] for row in selected}
+    rejected_candidates = [
+        candidate
+        for candidate in candidates.values()
+        if candidate["wallet"] not in selected_wallet_set
+    ]
+    rejected_candidates.sort(
+        key=lambda item: (
+            _safe_float(item.get("signalWalletRosterScore")),
+            _safe_float(item.get("robustSkillScore")),
+            _safe_float(item.get("categorySkillScore")),
+            _safe_float(item.get("recentActivityScore")),
+            _safe_float(item.get("copyabilityScore")),
+            _safe_float(item.get("lowHedgeScore")),
+            _safe_float(item.get("marketDiversityScore")),
+        ),
+        reverse=True,
+    )
+    diagnostic_profiles = await _diagnostic_prefetch_rejected_activity(
+        rejected_candidates,
+        top_n=SIGNAL_WALLET_DIAGNOSTIC_PREFLIGHT_TOP_N,
+    )
+    for wallet, profile in diagnostic_profiles.items():
+        candidate = candidates.get(wallet)
+        if candidate is None:
+            continue
+        _apply_preflight_profile(candidate, profile, diagnostic=True)
+
     for candidate in candidates.values():
         if candidate["wallet"] in selected_wallet_set:
             continue
-        rejection_reason = candidate.get("hardRejectReason") or _build_rejection_reason(candidate)
+        rejection_reasons = _collect_rejection_reasons(candidate)
+        rejection_breakdown = _build_rejection_breakdown(candidate, rejection_reasons)
+        rejection_reason = candidate.get("hardRejectReason") or (rejection_reasons[0] if rejection_reasons else _build_rejection_reason(candidate))
         rejected.append(
             {
                 "wallet": candidate["wallet"],
@@ -1198,19 +1389,28 @@ async def _build_adaptive_signal_wallet_roster_async(
                 "signalWalletRosterScore": round(_safe_float(candidate.get("signalWalletRosterScore")), 2),
                 "rejectionReason": rejection_reason,
                 "reason": rejection_reason,
+                "rejectionReasons": rejection_reasons,
+                "rejectionBreakdown": rejection_breakdown,
+                "scoreBreakdown": rejection_breakdown,
                 "recentActivityStatus": candidate.get("recentActivityStatus") or "unknown",
                 "robustSkillScore": round(_safe_float(candidate.get("robustSkillScore")), 2),
                 "categorySkillScore": round(_safe_float(candidate.get("categorySkillScore")), 2),
                 "recentActivityScore": round(_safe_float(candidate.get("recentActivityScore")), 2),
+                "recentRawTrades": int(candidate.get("recentRawTrades") or 0),
+                "recentNormalizedTrades": int(candidate.get("recentNormalizedTrades") or 0),
+                "uniqueMarketsCount": int(candidate.get("uniqueMarketsCount") or 0),
+                "totalRecentUsdc": round(_safe_float(candidate.get("totalRecentUsdc")), 2),
+                "clusterViabilityScore": round(_safe_float(candidate.get("clusterViabilityScore")), 2),
+                "previousQualityRecommendation": candidate.get("previousQualityRecommendation"),
+                "previousActionableSignalScore": _safe_float(candidate.get("previousActionableSignalScore"), default=0.0) if candidate.get("previousActionableSignalScore") is not None else None,
+                "previousRoutineClusterRate": _safe_float(candidate.get("previousRoutineClusterRate"), default=0.0) if candidate.get("previousRoutineClusterRate") is not None else None,
+                "previousMicroMarketClusterRate": _safe_float(candidate.get("previousMicroMarketClusterRate"), default=0.0) if candidate.get("previousMicroMarketClusterRate") is not None else None,
+                "qualityPenaltyApplied": round(_safe_float(candidate.get("qualityPenaltyApplied")), 2),
+                "diagnosticPreflightAnalyzed": bool(candidate.get("diagnosticPreflightAnalyzed")),
                 "staleActivityPenalty": round(_safe_float(candidate.get("staleActivityPenalty")), 2),
                 "insufficientSamplePenalty": round(_safe_float(candidate.get("insufficientSamplePenalty")), 2),
                 "hedgePenalty": round(_safe_float(candidate.get("hedgePenalty")), 2),
                 "concentrationPenalty": round(_safe_float(candidate.get("concentrationPenalty")), 2),
-                "previousActionableSignalScore": _safe_float(candidate.get("previousActionableSignalScore"), default=0.0) if candidate.get("previousActionableSignalScore") is not None else None,
-                "previousQualityRecommendation": candidate.get("previousQualityRecommendation"),
-                "previousRoutineClusterRate": _safe_float(candidate.get("previousRoutineClusterRate"), default=0.0) if candidate.get("previousRoutineClusterRate") is not None else None,
-                "previousMicroMarketClusterRate": _safe_float(candidate.get("previousMicroMarketClusterRate"), default=0.0) if candidate.get("previousMicroMarketClusterRate") is not None else None,
-                "qualityPenaltyApplied": round(_safe_float(candidate.get("qualityPenaltyApplied")), 2),
             }
         )
 
@@ -1227,6 +1427,14 @@ async def _build_adaptive_signal_wallet_roster_async(
     for row in rejected:
         print(f"SMART_MONEY_WALLET_ROSTER_REJECTED wallet={row['wallet']} reason={row['reason']}")
 
+    rejected_reason_summary: dict[str, int] = {}
+    for row in rejected:
+        reasons = list(dict.fromkeys(row.get("rejectionReasons") or [row.get("rejectionReason") or "low_actionable_score"]))
+        for reason in reasons:
+            rejected_reason_summary[reason] = rejected_reason_summary.get(reason, 0) + 1
+    for reason, count in sorted(rejected_reason_summary.items(), key=lambda item: (-item[1], item[0])):
+        print(f"SMART_MONEY_WALLET_ROSTER_REJECTION_SUMMARY reason={reason} count={count}")
+
     payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "benchmarkWallet": benchmark_wallet,
@@ -1235,8 +1443,11 @@ async def _build_adaptive_signal_wallet_roster_async(
         "selectedCount": selected_count,
         "explorationCount": exploration_count,
         "walletsForCopyabilityCount": wallets_for_copyability_count,
+        "diagnosticCandidatesAnalyzed": len(diagnostic_profiles),
+        "diagnosticPreflightTopN": SIGNAL_WALLET_DIAGNOSTIC_PREFLIGHT_TOP_N,
         "needsMoreDiscovery": needs_more_discovery,
         "needsMoreDiscoveryReason": "insufficient quality candidates" if needs_more_discovery else None,
+        "rejectedReasonSummary": rejected_reason_summary,
         "selectedWallets": [
             {
                 "wallet": row["wallet"],
