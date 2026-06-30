@@ -1136,7 +1136,8 @@ async def main() -> None:
             print(f"SMART_MONEY_SHADOW_COHORT_FAILED error={_safe_error_message(shadow_exc)}")
         adaptive_signal_wallet_roster = None
         if COPYABILITY_SHADOW_ENABLED and SIGNAL_WALLET_ROSTER_ENABLED:
-            adaptive_signal_wallet_roster = build_adaptive_signal_wallet_roster(
+            adaptive_signal_wallet_roster = await asyncio.to_thread(
+                build_adaptive_signal_wallet_roster,
                 benchmark_wallet=SIGNAL_WALLET_BENCHMARK_WALLET,
                 target_roster_size=SIGNAL_WALLET_ROSTER_SIZE,
                 priority_wallets=SKILL_PRIORITY_WALLETS,

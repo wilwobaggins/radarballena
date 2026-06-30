@@ -29,6 +29,82 @@ def _write_history(path: Path, rows: list[dict[str, object]]):
     path.write_text("\n".join(json.dumps(row, ensure_ascii=False, default=str) for row in rows) + "\n", encoding="utf-8")
 
 
+def _normalized_copyability_trade(wallet: str, *, market: str, index: int, category: str, size_usd: float, side: str = "BUY", outcome: str = "yes"):
+    ts = int((datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc) - timedelta(minutes=index * 7)).timestamp())
+    return {
+        "tradeId": f"{wallet}-{market}-{index}",
+        "dedupeKey": f"{wallet}-{market}-{index}",
+        "transactionHash": None,
+        "wallet": wallet,
+        "timestamp": ts,
+        "timestampIso": datetime.fromtimestamp(ts, tz=timezone.utc).isoformat(),
+        "conditionId": market,
+        "asset": f"{market}-asset",
+        "marketTitle": f"{category} market {market}",
+        "eventSlug": f"{category}-{market}",
+        "outcome": outcome,
+        "side": side,
+        "price": 0.5,
+        "shares": 1.0,
+        "sizeUsd": size_usd,
+        "category": category,
+        "rawSource": "activity",
+    }
+
+
+def _good_preflight_trades(wallet: str):
+    trades = []
+    for market_index, market in enumerate(["m1", "m2", "m3", "m4"], start=1):
+        for trade_index in range(1, 6):
+            trades.append(
+                _normalized_copyability_trade(
+                    wallet,
+                    market=market,
+                    index=(market_index - 1) * 5 + trade_index,
+                    category="macro",
+                    size_usd=240 + market_index * 60,
+                )
+            )
+    return trades
+
+
+def _weak_preflight_trades(wallet: str):
+    trades = []
+    for trade_index in range(1, 16):
+        trades.append(
+            _normalized_copyability_trade(
+                wallet,
+                market="exact-score-corners-halftime-prop",
+                index=trade_index,
+                category="sports",
+                size_usd=18 + trade_index,
+            )
+        )
+    return trades
+
+
+def _fake_fetch_copyability_trades_for_wallet_factory(trade_map: dict[str, list[dict[str, object]]]):
+    async def _fake_fetch_copyability_trades_for_wallet(wallet, limit, lookback_hours, *, return_details=False, **_kwargs):
+        normalized = list(trade_map.get(wallet.lower(), []))[:limit]
+        raw_count = len(normalized)
+        status = "completed"
+        reason = "clusters_generated" if len(normalized) >= 10 else "no_clusters_after_filters"
+        result = {
+            "wallet": wallet.lower(),
+            "status": status,
+            "reason": reason if normalized else "no_valid_trades",
+            "rawTrades": raw_count,
+            "normalizedTrades": len(normalized),
+            "trades": normalized,
+            "error": None,
+        }
+        if return_details:
+            return result
+        return normalized
+
+    return _fake_fetch_copyability_trades_for_wallet
+
+
 def _candidate_sources(base: Path):
     now = datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc)
     general_rankings = [
@@ -492,6 +568,16 @@ def test_adaptive_signal_wallet_roster_selects_six_wallets_and_writes_output(mon
 
     monkeypatch.setattr(roster, "OUTPUT_DIR", base)
     monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+    fetch_map = {
+        BENCHMARK: _good_preflight_trades(BENCHMARK),
+        WALLETS["macro"]: _good_preflight_trades(WALLETS["macro"]),
+        WALLETS["politics"]: _good_preflight_trades(WALLETS["politics"]),
+        WALLETS["geopolitics"]: _good_preflight_trades(WALLETS["geopolitics"]),
+        WALLETS["crypto"]: _good_preflight_trades(WALLETS["crypto"]),
+        WALLETS["technology"]: _good_preflight_trades(WALLETS["technology"]),
+        WALLETS["rejected"]: _weak_preflight_trades(WALLETS["rejected"]),
+    }
+    monkeypatch.setattr(roster, "fetch_copyability_trades_for_wallet", _fake_fetch_copyability_trades_for_wallet_factory(fetch_map))
 
     payload = roster.build_adaptive_signal_wallet_roster(
         benchmark_wallet=BENCHMARK,
@@ -532,6 +618,12 @@ def test_adaptive_signal_wallet_roster_keeps_benchmark_when_no_candidates(monkey
 
     monkeypatch.setattr(roster, "OUTPUT_DIR", base)
     monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+    fetch_map = {
+        BENCHMARK: _good_preflight_trades(BENCHMARK),
+        WALLETS["macro"]: _good_preflight_trades(WALLETS["macro"]),
+        WALLETS["rejected"]: _weak_preflight_trades(WALLETS["rejected"]),
+    }
+    monkeypatch.setattr(roster, "fetch_copyability_trades_for_wallet", _fake_fetch_copyability_trades_for_wallet_factory(fetch_map))
 
     payload = roster.build_adaptive_signal_wallet_roster(
         benchmark_wallet=BENCHMARK,
@@ -737,6 +829,11 @@ def test_high_hedge_and_not_copyable_penalize_roster_score(monkeypatch):
 
     monkeypatch.setattr(roster, "OUTPUT_DIR", base)
     monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+    fetch_map = {
+        BENCHMARK: _good_preflight_trades(BENCHMARK),
+        **{wallet: _weak_preflight_trades(wallet) for wallet in list(WALLETS.values())},
+    }
+    monkeypatch.setattr(roster, "fetch_copyability_trades_for_wallet", _fake_fetch_copyability_trades_for_wallet_factory(fetch_map))
 
     payload = roster.build_adaptive_signal_wallet_roster(
         benchmark_wallet=BENCHMARK,
@@ -772,15 +869,10 @@ def test_adaptive_signal_wallet_roster_fallback_fills_to_target_and_marks_probat
     output = capsys.readouterr().out
 
     assert payload["candidatesFound"] == 196
-    assert len(payload["selectedWallets"]) == 6
+    assert len(payload["selectedWallets"]) == 1
     assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
     assert payload["selectedWallets"][0]["rank"] == 1
     assert payload["selectedWallets"][0]["probationaryCandidate"] is False
-    assert all(row["probationaryCandidate"] is True for row in payload["selectedWallets"][1:])
-    assert all(row["recentActivityStatus"] == "unknown" for row in payload["selectedWallets"][1:])
-    assert any(row["staleActivityPenalty"] > 0 for row in payload["selectedWallets"][1:])
-    assert any(row["insufficientSamplePenalty"] > 0 for row in payload["selectedWallets"][1:])
-    assert payload["selectedWallets"][1]["signalWalletRosterScore"] < 35
-    assert "SMART_MONEY_WALLET_ROSTER_FALLBACK_USED" in output
-    assert "SMART_MONEY_WALLET_ROSTER_SELECTED count=6" in output
+    assert "SMART_MONEY_WALLET_ROSTER_INSUFFICIENT_LIVE_QUALITY" in output
+    assert "SMART_MONEY_WALLET_ROSTER_SELECTED count=1" in output
     shutil.rmtree(base, ignore_errors=True)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import math
 import os
@@ -11,11 +12,13 @@ from typing import Any
 try:  # pragma: no cover - support package and script-style imports
     from .copyability_storage import sanitize_payload
     from .path_utils import resolve_output_dir
+    from .trade_copyability import COPYABILITY_MAX_TRADES_PER_WALLET, build_trade_clusters, fetch_copyability_trades_for_wallet
     from .time_utils import to_utc_datetime
     from .wallet_shadow_cohort import parse_wallet_specifiers
 except ImportError:  # pragma: no cover
     from copyability_storage import sanitize_payload
     from path_utils import resolve_output_dir
+    from trade_copyability import COPYABILITY_MAX_TRADES_PER_WALLET, build_trade_clusters, fetch_copyability_trades_for_wallet
     from time_utils import to_utc_datetime
     from wallet_shadow_cohort import parse_wallet_specifiers
 
@@ -385,6 +388,97 @@ def _validate_candidate(candidate: dict[str, Any]) -> str | None:
     return None
 
 
+def _is_micro_prop_trade(trade: dict[str, Any]) -> bool:
+    text = " ".join(
+        str(trade.get(field) or "")
+        for field in ("marketTitle", "eventSlug", "category", "conditionId", "asset", "outcome")
+    ).lower()
+    if not text.strip():
+        return False
+    return any(
+        token in text
+        for token in [
+            "exact score",
+            "exact-score",
+            "corners",
+            "corner",
+            "halftime",
+            "half time",
+            "player ",
+            "player-",
+            "player_",
+            "stats",
+            "stat ",
+            "shots",
+            "rebounds",
+            "assists",
+            "goals",
+            "saves",
+            "touchdowns",
+            "yards",
+            "passes",
+            "cards",
+            "fouls",
+        ]
+    )
+
+
+def _build_preflight_profile(trades: list[dict[str, Any]], prior_score: float) -> dict[str, Any]:
+    recent_raw_trades = len(trades)
+    recent_normalized_trades = len(trades)
+    unique_markets = {
+        str(trade.get("conditionId") or trade.get("asset") or trade.get("marketTitle") or trade.get("eventSlug") or "")
+        for trade in trades
+        if str(trade.get("conditionId") or trade.get("asset") or trade.get("marketTitle") or trade.get("eventSlug") or "").strip()
+    }
+    unique_markets_count = len(unique_markets)
+    total_recent_usdc = round(sum(max(0.0, _safe_float(trade.get("sizeUsd"))) for trade in trades), 2)
+    category_hints: dict[str, int] = defaultdict(int)
+    micro_prop_count = 0
+    for trade in trades:
+        category = str(trade.get("category") or "unknown").lower()
+        category_hints[category] += 1
+        if _is_micro_prop_trade(trade):
+            micro_prop_count += 1
+    dominant_category = max(category_hints.items(), key=lambda item: item[1])[0] if category_hints else "unknown"
+    sports_only = bool(trades) and all(str(trade.get("category") or "").lower() in {"sports", "esports"} for trade in trades)
+    sports_only_penalty = 28.0 if sports_only else (12.0 if category_hints.get("sports", 0) and category_hints.get("sports", 0) >= sum(category_hints.values()) * 0.7 else 0.0)
+    micro_bet_penalty = 20.0 if trades and total_recent_usdc < 250 else (10.0 if total_recent_usdc < 750 else 0.0)
+    exact_score_prop_penalty = 18.0 if micro_prop_count and micro_prop_count >= max(1, int(len(trades) * 0.6)) else (8.0 if micro_prop_count else 0.0)
+    insufficient_recent_trades_penalty = 22.0 if recent_raw_trades < 5 else (14.0 if recent_raw_trades < 10 else (6.0 if recent_raw_trades < 20 else 0.0))
+    clusters = build_trade_clusters(trades)
+    no_cluster_viability_penalty = 0.0
+    if not clusters:
+        no_cluster_viability_penalty += 30.0
+    if unique_markets_count < 2:
+        no_cluster_viability_penalty += 18.0
+    cluster_viability_score = (
+        (len(clusters) * 18.0)
+        + (min(unique_markets_count, 8) * 6.0)
+        + (min(total_recent_usdc / 150.0, 20.0))
+        + (min(recent_raw_trades, 30) * 1.2)
+        + (prior_score * 0.15)
+    )
+    cluster_viability_score -= sports_only_penalty + micro_bet_penalty + exact_score_prop_penalty + insufficient_recent_trades_penalty + no_cluster_viability_penalty
+    cluster_viability_score = round(max(0.0, cluster_viability_score), 2)
+    return {
+        "recentRawTrades": recent_raw_trades,
+        "recentNormalizedTrades": recent_normalized_trades,
+        "estimatedTradeCount": max(recent_raw_trades, recent_normalized_trades),
+        "totalRecentUsdc": total_recent_usdc,
+        "uniqueMarketsCount": unique_markets_count,
+        "categoryHints": dict(sorted(category_hints.items())),
+        "sportsOnlyPenalty": round(sports_only_penalty, 2),
+        "microBetPenalty": round(micro_bet_penalty, 2),
+        "exactScorePropPenalty": round(exact_score_prop_penalty, 2),
+        "noClusterViabilityPenalty": round(no_cluster_viability_penalty, 2),
+        "insufficientRecentTradesPenalty": round(insufficient_recent_trades_penalty, 2),
+        "clusterViabilityScore": cluster_viability_score,
+        "dominantCategoryHint": dominant_category,
+        "clustersGenerated": len(clusters),
+    }
+
+
 def _score_candidate(candidate: dict[str, Any]) -> None:
     robust = _clamp(_safe_float(candidate.get("robustSkillScore"), default=_safe_float(candidate.get("walletQualityScore"))))
     category = _clamp(_safe_float(candidate.get("categorySkillScore"), default=0.0))
@@ -663,7 +757,57 @@ def _prepare_candidates(
     }
 
 
-def build_adaptive_signal_wallet_roster(
+async def _prefetch_fallback_activity(
+    candidates: list[dict[str, Any]],
+    *,
+    output_dir: str | os.PathLike[str] | None,
+) -> dict[str, dict[str, Any]]:
+    del output_dir
+    profiles: dict[str, dict[str, Any]] = {}
+    if not candidates:
+        return profiles
+    print(f"SMART_MONEY_WALLET_ROSTER_PREFLIGHT_STARTED candidates={len(candidates)}")
+    for candidate in candidates:
+        wallet = _normalize_wallet(candidate.get("wallet"))
+        if not wallet or wallet in profiles:
+            continue
+        prior_score = _safe_float(candidate.get("signalWalletRosterScore"))
+        fetch_result = await fetch_copyability_trades_for_wallet(
+            wallet,
+            COPYABILITY_MAX_TRADES_PER_WALLET,
+            168,
+            return_details=True,
+        )
+        trades = list((fetch_result or {}).get("trades") or [])
+        profile = _build_preflight_profile(trades, prior_score)
+        profile["wallet"] = wallet
+        profile["fetchStatus"] = str((fetch_result or {}).get("status") or "completed")
+        profile["fetchReason"] = str((fetch_result or {}).get("reason") or "no_valid_trades")
+        profile["fetchError"] = (fetch_result or {}).get("error")
+        profile["livePreflightRejected"] = (
+            profile["fetchStatus"] == "failed"
+            or profile["clusterViabilityScore"] <= 0
+            or profile["uniqueMarketsCount"] < 2
+            or profile["sportsOnlyPenalty"] >= 20
+            or profile["microBetPenalty"] >= 20
+            or profile["exactScorePropPenalty"] >= 18
+        )
+        profiles[wallet] = profile
+        print(
+            "SMART_MONEY_WALLET_ROSTER_PREFLIGHT_WALLET "
+            f"wallet={wallet} "
+            f"rawTrades={profile['recentRawTrades']} "
+            f"uniqueMarkets={profile['uniqueMarketsCount']} "
+            f"totalUsdc={profile['totalRecentUsdc']} "
+            f"clusterViability={profile['clusterViabilityScore']} "
+            f"penalties=sports:{profile['sportsOnlyPenalty']},micro:{profile['microBetPenalty']},exact:{profile['exactScorePropPenalty']},insufficient:{profile['insufficientRecentTradesPenalty']},no_cluster:{profile['noClusterViabilityPenalty']}"
+        )
+        if profile["livePreflightRejected"]:
+            print(f"SMART_MONEY_WALLET_ROSTER_PREFLIGHT_REJECTED wallet={wallet} reason=not_cluster_viable")
+    return profiles
+
+
+async def _build_adaptive_signal_wallet_roster_async(
     *,
     benchmark_wallet: str,
     target_roster_size: int = 6,
@@ -762,20 +906,56 @@ def build_adaptive_signal_wallet_roster(
 
     selected_before_fallback = len(selected)
     selected_wallets = {row["wallet"] for row in selected}
-    fallback_pool = [
+    preflight_candidates = [
         candidate
         for candidate in remaining_candidates
         if candidate["wallet"] not in selected_wallets and candidate not in pool
     ]
+    preflight_profiles = await _prefetch_fallback_activity(preflight_candidates, output_dir=output_dir)
+    fallback_pool: list[dict[str, Any]] = []
+    for candidate in preflight_candidates:
+        wallet = candidate["wallet"]
+        profile = preflight_profiles.get(wallet)
+        if not profile:
+            continue
+        candidate["recentRawTrades"] = profile["recentRawTrades"]
+        candidate["recentNormalizedTrades"] = profile["recentNormalizedTrades"]
+        candidate["estimatedTradeCount"] = profile["estimatedTradeCount"]
+        candidate["totalRecentUsdc"] = profile["totalRecentUsdc"]
+        candidate["uniqueMarketsCount"] = profile["uniqueMarketsCount"]
+        candidate["categoryHints"] = profile["categoryHints"]
+        candidate["sportsOnlyPenalty"] = profile["sportsOnlyPenalty"]
+        candidate["microBetPenalty"] = profile["microBetPenalty"]
+        candidate["exactScorePropPenalty"] = profile["exactScorePropPenalty"]
+        candidate["noClusterViabilityPenalty"] = profile["noClusterViabilityPenalty"]
+        candidate["insufficientRecentTradesPenalty"] = profile["insufficientRecentTradesPenalty"]
+        candidate["clusterViabilityScore"] = profile["clusterViabilityScore"]
+        candidate["livePreflightRejected"] = profile["livePreflightRejected"]
+        prior_score = _safe_float(candidate.get("signalWalletRosterScore"))
+        live_bonus = (
+            min(candidate["recentRawTrades"], 30) * 1.1
+            + min(candidate["recentNormalizedTrades"], 30) * 0.8
+            + min(candidate["uniqueMarketsCount"], 10) * 5.0
+            + min(candidate["totalRecentUsdc"] / 150.0, 20.0)
+            + min(candidate["clusterViabilityScore"], 100.0) * 0.6
+        )
+        live_penalty = (
+            candidate["sportsOnlyPenalty"]
+            + candidate["microBetPenalty"]
+            + candidate["exactScorePropPenalty"]
+            + candidate["noClusterViabilityPenalty"]
+            + candidate["insufficientRecentTradesPenalty"]
+        )
+        candidate["signalWalletRosterScore"] = round(_clamp(prior_score + live_bonus - live_penalty), 2)
+        if not candidate["livePreflightRejected"] and candidate["clusterViabilityScore"] > 0 and candidate["signalWalletRosterScore"] >= 25:
+            fallback_pool.append(candidate)
     fallback_pool.sort(
         key=lambda item: (
+            _safe_float(item.get("clusterViabilityScore")),
             _safe_float(item.get("signalWalletRosterScore")),
-            _safe_float(item.get("robustSkillScore")),
-            _safe_float(item.get("categorySkillScore")),
-            _safe_float(item.get("recentActivityScore")),
-            _safe_float(item.get("copyabilityScore")),
-            _safe_float(item.get("lowHedgeScore")),
-            _safe_float(item.get("marketDiversityScore")),
+            _safe_float(item.get("recentRawTrades")),
+            _safe_float(item.get("totalRecentUsdc")),
+            _safe_float(item.get("uniqueMarketsCount")),
         ),
         reverse=True,
     )
@@ -786,7 +966,7 @@ def build_adaptive_signal_wallet_roster(
         chosen["isBenchmark"] = False
         chosen["probationaryCandidate"] = True
         chosen["recentActivityStatus"] = "unknown"
-        chosen["selectionReason"] = "fallback selected despite limited recent evidence"
+        chosen["selectionReason"] = "fallback selected with live preflight viability"
         selected.append(chosen)
         selected_categories.add(str(chosen.get("primaryCategory") or "mixed"))
         fallback_used = True
@@ -797,6 +977,14 @@ def build_adaptive_signal_wallet_roster(
             f"selected_before={selected_before_fallback} "
             f"selected_after={len(selected)} "
             f"target={target_roster_size}"
+        )
+
+    if len(selected) < target_roster_size and not fallback_pool:
+        print(
+            "SMART_MONEY_WALLET_ROSTER_INSUFFICIENT_LIVE_QUALITY "
+            f"selected={len(selected)} "
+            f"target={target_roster_size} "
+            f"reason=no cluster-viable candidates"
         )
 
     if len(selected) < target_roster_size:
@@ -865,6 +1053,15 @@ def build_adaptive_signal_wallet_roster(
                 "signalWalletRosterScore": row["signalWalletRosterScore"],
                 "primaryCategory": row.get("primaryCategory") or "mixed",
                 "recentActivityStatus": row.get("recentActivityStatus") or "unknown",
+                "recentRawTrades": int(row.get("recentRawTrades") or 0),
+                "recentNormalizedTrades": int(row.get("recentNormalizedTrades") or 0),
+                "estimatedTradeCount": int(row.get("estimatedTradeCount") or 0),
+                "uniqueMarketsCount": int(row.get("uniqueMarketsCount") or 0),
+                "totalRecentUsdc": round(_safe_float(row.get("totalRecentUsdc")), 2),
+                "clusterViabilityScore": round(_safe_float(row.get("clusterViabilityScore")), 2),
+                "sportsOnlyPenalty": round(_safe_float(row.get("sportsOnlyPenalty")), 2),
+                "microBetPenalty": round(_safe_float(row.get("microBetPenalty")), 2),
+                "exactScorePropPenalty": round(_safe_float(row.get("exactScorePropPenalty")), 2),
                 "robustSkillScore": round(_safe_float(row.get("robustSkillScore")), 2),
                 "categorySkillScore": round(_safe_float(row.get("categorySkillScore")), 2),
                 "recentActivityScore": round(_safe_float(row.get("recentActivityScore")), 2),
@@ -881,6 +1078,27 @@ def build_adaptive_signal_wallet_roster(
         "rejectedWallets": rejected,
     }
     return payload
+
+
+def build_adaptive_signal_wallet_roster(
+    *,
+    benchmark_wallet: str,
+    target_roster_size: int = 6,
+    priority_wallets: str | list[str] | None = None,
+    wallet_scores: list[dict[str, Any]] | None = None,
+    shadow_rows: list[dict[str, Any]] | None = None,
+    output_dir: str | os.PathLike[str] | None = None,
+) -> dict[str, Any]:
+    return asyncio.run(
+        _build_adaptive_signal_wallet_roster_async(
+            benchmark_wallet=benchmark_wallet,
+            target_roster_size=target_roster_size,
+            priority_wallets=priority_wallets,
+            wallet_scores=wallet_scores,
+            shadow_rows=shadow_rows,
+            output_dir=output_dir,
+        )
+    )
 
 
 def write_adaptive_signal_wallet_roster(payload: dict[str, Any]) -> Path:
