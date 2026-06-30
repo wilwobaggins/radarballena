@@ -28,6 +28,10 @@ try:  # pragma: no cover - support package and script-style imports
         build_adaptive_signal_wallet_roster,
         write_adaptive_signal_wallet_roster,
     )
+    from .adaptive_wallet_quality import (
+        build_adaptive_signal_wallet_quality,
+        write_adaptive_signal_wallet_quality,
+    )
     from .category_utils import guess_category_from_title
     from .wallet_shadow_cohort import (
         build_shadow_wallet_cohort,
@@ -84,6 +88,10 @@ except ImportError:  # pragma: no cover
     from adaptive_wallet_roster import (
         build_adaptive_signal_wallet_roster,
         write_adaptive_signal_wallet_roster,
+    )
+    from adaptive_wallet_quality import (
+        build_adaptive_signal_wallet_quality,
+        write_adaptive_signal_wallet_quality,
     )
     from category_utils import guess_category_from_title
     from wallet_shadow_cohort import (
@@ -1163,6 +1171,32 @@ async def main() -> None:
                     wallet_roster=adaptive_signal_wallet_roster,
                 )
                 result["copyability_phase"] = copyability_phase
+                try:
+                    copyability_quality = await asyncio.to_thread(
+                        build_adaptive_signal_wallet_quality,
+                        copyability_phase=copyability_phase,
+                        wallet_roster=adaptive_signal_wallet_roster,
+                        benchmark_wallet=SIGNAL_WALLET_BENCHMARK_WALLET,
+                        output_dir=resolve_output_dir(),
+                    )
+                    write_adaptive_signal_wallet_quality(copyability_quality)
+                    result["copyability_quality_phase"] = copyability_quality
+                except Exception as quality_exc:
+                    print(
+                        "SMART_MONEY_WALLET_QUALITY_FAILED "
+                        f"error={_safe_error_message(quality_exc)} "
+                        f"run_id={run_id}"
+                    )
+                    result["copyability_quality_phase"] = {
+                        "runId": run_id,
+                        "generatedAt": datetime.now(timezone.utc).isoformat(),
+                        "benchmarkWallet": SIGNAL_WALLET_BENCHMARK_WALLET,
+                        "walletCount": 0,
+                        "walletQualityRows": [],
+                        "walletResults": [],
+                        "status": "failed",
+                        "error": _safe_error_message(quality_exc),
+                    }
             except Exception as copyability_exc:
                 print(
                     "SMART_MONEY_COPYABILITY_FAILED "
