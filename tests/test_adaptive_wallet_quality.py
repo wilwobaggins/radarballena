@@ -95,7 +95,7 @@ def test_build_adaptive_signal_wallet_quality_uses_copyability_score_and_detects
                 GOOD,
                 score=80,
                 label="ACUMULACION",
-                status="high_copyability",
+                status="watch_copyability",
                 title="Politics future event",
                 category="politics",
                 size_usd=1000,
@@ -105,7 +105,7 @@ def test_build_adaptive_signal_wallet_quality_uses_copyability_score_and_detects
             _cluster(
                 GOOD,
                 score=70,
-                label="ACUMULACION",
+                label="ACTIVIDAD_RUTINARIA",
                 status="watch_copyability",
                 title="Geopolitics future event",
                 category="geopolitics",
@@ -169,6 +169,17 @@ def test_build_adaptive_signal_wallet_quality_uses_copyability_score_and_detects
                 duration_minutes=6,
                 hedge_probability=10,
             ),
+            _cluster(
+                RUTINE,
+                score=23,
+                label="COBERTURA_NO_COPIABLE",
+                status="not_copyable",
+                title="Routine hedge market duplicate",
+                category="unknown",
+                size_usd=65,
+                duration_minutes=6,
+                hedge_probability=92,
+            ),
         ],
     }
 
@@ -191,12 +202,18 @@ def test_build_adaptive_signal_wallet_quality_uses_copyability_score_and_detects
     assert "SMART_MONEY_WALLET_QUALITY_SUMMARY wallet=0x" in captured
     rows = payload["walletQualityRows"]
     assert len(rows) == 3
+    assert payload["wallets"] == rows
+    assert payload["walletResults"] == rows
 
     benchmark_row = next(row for row in rows if row["wallet"] == BENCHMARK)
     good_row = next(row for row in rows if row["wallet"] == GOOD)
     routine_row = next(row for row in rows if row["wallet"] == RUTINE)
 
     assert benchmark_row["keepInRosterRecommendation"] == "KEEP_BENCHMARK"
+    assert good_row["highCopyabilityCount"] == 1
+    assert good_row["watchCopyabilityCount"] == 2
+    assert good_row["accumulationCount"] == 1
+    assert good_row["actionableClusterCount"] > good_row["highCopyabilityCount"]
     assert good_row["averageCopyabilityAtDetectionScore"] == 80.0
     assert good_row["medianCopyabilityAtDetectionScore"] == 80
     assert good_row["microMarketClusterCount"] == 0
@@ -207,6 +224,7 @@ def test_build_adaptive_signal_wallet_quality_uses_copyability_score_and_detects
     assert routine_row["microMarketPenalty"] > 0
     assert routine_row["keepInRosterRecommendation"] in {"WATCHLIST", "REPLACE_CANDIDATE"}
     assert routine_row["unknownCategoryPenalty"] > 0
+    assert routine_row["notCopyableCount"] == 2
     assert good_row["bestCategory"] in {"macro", "politics"}
     _assert_no_nan_or_infinity(payload)
 
@@ -253,6 +271,36 @@ def test_write_adaptive_signal_wallet_quality_writes_json(monkeypatch):
                 "keepInRosterRecommendation": "KEEP_BENCHMARK",
             }
         ],
+        "wallets": [
+            {
+                "wallet": BENCHMARK,
+                "displayName": "Ken",
+                "clustersCount": 1,
+                "highCopyabilityCount": 1,
+                "watchCopyabilityCount": 0,
+                "accumulationCount": 1,
+                "reductionSignalCount": 0,
+                "routineActivityCount": 0,
+                "notCopyableCount": 0,
+                "hedgeRate": 0.0,
+                "averageCopyabilityAtDetectionScore": 82.0,
+                "medianCopyabilityAtDetectionScore": 82.0,
+                "bestCategory": "macro",
+                "actionableClusterCount": 1,
+                "actionableClusterRate": 1.0,
+                "routineClusterRate": 0.0,
+                "microMarketClusterCount": 0,
+                "microMarketClusterRate": 0.0,
+                "strategicMarketClusterCount": 1,
+                "strategicMarketRate": 1.0,
+                "microMarketPenalty": 0.0,
+                "routinePenalty": 0.0,
+                "hedgePenalty": 0.0,
+                "unknownCategoryPenalty": 0.0,
+                "actionableSignalScore": 91.0,
+                "keepInRosterRecommendation": "KEEP_BENCHMARK",
+            }
+        ],
         "walletResults": [],
     }
 
@@ -260,6 +308,8 @@ def test_write_adaptive_signal_wallet_quality_writes_json(monkeypatch):
     assert written_path.exists()
     written = json.loads(written_path.read_text(encoding="utf-8"))
     assert written["walletCount"] == 1
+    assert written["wallets"] == written["walletQualityRows"]
+    assert written["walletResults"] == written["walletQualityRows"]
     assert written["walletQualityRows"][0]["keepInRosterRecommendation"] == "KEEP_BENCHMARK"
     _assert_no_nan_or_infinity(written)
 

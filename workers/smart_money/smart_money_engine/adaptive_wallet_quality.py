@@ -22,7 +22,9 @@ OUTPUT_DIR = resolve_output_dir()
 ADAPTIVE_SIGNAL_WALLET_QUALITY_FILE = OUTPUT_DIR / "adaptive_signal_wallet_quality.json"
 
 HIGH_VALUE_LABELS = {"ALTA_CONVICCION", "ACUMULACION"}
-HIGH_VALUE_STATUSES = {"high_copyability", "watch_copyability"}
+HIGH_COPYABILITY_LABELS = {"ALTA_CONVICCION"}
+HIGH_COPYABILITY_STATUSES = {"high_copyability"}
+WATCH_COPYABILITY_STATUSES = {"watch_copyability"}
 ROUTINE_LABELS = {"ACTIVIDAD_RUTINARIA"}
 NOT_COPYABLE_LABELS = {"COBERTURA_NO_COPIABLE"}
 REDUCTION_LABELS = {"REDUCCION_DE_TESIS"}
@@ -81,10 +83,20 @@ def _is_micro_market(cluster: dict[str, Any]) -> bool:
     return False
 
 
-def _is_high_value(cluster: dict[str, Any]) -> bool:
+def _is_high_copyability(cluster: dict[str, Any]) -> bool:
     status = str(cluster.get("copyabilityStatus") or "")
     label = str(cluster.get("copyabilityLabel") or "")
-    return status in HIGH_VALUE_STATUSES or label in HIGH_VALUE_LABELS
+    return status in HIGH_COPYABILITY_STATUSES or label in HIGH_COPYABILITY_LABELS
+
+
+def _is_watch_copyability(cluster: dict[str, Any]) -> bool:
+    status = str(cluster.get("copyabilityStatus") or "")
+    return status in WATCH_COPYABILITY_STATUSES
+
+
+def _is_actionable(cluster: dict[str, Any]) -> bool:
+    label = str(cluster.get("copyabilityLabel") or "")
+    return _is_high_copyability(cluster) or _is_watch_copyability(cluster) or label in HIGH_VALUE_LABELS
 
 
 def _is_routine(cluster: dict[str, Any]) -> bool:
@@ -103,10 +115,6 @@ def _is_reduction_signal(cluster: dict[str, Any]) -> bool:
     status = str(cluster.get("copyabilityStatus") or "")
     label = str(cluster.get("copyabilityLabel") or "")
     return status == "reduction_signal" or label in REDUCTION_LABELS
-
-
-def _is_actionable(cluster: dict[str, Any]) -> bool:
-    return _is_high_value(cluster)
 
 
 def _is_strategic_market(cluster: dict[str, Any]) -> bool:
@@ -137,6 +145,19 @@ def _choose_best_category(category_stats: dict[str, dict[str, float]]) -> str:
         ),
     )
     return category
+
+
+def _cluster_identity(cluster: dict[str, Any]) -> tuple[Any, ...]:
+    return (
+        _normalize_wallet(cluster.get("wallet")),
+        str(cluster.get("clusterId") or cluster.get("tradeId") or ""),
+        str(cluster.get("conditionId") or cluster.get("asset") or cluster.get("marketTitle") or ""),
+        str(cluster.get("side") or ""),
+        str(cluster.get("outcome") or ""),
+        _safe_float(cluster.get("copyabilityAtDetectionScore")),
+        _safe_float(cluster.get("totalSizeUsd")),
+        str(cluster.get("validationStatus") or ""),
+    )
 
 
 def _wallet_display_name(wallet: str, roster_map: dict[str, dict[str, Any]], copyability_rows: dict[str, dict[str, Any]]) -> str:
@@ -188,15 +209,21 @@ def _score_wallet_row(row: dict[str, Any], *, benchmark_wallet: str) -> dict[str
     unknown_category_count = 0
 
     category_stats: dict[str, dict[str, float]] = defaultdict(lambda: {"count": 0.0, "score_sum": 0.0, "actionable": 0.0})
+    seen_cluster_identities: set[tuple[Any, ...]] = set()
 
     for cluster in clusters:
+        identity = _cluster_identity(cluster)
+        if identity in seen_cluster_identities:
+            continue
+        seen_cluster_identities.add(identity)
+
         category = str(cluster.get("category") or "unknown").strip().lower() or "unknown"
         category_stats[category]["count"] += 1.0
         category_stats[category]["score_sum"] += _safe_float(cluster.get("copyabilityAtDetectionScore"))
 
         is_micro = _is_micro_market(cluster)
         is_actionable = _is_actionable(cluster)
-        is_high = _is_high_value(cluster)
+        is_high = _is_high_copyability(cluster)
         is_routine = _is_routine(cluster)
         is_not_copyable = _is_not_copyable(cluster)
         is_reduction = _is_reduction_signal(cluster)
@@ -212,7 +239,7 @@ def _score_wallet_row(row: dict[str, Any], *, benchmark_wallet: str) -> dict[str
             strategic_market_cluster_count += 1
         if is_high:
             high_copyability_count += 1
-        if str(cluster.get("copyabilityStatus") or "") == "watch_copyability":
+        if _is_watch_copyability(cluster):
             watch_copyability_count += 1
         if str(cluster.get("copyabilityLabel") or "") == "ACUMULACION":
             accumulation_count += 1
@@ -407,6 +434,7 @@ def build_adaptive_signal_wallet_quality(
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "benchmarkWallet": _normalize_wallet(benchmark_wallet),
         "walletCount": len(rows),
+        "wallets": sanitize_payload(rows),
         "walletQualityRows": sanitize_payload(rows),
         "walletResults": sanitize_payload(rows),
     }
@@ -416,6 +444,11 @@ def build_adaptive_signal_wallet_quality(
 def write_adaptive_signal_wallet_quality(payload: dict[str, Any]) -> Path:
     ADAPTIVE_SIGNAL_WALLET_QUALITY_FILE.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = ADAPTIVE_SIGNAL_WALLET_QUALITY_FILE.with_suffix(ADAPTIVE_SIGNAL_WALLET_QUALITY_FILE.suffix + ".tmp")
+    payload = dict(payload)
+    canonical_rows = payload.get("wallets") or payload.get("walletQualityRows") or payload.get("walletResults") or []
+    payload["wallets"] = canonical_rows
+    payload["walletQualityRows"] = payload.get("walletQualityRows") or canonical_rows
+    payload["walletResults"] = payload.get("walletResults") or canonical_rows
     with tmp_path.open("w", encoding="utf-8") as handle:
         json.dump(sanitize_payload(payload), handle, ensure_ascii=False, indent=2, default=str)
     os.replace(tmp_path, ADAPTIVE_SIGNAL_WALLET_QUALITY_FILE)
