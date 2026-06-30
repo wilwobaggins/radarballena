@@ -100,6 +100,16 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 def load_adaptive_signal_roster_sources(output_dir: str | os.PathLike[str] | None = None) -> dict[str, Any]:
     base = Path(output_dir) if output_dir else OUTPUT_DIR
+    quality_payload = _load_json(base / "adaptive_signal_wallet_quality.json", {})
+    if isinstance(quality_payload, dict):
+        quality_rows = (
+            quality_payload.get("wallets")
+            or quality_payload.get("walletQualityRows")
+            or quality_payload.get("walletResults")
+            or []
+        )
+    else:
+        quality_rows = []
     return {
         "wallet_shadow_rankings": _load_json(base / "wallet_shadow_rankings.json", []),
         "wallet_category_rankings": _load_json(base / "wallet_category_rankings.json", {}),
@@ -107,6 +117,7 @@ def load_adaptive_signal_roster_sources(output_dir: str | os.PathLike[str] | Non
         "wallet_shadow_history": _load_jsonl(base / "wallet_shadow_history.jsonl"),
         "trade_copyability_shadow": _load_json(base / "trade_copyability_shadow.json", {}),
         "wallet_copyability_summary": _load_json(base / "wallet_copyability_summary.json", {}),
+        "wallet_quality": quality_rows,
     }
 
 
@@ -152,6 +163,11 @@ def _ensure_candidate(candidates: dict[str, dict[str, Any]], wallet: str) -> dic
             "hedgeRate70": 0.0,
             "possibleHedgeRate60": 0.0,
             "comparisonLeadCount": 0,
+            "previousActionableSignalScore": None,
+            "previousQualityRecommendation": None,
+            "previousRoutineClusterRate": None,
+            "previousMicroMarketClusterRate": None,
+            "qualityPenaltyApplied": 0.0,
         }
         candidates[wallet] = candidate
     return candidate
@@ -286,6 +302,28 @@ def _merge_copyability_shadow(candidate: dict[str, Any], shadow_payload: dict[st
             candidate["hedgeCount70"] = max(candidate.get("hedgeCount70") or 0, 1)
         if hedge_probability >= 60:
             candidate["possibleHedgeCount60"] = max(candidate.get("possibleHedgeCount60") or 0, 1)
+
+
+def _merge_quality_feedback(candidate: dict[str, Any], row: dict[str, Any]) -> None:
+    candidate["sources"].add("wallet_quality")
+    candidate["previousActionableSignalScore"] = _safe_float(row.get("actionableSignalScore"), default=None) if row.get("actionableSignalScore") is not None else candidate.get("previousActionableSignalScore")
+    candidate["previousQualityRecommendation"] = str(row.get("keepInRosterRecommendation") or candidate.get("previousQualityRecommendation") or "") or None
+    candidate["previousRoutineClusterRate"] = _safe_float(row.get("routineClusterRate"), default=None) if row.get("routineClusterRate") is not None else candidate.get("previousRoutineClusterRate")
+    candidate["previousMicroMarketClusterRate"] = _safe_float(row.get("microMarketClusterRate"), default=None) if row.get("microMarketClusterRate") is not None else candidate.get("previousMicroMarketClusterRate")
+    recommendation = str(candidate.get("previousQualityRecommendation") or "")
+    actionable_score = _safe_float(candidate.get("previousActionableSignalScore"), default=0.0)
+    routine_rate = _safe_float(candidate.get("previousRoutineClusterRate"), default=0.0)
+    micro_rate = _safe_float(candidate.get("previousMicroMarketClusterRate"), default=0.0)
+    quality_penalty = 0.0
+    if recommendation == "REPLACE_CANDIDATE":
+        quality_penalty += 18.0
+    if actionable_score and actionable_score < 50:
+        quality_penalty += 8.0
+    if routine_rate >= 0.45:
+        quality_penalty += 6.0
+    if micro_rate >= 0.25:
+        quality_penalty += 6.0
+    candidate["qualityPenaltyApplied"] = round(quality_penalty, 2)
 
 
 def _merge_comparison_summary(candidate: dict[str, Any], comparison_summary: dict[str, Any]) -> None:
@@ -701,6 +739,26 @@ def _prepare_candidates(
                 continue
             _merge_copyability_summary(candidate, _merge_copyability_summary_map)
 
+    wallet_quality_rows = sources.get("wallet_quality") or []
+    quality_rows_by_wallet: dict[str, dict[str, Any]] = {}
+    for row in wallet_quality_rows or []:
+        wallet = _normalize_wallet(row.get("wallet"))
+        if not wallet or wallet in quality_rows_by_wallet:
+            continue
+        quality_rows_by_wallet[wallet] = row
+    print(f"SMART_MONEY_WALLET_ROSTER_QUALITY_FEEDBACK_LOADED rows={len(quality_rows_by_wallet)}")
+    for wallet, row in quality_rows_by_wallet.items():
+        candidate = include(wallet)
+        if candidate is None:
+            continue
+        _merge_quality_feedback(candidate, row)
+        print(
+            "SMART_MONEY_WALLET_ROSTER_QUALITY_PENALTY "
+            f"wallet={wallet} "
+            f"recommendation={candidate.get('previousQualityRecommendation') or 'unknown'} "
+            f"penalty={candidate.get('qualityPenaltyApplied')}"
+        )
+
     trade_copyability_shadow = sources["trade_copyability_shadow"] or {}
     if isinstance(trade_copyability_shadow, dict):
         for wallet in list({*_merge_copyability_summary_map.keys(), *[row.get("wallet") for row in trade_copyability_shadow.get("walletResults") or []]}):
@@ -754,6 +812,10 @@ def _prepare_candidates(
         if candidate.get("benchmark"):
             continue
         _score_candidate(candidate)
+        quality_penalty = _safe_float(candidate.get("qualityPenaltyApplied"))
+        if quality_penalty:
+            candidate["signalWalletRosterScore"] = round(_clamp(_safe_float(candidate.get("signalWalletRosterScore")) - quality_penalty), 2)
+            candidate["scoreBreakdown"]["qualityPenaltyApplied"] = round(quality_penalty, 2)
         hard_reject_reason = _validate_candidate(candidate)
         candidate["hardRejectReason"] = hard_reject_reason
 
@@ -924,34 +986,62 @@ async def _build_adaptive_signal_wallet_roster_async(
     )
 
     min_qualifying_score = 35.0
-    qualifying_candidates = [candidate for candidate in remaining_candidates if _safe_float(candidate.get("signalWalletRosterScore")) >= min_qualifying_score]
+    replacement_candidates = [
+        candidate
+        for candidate in remaining_candidates
+        if str(candidate.get("previousQualityRecommendation") or "") == "REPLACE_CANDIDATE"
+    ]
+    preferred_candidates = [candidate for candidate in remaining_candidates if candidate not in replacement_candidates]
+    for candidate in replacement_candidates:
+        print(f"SMART_MONEY_WALLET_ROSTER_REPLACE_CANDIDATE_SKIPPED wallet={candidate['wallet']}")
 
-    pool = qualifying_candidates[:]
-    while pool and len(selected) < target_roster_size:
-        best_index = 0
-        best_effective = -10_000.0
-        for index, candidate in enumerate(pool):
-            category = str(candidate.get("primaryCategory") or "mixed")
-            novelty_bonus = 8.0 if category not in selected_categories else 0.0
-            priority_bonus = 6.0 if candidate.get("priority") else 0.0
-            effective_score = _safe_float(candidate.get("signalWalletRosterScore")) + novelty_bonus + priority_bonus
-            if effective_score > best_effective:
-                best_effective = effective_score
-                best_index = index
-        chosen = pool.pop(best_index)
-        chosen["rank"] = len(selected) + 1
-        chosen["isBenchmark"] = False
-        chosen["probationaryCandidate"] = bool(chosen.get("recentActivityStatus") != "recent")
-        chosen["selectionReason"] = chosen.get("reason") or _build_reason(chosen)
-        selected.append(chosen)
-        selected_categories.add(str(chosen.get("primaryCategory") or "mixed"))
+    def _select_from_pool(pool: list[dict[str, Any]], *, reuse_replacement: bool = False) -> bool:
+        made_selection = False
+        while pool and len(selected) < target_roster_size:
+            best_index = 0
+            best_effective = -10_000.0
+            for index, candidate in enumerate(pool):
+                category = str(candidate.get("primaryCategory") or "mixed")
+                novelty_bonus = 8.0 if category not in selected_categories else 0.0
+                priority_bonus = 6.0 if candidate.get("priority") else 0.0
+                quality_bonus = 0.0
+                if _safe_float(candidate.get("previousActionableSignalScore"), default=100.0) < 50:
+                    quality_bonus -= 4.0
+                if _safe_float(candidate.get("previousRoutineClusterRate"), default=0.0) >= 0.45:
+                    quality_bonus -= 3.0
+                if _safe_float(candidate.get("previousMicroMarketClusterRate"), default=0.0) >= 0.25:
+                    quality_bonus -= 3.0
+                effective_score = _safe_float(candidate.get("signalWalletRosterScore")) + novelty_bonus + priority_bonus + quality_bonus
+                if effective_score > best_effective:
+                    best_effective = effective_score
+                    best_index = index
+            chosen = pool.pop(best_index)
+            chosen["rank"] = len(selected) + 1
+            chosen["isBenchmark"] = False
+            chosen["probationaryCandidate"] = bool(chosen.get("recentActivityStatus") != "recent")
+            if reuse_replacement:
+                chosen["probationaryCandidate"] = True
+                chosen["selectionReason"] = "fallback reused despite previous REPLACE_CANDIDATE"
+            else:
+                chosen["selectionReason"] = chosen.get("reason") or _build_reason(chosen)
+            selected.append(chosen)
+            selected_categories.add(str(chosen.get("primaryCategory") or "mixed"))
+            made_selection = True
+        return made_selection
+
+    preferred_pool = [
+        candidate
+        for candidate in preferred_candidates
+        if _safe_float(candidate.get("signalWalletRosterScore")) >= min_qualifying_score
+    ]
+    _select_from_pool(preferred_pool)
 
     selected_before_fallback = len(selected)
     selected_wallets = {row["wallet"] for row in selected}
     preflight_candidates = [
         candidate
-        for candidate in remaining_candidates
-        if candidate["wallet"] not in selected_wallets and candidate not in pool
+        for candidate in preferred_candidates
+        if candidate["wallet"] not in selected_wallets and candidate not in preferred_pool
     ]
     preflight_profiles = await _prefetch_fallback_activity(
         preflight_candidates,
@@ -1006,16 +1096,26 @@ async def _build_adaptive_signal_wallet_roster_async(
         reverse=True,
     )
     fallback_used = False
-    while fallback_pool and len(selected) < target_roster_size:
-        chosen = fallback_pool.pop(0)
-        chosen["rank"] = len(selected) + 1
-        chosen["isBenchmark"] = False
-        chosen["probationaryCandidate"] = True
-        chosen["recentActivityStatus"] = "unknown"
-        chosen["selectionReason"] = "fallback selected with live preflight viability"
-        selected.append(chosen)
-        selected_categories.add(str(chosen.get("primaryCategory") or "mixed"))
-        fallback_used = True
+    if fallback_pool and len(selected) < target_roster_size:
+        fallback_used = _select_from_pool(fallback_pool)
+
+    replacement_pool = [
+        candidate
+        for candidate in replacement_candidates
+        if candidate["wallet"] not in {row["wallet"] for row in selected}
+    ]
+    replacement_pool.sort(
+        key=lambda item: (
+            _safe_float(item.get("clusterViabilityScore")),
+            _safe_float(item.get("signalWalletRosterScore")),
+            _safe_float(item.get("recentRawTrades")),
+            _safe_float(item.get("totalRecentUsdc")),
+            _safe_float(item.get("uniqueMarketsCount")),
+        ),
+        reverse=True,
+    )
+    if replacement_pool and len(selected) < target_roster_size:
+        fallback_used = _select_from_pool(replacement_pool, reuse_replacement=True) or fallback_used
 
     if fallback_used:
         print(
@@ -1078,6 +1178,11 @@ async def _build_adaptive_signal_wallet_roster_async(
                 "insufficientSamplePenalty": round(_safe_float(candidate.get("insufficientSamplePenalty")), 2),
                 "hedgePenalty": round(_safe_float(candidate.get("hedgePenalty")), 2),
                 "concentrationPenalty": round(_safe_float(candidate.get("concentrationPenalty")), 2),
+                "previousActionableSignalScore": _safe_float(candidate.get("previousActionableSignalScore"), default=0.0) if candidate.get("previousActionableSignalScore") is not None else None,
+                "previousQualityRecommendation": candidate.get("previousQualityRecommendation"),
+                "previousRoutineClusterRate": _safe_float(candidate.get("previousRoutineClusterRate"), default=0.0) if candidate.get("previousRoutineClusterRate") is not None else None,
+                "previousMicroMarketClusterRate": _safe_float(candidate.get("previousMicroMarketClusterRate"), default=0.0) if candidate.get("previousMicroMarketClusterRate") is not None else None,
+                "qualityPenaltyApplied": round(_safe_float(candidate.get("qualityPenaltyApplied")), 2),
             }
         )
 
@@ -1115,6 +1220,11 @@ async def _build_adaptive_signal_wallet_roster_async(
                 "insufficientSamplePenalty": round(_safe_float(row.get("insufficientSamplePenalty")), 2),
                 "hedgePenalty": round(_safe_float(row.get("hedgePenalty")), 2),
                 "concentrationPenalty": round(_safe_float(row.get("concentrationPenalty")), 2),
+                "previousActionableSignalScore": _safe_float(row.get("previousActionableSignalScore"), default=0.0) if row.get("previousActionableSignalScore") is not None else None,
+                "previousQualityRecommendation": row.get("previousQualityRecommendation"),
+                "previousRoutineClusterRate": _safe_float(row.get("previousRoutineClusterRate"), default=0.0) if row.get("previousRoutineClusterRate") is not None else None,
+                "previousMicroMarketClusterRate": _safe_float(row.get("previousMicroMarketClusterRate"), default=0.0) if row.get("previousMicroMarketClusterRate") is not None else None,
+                "qualityPenaltyApplied": round(_safe_float(row.get("qualityPenaltyApplied")), 2),
                 "selectionReason": row.get("selectionReason") or row["reason"],
                 "reason": row["reason"],
                 "scoreBreakdown": row.get("scoreBreakdown") or {},

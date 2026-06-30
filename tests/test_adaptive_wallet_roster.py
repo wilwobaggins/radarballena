@@ -24,6 +24,19 @@ def _write_json(path: Path, payload):
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
 
 
+def _write_quality(path: Path, rows: list[dict[str, object]]):
+    payload = {
+        "runId": "quality-run",
+        "generatedAt": datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc).isoformat(),
+        "benchmarkWallet": BENCHMARK,
+        "walletCount": len(rows),
+        "wallets": rows,
+        "walletQualityRows": rows,
+        "walletResults": rows,
+    }
+    _write_json(path, payload)
+
+
 def _write_history(path: Path, rows: list[dict[str, object]]):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(json.dumps(row, ensure_ascii=False, default=str) for row in rows) + "\n", encoding="utf-8")
@@ -884,6 +897,7 @@ def test_adaptive_signal_wallet_roster_fallback_fills_to_target_and_marks_probat
     assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
     assert payload["selectedWallets"][0]["rank"] == 1
     assert payload["selectedWallets"][0]["probationaryCandidate"] is False
+    assert "SMART_MONEY_WALLET_ROSTER_QUALITY_FEEDBACK_LOADED rows=0" in output
     assert "SMART_MONEY_WALLET_ROSTER_INSUFFICIENT_LIVE_QUALITY" in output
     assert "SMART_MONEY_WALLET_ROSTER_SELECTED count=1" in output
     shutil.rmtree(base, ignore_errors=True)
@@ -974,4 +988,155 @@ def test_adaptive_signal_wallet_roster_prefers_copyability_seed_source_over_api(
     assert payload["selectedWallets"][0]["wallet"] == BENCHMARK
     assert "SMART_MONEY_WALLET_ROSTER_PREFLIGHT_SOURCE source=copyability_seed_trades" in output
     assert f"SMART_MONEY_WALLET_ROSTER_PREFLIGHT_COPYABILITY_PARITY wallet={WALLETS['macro']} preflightRaw=1 copyabilityRawEstimate=1" in output
+    shutil.rmtree(base, ignore_errors=True)
+
+
+def test_adaptive_signal_wallet_roster_skips_replacement_candidate_when_alternatives_exist(monkeypatch, capsys):
+    base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp_quality_skip"
+    shutil.rmtree(base, ignore_errors=True)
+    base.mkdir(parents=True, exist_ok=True)
+    _candidate_sources(base)
+    _write_quality(
+        base / "adaptive_signal_wallet_quality.json",
+        [
+            {
+                "wallet": BENCHMARK,
+                "actionableSignalScore": 88,
+                "keepInRosterRecommendation": "KEEP_BENCHMARK",
+                "routineClusterRate": 0.0,
+                "microMarketClusterRate": 0.0,
+            },
+            *[
+                {
+                    "wallet": wallet,
+                    "actionableSignalScore": 82,
+                    "keepInRosterRecommendation": "KEEP_CANDIDATE",
+                    "routineClusterRate": 0.1,
+                    "microMarketClusterRate": 0.0,
+                }
+                for wallet in [WALLETS["macro"], WALLETS["politics"], WALLETS["geopolitics"], WALLETS["crypto"], WALLETS["technology"]]
+            ],
+            {
+                "wallet": WALLETS["rejected"],
+                "actionableSignalScore": 18,
+                "keepInRosterRecommendation": "REPLACE_CANDIDATE",
+                "routineClusterRate": 0.75,
+                "microMarketClusterRate": 0.5,
+            },
+        ],
+    )
+
+    monkeypatch.setattr(roster, "OUTPUT_DIR", base)
+    monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+
+    payload = roster.build_adaptive_signal_wallet_roster(
+        benchmark_wallet=BENCHMARK,
+        target_roster_size=6,
+        wallet_scores=[],
+        shadow_rows=[],
+        output_dir=base,
+    )
+    output = capsys.readouterr().out
+
+    selected_wallets = [row["wallet"] for row in payload["selectedWallets"]]
+    assert len(selected_wallets) == 6
+    assert BENCHMARK in selected_wallets
+    assert WALLETS["rejected"] not in selected_wallets
+    assert "SMART_MONEY_WALLET_ROSTER_QUALITY_FEEDBACK_LOADED rows=7" in output
+    assert f"SMART_MONEY_WALLET_ROSTER_QUALITY_PENALTY wallet={WALLETS['rejected']} recommendation=REPLACE_CANDIDATE" in output
+    assert f"SMART_MONEY_WALLET_ROSTER_REPLACE_CANDIDATE_SKIPPED wallet={WALLETS['rejected']}" in output
+    rejected = next(row for row in payload["rejectedWallets"] if row["wallet"] == WALLETS["rejected"])
+    assert rejected["previousQualityRecommendation"] == "REPLACE_CANDIDATE"
+    assert rejected["qualityPenaltyApplied"] > 0
+    shutil.rmtree(base, ignore_errors=True)
+
+
+def test_adaptive_signal_wallet_roster_reuses_replacement_candidate_only_when_needed(monkeypatch, capsys):
+    base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp_quality_reuse"
+    shutil.rmtree(base, ignore_errors=True)
+    base.mkdir(parents=True, exist_ok=True)
+    _write_json(
+        base / "wallet_shadow_rankings.json",
+        [
+            {
+                "wallet": BENCHMARK,
+                "displayName": "Ken",
+                "roles": ["benchmark"],
+                "profiles": ["mixed"],
+                "classification": "WHALE_BUT_NOISY",
+                "robustSkillScore": 75,
+                "shadowRobustMetaScore": 69,
+                "longitudinalComparisonScore": 61,
+                "comparisonConfidence": "sufficient",
+                "runCount": 6,
+                "dominantKnownCategory": "geopolitics",
+                "knownCategoryCoverageScore": 50,
+                "pnlConcentrationLevel": "low",
+                "recommendation": "shadow_watch",
+                "rank": 1,
+            },
+            {
+                "wallet": WALLETS["macro"],
+                "displayName": "Macro Wallet",
+                "roles": ["candidate"],
+                "profiles": ["macro"],
+                "classification": "SPECIALIST_WALLET",
+                "robustSkillScore": 88,
+                "shadowRobustMetaScore": 84,
+                "longitudinalComparisonScore": 79,
+                "comparisonConfidence": "sufficient",
+                "runCount": 8,
+                "dominantKnownCategory": "macro",
+                "knownCategoryCoverageScore": 88,
+                "pnlConcentrationLevel": "low",
+                "recommendation": "shadow_strong",
+                "rank": 2,
+            },
+        ],
+    )
+    _write_json(base / "wallet_category_rankings.json", {})
+    _write_history(base / "wallet_shadow_history.jsonl", [])
+    _write_json(base / "wallet_copyability_summary.json", {})
+    _write_json(base / "wallet_comparison_summary.json", {"comparisons": [], "sufficient": 0})
+    _write_json(base / "trade_copyability_shadow.json", {"clusters": [], "walletResults": []})
+    _write_quality(
+        base / "adaptive_signal_wallet_quality.json",
+        [
+            {
+                "wallet": BENCHMARK,
+                "actionableSignalScore": 90,
+                "keepInRosterRecommendation": "KEEP_BENCHMARK",
+                "routineClusterRate": 0.0,
+                "microMarketClusterRate": 0.0,
+            },
+            {
+                "wallet": WALLETS["macro"],
+                "actionableSignalScore": 18,
+                "keepInRosterRecommendation": "REPLACE_CANDIDATE",
+                "routineClusterRate": 0.7,
+                "microMarketClusterRate": 0.4,
+            },
+        ],
+    )
+
+    monkeypatch.setattr(roster, "OUTPUT_DIR", base)
+    monkeypatch.setattr(roster, "ADAPTIVE_SIGNAL_WALLET_ROSTER_FILE", base / "adaptive_signal_wallet_roster.json")
+
+    payload = roster.build_adaptive_signal_wallet_roster(
+        benchmark_wallet=BENCHMARK,
+        target_roster_size=2,
+        wallet_scores=[],
+        shadow_rows=[],
+        output_dir=base,
+    )
+    output = capsys.readouterr().out
+
+    assert len(payload["selectedWallets"]) == 2
+    selected = payload["selectedWallets"][1]
+    assert selected["wallet"] == WALLETS["macro"]
+    assert selected["probationaryCandidate"] is True
+    assert selected["selectionReason"] == "fallback reused despite previous REPLACE_CANDIDATE"
+    assert selected["previousQualityRecommendation"] == "REPLACE_CANDIDATE"
+    assert selected["qualityPenaltyApplied"] > 0
+    assert "SMART_MONEY_WALLET_ROSTER_REPLACE_CANDIDATE_SKIPPED wallet=" in output
     shutil.rmtree(base, ignore_errors=True)
