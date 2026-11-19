@@ -15,6 +15,7 @@ try:  # pragma: no cover - support package and script-style imports
     )
     from .related_markets import build_estela_capital_by_market
     from .polymarket_profile_client import fetch_closed_positions
+    from .polymarket_data_api import iter_pages as iter_polymarket_pages
     from .storage import save_json
     from .supabase_writer import (
         fail_engine_run,
@@ -80,6 +81,7 @@ except ImportError:  # pragma: no cover
     )
     from related_markets import build_estela_capital_by_market
     from polymarket_profile_client import fetch_closed_positions
+    from polymarket_data_api import iter_pages as iter_polymarket_pages
     from storage import save_json
     from supabase_writer import (
         fail_engine_run,
@@ -147,7 +149,6 @@ print(
     f"source={'COPYABILITY_OUTPUTS_DIR' if os.getenv('COPYABILITY_OUTPUTS_DIR') else 'SMART_MONEY_ENGINE_OUTPUT_DIR' if os.getenv('SMART_MONEY_ENGINE_OUTPUT_DIR') else 'fallback'}"
 )
 
-DATA_API = "https://data-api.polymarket.com"
 MIN_TRADE_USD = float(os.getenv("MIN_TRADE_USD", "250"))
 LOOKBACK_HOURS = int(os.getenv("LOOKBACK_HOURS", "168"))
 PAGE_LIMIT = int(os.getenv("PAGE_LIMIT", "1000"))
@@ -180,7 +181,7 @@ def parse_float(value: Any, default: float = 0.0) -> float:
 
 
 def pick_wallet(activity: dict[str, Any]) -> Optional[str]:
-    for key in ["proxyWallet", "wallet", "user", "address", "trader"]:
+    for key in ["proxy_wallet", "proxyWallet", "wallet", "user", "address", "trader"]:
         value = activity.get(key)
         if isinstance(value, str) and value.startswith("0x"):
             return value.lower()
@@ -240,14 +241,16 @@ def normalize_activity(row: dict[str, Any]) -> Optional[dict[str, Any]]:
     if not wallet:
         return None
 
-    size_usd = (
-        parse_float(row.get("usdcSize"))
-        or parse_float(row.get("size"))
-        or parse_float(row.get("amount"))
-        or parse_float(row.get("value"))
-    )
-
     price = parse_float(row.get("price"), default=0.0)
+    usdc_size = row.get("usdc_size")
+    if usdc_size is None:
+        usdc_size = row.get("usdcSize")
+    if usdc_size is not None:
+        size_usd = parse_float(usdc_size)
+    elif row.get("size") is not None:
+        size_usd = parse_float(row.get("size")) * price
+    else:
+        size_usd = parse_float(row.get("amount") or row.get("value"))
     timestamp = pick_timestamp(row)
     title = normalize_title(row.get("title") or row.get("marketTitle") or row.get("slug"))
 
@@ -272,41 +275,16 @@ async def fetch_recent_activity() -> list[dict[str, Any]]:
     all_items: list[dict[str, Any]] = []
 
     async with httpx.AsyncClient(timeout=25) as http:
-        for offset in range(0, MAX_OFFSET, PAGE_LIMIT):
-            params = {
-                "limit": PAGE_LIMIT,
-                "offset": offset,
-                "takerOnly": False,
-            }
-
-            try:
-                response = await http.get(f"{DATA_API}/trades", params=params)
-            except httpx.HTTPError as exc:
-                print(f"Stopping pagination: request error at offset={offset}: {exc}")
-                break
-
-            if response.status_code == 400:
-                print(f"Stopping pagination: 400 at offset={offset}")
-                break
-
-            try:
-                response.raise_for_status()
-            except httpx.HTTPError as exc:
-                print(f"Stopping pagination: response error at offset={offset}: {exc}")
-                break
-            data = response.json()
-
-            if isinstance(data, dict):
-                items = data.get("data") or data.get("items") or data.get("trades") or []
-            else:
-                items = data
-
-            print(f"offset={offset} raw_items={len(items)}")
-
-            if not items:
-                break
-
-            all_items.extend(items)
+        try:
+            async for items in iter_polymarket_pages(
+                http,
+                "trades",
+                {"limit": min(1000, max(1, PAGE_LIMIT)), "taker_only": False},
+                max_items=max(0, MAX_OFFSET),
+            ):
+                all_items.extend(items)
+        except (httpx.HTTPError, ValueError) as exc:
+            print(f"Stopping Polymarket v2 pagination after request error: {exc}")
 
     normalized: list[dict[str, Any]] = []
     cutoff = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
@@ -525,27 +503,13 @@ async def _fetch_targeted_activity_for_wallet(wallet: str) -> tuple[list[dict[st
     raw_events: list[dict[str, Any]] = []
     try:
         async with httpx.AsyncClient(timeout=float(os.getenv("SKILL_HTTP_TIMEOUT_SECONDS", "25"))) as http:
-            for offset in range(0, SKILL_MAX_CLOSED_POSITIONS, 50):
-                response = await http.get(
-                    f"{DATA_API}/trades",
-                    params={
-                        "user": wallet,
-                        "limit": 50,
-                        "offset": offset,
-                        "takerOnly": False,
-                    },
-                )
-                response.raise_for_status()
-                data = response.json()
-                if isinstance(data, dict):
-                    items = data.get("data") or data.get("items") or data.get("trades") or []
-                else:
-                    items = data
-                if not isinstance(items, list) or not items:
-                    break
-                raw_events.extend(item for item in items if isinstance(item, dict))
-                if len(items) < 50:
-                    break
+            async for items in iter_polymarket_pages(
+                http,
+                "trades",
+                {"user": wallet, "limit": 50, "taker_only": False},
+                max_items=max(0, SKILL_MAX_CLOSED_POSITIONS),
+            ):
+                raw_events.extend(items)
     except Exception as error:
         print(
             "SMART_MONEY_SKILL_TARGETED_ACTIVITY_FAILED "

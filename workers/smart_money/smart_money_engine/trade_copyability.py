@@ -26,6 +26,7 @@ try:  # pragma: no cover - support package and script-style imports
         fetch_batch_price_history,
         find_nearest_price_point,
     )
+    from .polymarket_data_api import iter_pages as iter_polymarket_pages
     from .time_utils import to_unix_seconds, to_utc_datetime, to_utc_iso
 except ImportError:  # pragma: no cover
     from category_utils import guess_skill_category_from_title
@@ -42,6 +43,7 @@ except ImportError:  # pragma: no cover
         fetch_batch_price_history,
         find_nearest_price_point,
     )
+    from polymarket_data_api import iter_pages as iter_polymarket_pages
     from time_utils import to_unix_seconds, to_utc_datetime, to_utc_iso
 
 
@@ -193,21 +195,27 @@ def normalize_copyability_trade(raw: dict[str, Any], wallet: str) -> dict[str, A
     if price is None:
         return None
 
-    shares = _normalize_nonnegative(raw.get("shares") or raw.get("quantity") or raw.get("amount"))
-    size_usd = _normalize_nonnegative(
-        raw.get("sizeUsd")
+    shares = _normalize_nonnegative(
+        raw.get("shares") or raw.get("quantity") or raw.get("size") or raw.get("amount")
+    )
+    explicit_usdc = (
+        raw.get("usdc_size")
         or raw.get("usdcSize")
-        or raw.get("size")
-        or raw.get("value")
+        or raw.get("sizeUsd")
         or raw.get("usdSize")
+    )
+    size_usd = (
+        _normalize_nonnegative(explicit_usdc)
+        if explicit_usdc is not None
+        else _normalize_nonnegative(shares * price if shares and price else raw.get("value"))
     )
 
     if size_usd == 0.0 and shares == 0.0:
         return None
 
-    transaction_hash = _string_value(raw, "transactionHash", "txHash", "hash")
+    transaction_hash = _string_value(raw, "transaction_hash", "transactionHash", "txHash", "hash")
     trade_id = _string_value(raw, "tradeId", "id", "trade_id")
-    event_slug = _string_value(raw, "eventSlug", "slug")
+    event_slug = _string_value(raw, "event_slug", "eventSlug", "slug")
     outcome = _string_value(raw, "outcome", "answer", "outcomeName")
     category = guess_skill_category_from_title(market_title or event_slug or condition_id or asset)
 
@@ -332,26 +340,14 @@ async def fetch_copyability_trades_for_wallet(
     reason = "no_valid_trades"
     cutoff = _utc_now() - timedelta(hours=lookback_hours)
     try:
-        for offset in range(0, limit, 50):
-            params = {
-                "user": wallet,
-                "limit": min(50, limit - offset),
-                "offset": offset,
-                "takerOnly": False,
-            }
-            if semaphore is not None:
-                async with semaphore:
-                    response = await client.get("https://data-api.polymarket.com/trades", params=params)
-            else:
-                response = await client.get("https://data-api.polymarket.com/trades", params=params)
-            response.raise_for_status()
-            data = response.json()
-            if isinstance(data, dict):
-                items = data.get("data") or data.get("items") or data.get("trades") or []
-            else:
-                items = data
-            if not isinstance(items, list) or not items:
-                    break
+        params = {"user": wallet, "limit": min(50, max(1, limit)), "taker_only": False}
+        async for items in iter_polymarket_pages(
+            client,
+            "trades",
+            params,
+            max_items=max(0, limit),
+            semaphore=semaphore,
+        ):
             for raw in items:
                 if not isinstance(raw, dict):
                     continue
@@ -364,8 +360,6 @@ async def fetch_copyability_trades_for_wallet(
                 if trade_ts is None or trade_ts < cutoff:
                     continue
                 collected.append(trade)
-            if len(items) < 50:
-                break
     except Exception:
         collected = []
         status = "failed"
@@ -1431,6 +1425,7 @@ async def run_trade_copyability_shadow(
             start_timestamp=start_timestamp,
             end_timestamp=end_timestamp,
             fidelity=str(COPYABILITY_PRICE_FIDELITY_MINUTES),
+            semaphore=semaphore,
             cache_enabled=COPYABILITY_PRICE_CACHE_ENABLED,
         )
         price_history_cache_hits = max(0, len(token_ids) - price_history_requests)

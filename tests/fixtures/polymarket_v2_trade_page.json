@@ -1,0 +1,24 @@
+{
+  "data": [
+    {
+      "proxy_wallet": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "side": "BUY",
+      "token_id": "12345678901234567890",
+      "condition_id": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "size": 10,
+      "price": 0.4,
+      "timestamp": 1782752879,
+      "transaction_hash": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "title": "Fixture market",
+      "slug": "fixture-market",
+      "event_slug": "fixture-event",
+      "outcome": "Yes"
+    }
+  ],
+  "pagination": {
+    "limit": 1,
+    "offset": 0,
+    "has_more": true,
+    "next_cursor": "fixture-cursor-page-2"
+  }
+}

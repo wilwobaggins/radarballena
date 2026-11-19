@@ -12,7 +12,10 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
-DATA_API = "https://data-api.polymarket.com"
+try:
+    from .polymarket_data_api import iter_pages as iter_polymarket_trade_pages
+except ImportError:  # pragma: no cover - script-style container entrypoint
+    from polymarket_data_api import iter_pages as iter_polymarket_trade_pages
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
@@ -33,7 +36,7 @@ MIN_TRADE_USD = float(os.getenv("MIN_TRADE_USD", "250"))
 LOOKBACK_HOURS = int(os.getenv("LOOKBACK_HOURS", "168"))
 MAX_CANDIDATES_FOR_AI = int(os.getenv("MAX_CANDIDATES_FOR_AI", "20"))
 
-# Pagination: keep this conservative. Some offsets can return 400.
+# Data API v2 cursor pagination; retain the prior bounded row budget.
 PAGE_LIMIT = int(os.getenv("PAGE_LIMIT", "1000"))
 MAX_OFFSET = int(os.getenv("MAX_OFFSET", "4000"))
 HTTP_TIMEOUT_SECONDS = int(os.getenv("HTTP_TIMEOUT_SECONDS", "25"))
@@ -180,7 +183,7 @@ def parse_float(value: Any, default: float = 0.0) -> float:
 
 
 def pick_wallet(activity: Dict[str, Any]) -> Optional[str]:
-    for key in ["proxyWallet", "wallet", "user", "address", "trader"]:
+    for key in ["proxy_wallet", "proxyWallet", "wallet", "user", "address", "trader"]:
         value = activity.get(key)
         if isinstance(value, str) and value.startswith("0x"):
             return value.lower()
@@ -271,14 +274,16 @@ def normalize_activity(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if not wallet:
         return None
 
-    size_usd = (
-        parse_float(row.get("usdcSize"))
-        or parse_float(row.get("size"))
-        or parse_float(row.get("amount"))
-        or parse_float(row.get("value"))
-    )
-
     price = parse_float(row.get("price"), default=0.0)
+    usdc_size = row.get("usdc_size")
+    if usdc_size is None:
+        usdc_size = row.get("usdcSize")
+    if usdc_size is not None:
+        size_usd = parse_float(usdc_size)
+    elif row.get("size") is not None:
+        size_usd = parse_float(row.get("size")) * price
+    else:
+        size_usd = parse_float(row.get("amount") or row.get("value"))
     timestamp = pick_timestamp(row)
     title = normalize_title(row.get("title") or row.get("marketTitle") or row.get("slug"))
 
@@ -303,45 +308,17 @@ async def fetch_recent_activity() -> List[Dict[str, Any]]:
     """
     Fetches recent trades from Polymarket Data API.
 
-    Notes:
-    - /trades supports limit, offset and takerOnly.
-    - Some high offsets can return 400. We stop instead of crashing.
-    - takerOnly=false includes maker fills too, which is better for discovery.
+    Uses the public v2 trades feed with its documented cursor and bounded row budget.
     """
     all_items: List[Dict[str, Any]] = []
 
+    row_budget = max(0, MAX_OFFSET)
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as http:
-        for offset in range(0, MAX_OFFSET, PAGE_LIMIT):
-            params = {
-                "limit": PAGE_LIMIT,
-                "offset": offset,
-                "takerOnly": False,
-            }
-
-            res = await http.get(f"{DATA_API}/trades", params=params)
-
-            if res.status_code == 400:
-                print(f"Stopping pagination: 400 at offset={offset}")
-                break
-
-            res.raise_for_status()
-            data = res.json()
-
-            if isinstance(data, dict):
-                items = data.get("data") or data.get("items") or data.get("trades") or []
-            else:
-                items = data
-
-            print(f"offset={offset} raw_items={len(items)}")
-
-            if not items:
-                break
-
-            if offset == 0 and items:
-                print("\nSample raw trade keys:")
-                print(list(items[0].keys()))
-                print()
-
+        async for items in iter_polymarket_trade_pages(
+            http,
+            {"limit": min(1000, max(1, PAGE_LIMIT)), "taker_only": False},
+            max_items=row_budget,
+        ):
             all_items.extend(items)
 
     print(f"Raw trades fetched: {len(all_items)}")
@@ -381,31 +358,11 @@ async def fetch_wallet_trades(wallet: str, min_trade_usd: Optional[float] = None
     min_trade = MIN_TRADE_USD if min_trade_usd is None else float(min_trade_usd)
 
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as http:
-        for offset in range(0, MAX_OFFSET, PAGE_LIMIT):
-            params = {
-                "user": wallet,
-                "limit": PAGE_LIMIT,
-                "offset": offset,
-                "takerOnly": False,
-            }
-
-            res = await http.get(f"{DATA_API}/trades", params=params)
-
-            if res.status_code == 400:
-                print(f"Stopping wallet pagination: wallet={wallet} offset={offset}")
-                break
-
-            res.raise_for_status()
-            data = res.json()
-
-            if isinstance(data, dict):
-                items = data.get("data") or data.get("items") or data.get("trades") or []
-            else:
-                items = data
-
-            if not items:
-                break
-
+        async for items in iter_polymarket_trade_pages(
+            http,
+            {"user": wallet, "limit": min(1000, max(1, PAGE_LIMIT)), "taker_only": False},
+            max_items=max(0, MAX_OFFSET),
+        ):
             all_items.extend(items)
 
     normalized: List[Dict[str, Any]] = []

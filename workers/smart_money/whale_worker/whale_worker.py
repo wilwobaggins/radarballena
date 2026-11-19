@@ -40,7 +40,7 @@ WATCHED_WHALES = {
 }
 
 POLL_SECONDS = int(os.getenv("POLL_SECONDS", "30"))
-DATA_API = "https://data-api.polymarket.com/activity"
+DATA_API = "https://data-api.polymarket.com/v2/activity"
 SEEN_FILE = os.getenv("SEEN_FILE", "/data/seen_hashes.json")
 MAX_SEEN_HASHES = 10000
 MAX_AGE_SECONDS = int(os.getenv("MAX_AGE_SECONDS", "259200"))
@@ -76,8 +76,8 @@ def safe_float(value, default=0.0):
 
 def make_hash(item):
     raw = (
-        f"{item.get('transactionHash')}:"
-        f"{item.get('asset')}:"
+        f"{item.get('transaction_hash') or item.get('transactionHash')}:"
+        f"{item.get('token_id') or item.get('asset')}:"
         f"{item.get('timestamp')}:"
         f"{item.get('side')}:"
         f"{item.get('size')}"
@@ -112,16 +112,20 @@ def fetch_activity(wallet):
     params = {
         "user": wallet,
         "limit": 50,
-        "sortBy": "TIMESTAMP",
-        "sortDirection": "DESC",
+        "type": "TRADE",
+        "sort_by": "TIMESTAMP",
+        "sort_direction": "DESC",
     }
 
-    return get_json(DATA_API, params)
+    payload = get_json(DATA_API, params, timeout=10)
+    if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
+        raise ValueError("Unexpected Polymarket v2 activity envelope")
+    return [item for item in payload["data"] if isinstance(item, dict)]
 
 
 def is_relevant_trade(item, whale_id):
     title = (item.get("title") or "").lower()
-    event_slug = (item.get("eventSlug") or "").lower()
+    event_slug = (item.get("event_slug") or item.get("eventSlug") or "").lower()
     text = f"{title} {event_slug}"
 
     nba_keywords = [
@@ -281,7 +285,7 @@ def get_market_id_from_event_slug(event_slug, alert_title=None):
 
 def resolve_market_id(item, market_title):
     market_slug = item.get("slug")
-    event_slug = item.get("eventSlug")
+    event_slug = item.get("event_slug") or item.get("eventSlug")
 
     market_id = get_market_id_by_slug(market_slug)
 
@@ -303,10 +307,12 @@ def resolve_market_id(item, market_title):
 
 def parse_alert(item, whale_id, whale_name):
     price = safe_float(item.get("price"))
-    size_usd = safe_float(item.get("usdcSize"))
+    size_usd = safe_float(item.get("usdc_size") or item.get("usdcSize"))
+    if size_usd == 0:
+        size_usd = safe_float(item.get("size")) * safe_float(item.get("price"))
     shares = safe_float(item.get("size"))
 
-    event_slug = item.get("eventSlug")
+    event_slug = item.get("event_slug") or item.get("eventSlug")
 
     action = item.get("side") or ""
     answer = item.get("outcome") or ""
@@ -427,7 +433,9 @@ def main():
                         non_trades += 1
                         continue
 
-                    size_usd = safe_float(item.get("usdcSize"))
+                    size_usd = safe_float(item.get("usdc_size") or item.get("usdcSize"))
+                    if size_usd == 0:
+                        size_usd = safe_float(item.get("size")) * safe_float(item.get("price"))
 
                     if size_usd < cfg["min_usdc"]:
                         below_min += 1
@@ -446,7 +454,10 @@ def main():
                     if timestamp:
                         try:
                             from datetime import datetime
-                            trade_time = datetime.fromisoformat(timestamp.replace('Z', '+00:00')).timestamp()
+                            if isinstance(timestamp, (int, float)):
+                                trade_time = float(timestamp)
+                            else:
+                                trade_time = datetime.fromisoformat(timestamp.replace('Z', '+00:00')).timestamp()
                             age = time.time() - trade_time
                             if age > MAX_AGE_SECONDS:
                                 too_old += 1

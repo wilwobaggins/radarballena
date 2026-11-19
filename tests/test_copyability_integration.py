@@ -280,7 +280,7 @@ def test_copyability_phase_marks_network_failure_explicitly(monkeypatch, capsys)
 
     async def fake_fetch(wallet, *_args, **_kwargs):
         if wallet == wallets[0]:
-            raise httpx.ConnectError("network down", request=httpx.Request("GET", "https://data-api.polymarket.com/trades"))
+            raise httpx.ConnectError("network down", request=httpx.Request("GET", "https://data-api.polymarket.com/v2/trades"))
         if wallet == wallets[1]:
             return {
                 "wallet": wallet,

@@ -9,13 +9,17 @@ import httpx
 
 try:  # pragma: no cover - support package and script-style imports
     from .time_utils import to_unix_seconds, to_utc_datetime
+    from .polymarket_data_api import iter_pages as iter_polymarket_pages
 except ImportError:  # pragma: no cover
     from time_utils import to_unix_seconds, to_utc_datetime
+    from polymarket_data_api import iter_pages as iter_polymarket_pages
 
 
-DEFAULT_BASE_URL = os.getenv("COPYABILITY_PRICE_HISTORY_BASE_URL", "https://clob.polymarket.com")
 DEFAULT_TIMEOUT_SECONDS = float(os.getenv("COPYABILITY_PRICE_HISTORY_TIMEOUT_SECONDS", "25"))
 DEFAULT_FIDELITY = os.getenv("COPYABILITY_PRICE_FIDELITY_DEFAULT", "5")
+MAX_HISTORY_DAYS = 15
+MAX_HISTORY_POINTS = 10000
+PRICE_HISTORY_PAGE_SIZE = 1000
 PRICE_HISTORY_CACHE_ENABLED = os.getenv("COPYABILITY_PRICE_CACHE_ENABLED", "true").lower() == "true"
 
 PRICE_HISTORY_CACHE: dict[str, list[dict[str, Any]]] = {}
@@ -27,13 +31,19 @@ def _normalize_token_id(token_id: Any) -> str:
 
 def _normalize_point(point: dict[str, Any]) -> dict[str, Any] | None:
     try:
-        timestamp_value = point.get("timestamp") or point.get("time") or point.get("t")
+        timestamp_value = next(
+            (point.get(key) for key in ("timestamp", "time", "t") if point.get(key) is not None),
+            None,
+        )
         if timestamp_value is None:
             return None
         timestamp = to_utc_datetime(timestamp_value)
         if timestamp is None:
             return None
-        price_value = point.get("price") or point.get("value") or point.get("midpoint")
+        price_value = next(
+            (point.get(key) for key in ("price", "value", "midpoint", "p") if point.get(key) is not None),
+            None,
+        )
         price = float(price_value)
         if price != price or price in {float("inf"), float("-inf")}:
             return None
@@ -88,39 +98,42 @@ async def _fetch_history(
     end_timestamp: datetime | None,
     fidelity: str,
 ) -> list[dict[str, Any]]:
-    params: dict[str, Any] = {"token_id": token_id, "fidelity": fidelity}
-    if start_timestamp is not None:
-        start_dt = to_utc_datetime(start_timestamp)
-        if start_dt is not None:
-            params["start_ts"] = to_unix_seconds(start_dt)
-    if end_timestamp is not None:
-        end_dt = to_utc_datetime(end_timestamp)
+    params: dict[str, Any] = {
+        "token_id": token_id,
+        "bucket_seconds": max(60, min(86400, int(float(fidelity) * 60))),
+        "limit": PRICE_HISTORY_PAGE_SIZE,
+    }
+    start_dt = to_utc_datetime(start_timestamp) if start_timestamp is not None else None
+    end_dt = to_utc_datetime(end_timestamp) if end_timestamp is not None else None
+    if start_dt is not None:
+        params["start"] = to_unix_seconds(start_dt)
         if end_dt is not None:
-            params["end_ts"] = to_unix_seconds(end_dt)
+            params["end"] = to_unix_seconds(end_dt)
+    elif end_dt is not None:
+        params["start"] = to_unix_seconds(end_dt - timedelta(days=1))
+        params["end"] = to_unix_seconds(end_dt)
+    else:
+        params["interval"] = "1d"
 
-    for path in ("prices-history", "price-history", "history"):
-        try:
-            response = await client.get(f"{DEFAULT_BASE_URL}/{path}", params=params)
-            response.raise_for_status()
-        except Exception:
-            continue
-        data = response.json()
-        if isinstance(data, dict):
-            items = data.get("data") or data.get("history") or data.get("prices") or data.get("items") or []
-        else:
-            items = data
-        if not isinstance(items, list):
+    if "start" in params:
+        start_epoch = int(params["start"])
+        end_epoch = int(params.get("end", to_unix_seconds(datetime.now(timezone.utc))))
+        if end_epoch <= start_epoch or end_epoch - start_epoch > MAX_HISTORY_DAYS * 86400:
             return []
-        points = []
-        for item in items:
-            if not isinstance(item, dict):
-                continue
+
+    points: list[dict[str, Any]] = []
+    async for rows in iter_polymarket_pages(
+        client,
+        "prices-history",
+        params,
+        max_items=MAX_HISTORY_POINTS,
+    ):
+        for item in rows:
             normalized = _normalize_point(item)
             if normalized is not None:
                 points.append(normalized)
-        points.sort(key=lambda item: item["timestamp"])
-        return points
-    return []
+    points.sort(key=lambda item: item["timestamp"])
+    return points
 
 
 async def fetch_price_history(

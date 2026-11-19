@@ -9,7 +9,7 @@ import os
 
 GAMMA_MARKETS = "https://gamma-api.polymarket.com/markets"
 GAMMA_EVENTS = "https://gamma-api.polymarket.com/events"
-DATA_TRADES = "https://data-api.polymarket.com/trades"
+DATA_TRADES = "https://data-api.polymarket.com/v2/trades"
 
 MIN_TRADE_USD = 20
 MARKETS_PER_TERM = 100
@@ -309,21 +309,40 @@ def search_markets(term, include_macro=True, extra_keywords=None):
 
 def fetch_trades(condition_id):
     try:
-        data = get_json(
-            DATA_TRADES,
-            {
-                "market": condition_id,
-                "limit": TRADES_PER_MARKET,
-                "takerOnly": "false",
-                "filterType": "CASH",
-                "filterAmount": MIN_TRADE_USD,
-            },
-        )
-
-        if isinstance(data, list):
-            return data
-
-        return []
+        collected = []
+        row_budget = max(0, int(TRADES_PER_MARKET))
+        if row_budget == 0:
+            return []
+        cursor = None
+        seen_cursors = set()
+        page_size = min(1000, row_budget)
+        max_pages = (row_budget + page_size - 1) // page_size
+        for _ in range(max_pages):
+            params = {
+                "condition": condition_id,
+                "limit": page_size,
+                "taker_only": "false",
+                "filter_type": "CASH",
+                "filter_amount": MIN_TRADE_USD,
+            }
+            if cursor:
+                params["cursor"] = cursor
+            payload = get_json(DATA_TRADES, params)
+            if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
+                return []
+            rows = [row for row in payload["data"] if isinstance(row, dict)]
+            if not rows:
+                break
+            pagination = payload.get("pagination")
+            next_cursor = pagination.get("next_cursor") if isinstance(pagination, dict) else None
+            if next_cursor is not None and next_cursor in seen_cursors:
+                break
+            collected.extend(rows[: row_budget - len(collected)])
+            if len(collected) >= row_budget or not next_cursor:
+                break
+            seen_cursors.add(next_cursor)
+            cursor = next_cursor
+        return collected
 
     except Exception as e:
         print(f"[TRADES_ERROR] conditionId={condition_id} error={e}")
