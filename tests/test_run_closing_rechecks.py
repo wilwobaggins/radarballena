@@ -1,6 +1,22 @@
+from datetime import datetime, timezone
+
+import pytest
+
+import services.closing_recheck_service as closing_recheck_service
 from services.closing_recheck_candidates_client import normalize_closing_recheck_candidates
 from services.closing_recheck_service import ClosingRecheckQuotaExceeded
 from scripts import run_closing_rechecks as runner
+
+
+@pytest.fixture(autouse=True)
+def freeze_market_clock(monkeypatch):
+    fixed_now = datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc)
+    original_get_market_open_status = closing_recheck_service.get_market_open_status
+    monkeypatch.setattr(
+        closing_recheck_service,
+        "get_market_open_status",
+        lambda market, now=None: original_get_market_open_status(market, now=fixed_now),
+    )
 
 
 def build_flat_candidate(

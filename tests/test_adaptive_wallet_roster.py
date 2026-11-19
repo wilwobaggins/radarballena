@@ -9,6 +9,7 @@ from workers.smart_money.smart_money_engine import adaptive_wallet_roster as ros
 
 
 BENCHMARK = "0x9d84ce0306f8551e02efef1680475fc0f1dc1344"
+ROSTER_TEST_NOW = datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc)
 WALLETS = {
     "macro": "0x" + "1" * 40,
     "politics": "0x" + "2" * 40,
@@ -19,6 +20,14 @@ WALLETS = {
 }
 
 
+class _FrozenDateTime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        if tz is None:
+            return ROSTER_TEST_NOW.replace(tzinfo=None)
+        return ROSTER_TEST_NOW.astimezone(tz)
+
+
 def _write_json(path: Path, payload):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
@@ -27,7 +36,7 @@ def _write_json(path: Path, payload):
 def _write_quality(path: Path, rows: list[dict[str, object]]):
     payload = {
         "runId": "quality-run",
-        "generatedAt": datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc).isoformat(),
+        "generatedAt": ROSTER_TEST_NOW.isoformat(),
         "benchmarkWallet": BENCHMARK,
         "walletCount": len(rows),
         "wallets": rows,
@@ -119,7 +128,7 @@ def _fake_fetch_copyability_trades_for_wallet_factory(trade_map: dict[str, list[
 
 
 def _candidate_sources(base: Path):
-    now = datetime(2026, 6, 29, 12, 0, tzinfo=timezone.utc)
+    now = ROSTER_TEST_NOW
     general_rankings = [
         {
             "wallet": BENCHMARK,
@@ -574,6 +583,7 @@ def _write_low_signal_candidate_sources(base: Path, candidate_count: int = 195):
 
 
 def test_adaptive_signal_wallet_roster_selects_six_wallets_and_writes_output(monkeypatch):
+    monkeypatch.setattr(roster, "datetime", _FrozenDateTime)
     base = Path.cwd() / "tests" / "_adaptive_wallet_roster_tmp"
     shutil.rmtree(base, ignore_errors=True)
     base.mkdir(parents=True, exist_ok=True)
