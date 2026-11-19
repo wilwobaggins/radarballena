@@ -68,3 +68,25 @@ def test_insert_deepsignal_prediction_builds_expected_payload(monkeypatch):
         fake_supabase.table_ref.payload["rawPrediction"]["raw_output_metadata"]["provider"]
         == "openai"
     )
+
+
+def test_get_supabase_client_reuses_process_client(monkeypatch):
+    fake_client = FakeSupabase()
+    created = []
+
+    monkeypatch.setenv("SUPABASE_URL", "https://unit.test.invalid")
+    monkeypatch.setenv("SUPABASE_SERVICE_ROLE_KEY", "unit-test-key")
+    monkeypatch.setattr(supabase_service, "_SUPABASE_CLIENT", None)
+
+    def fake_create_client(url, key):
+        created.append((url, key))
+        return fake_client
+
+    monkeypatch.setattr(supabase_service, "create_client", fake_create_client)
+
+    first = supabase_service.get_supabase_client()
+    second = supabase_service.get_supabase_client()
+
+    assert first is fake_client
+    assert second is fake_client
+    assert created == [("https://unit.test.invalid", "unit-test-key")]

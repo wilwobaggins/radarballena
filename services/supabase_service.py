@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 
 load_dotenv()
 
+_SUPABASE_CLIENT: Client | None = None
+
 
 def _coalesce(*values: Any) -> Any:
     for value in values:
@@ -56,10 +58,16 @@ def required_env(name: str) -> str:
 
 
 def get_supabase_client() -> Client:
+    global _SUPABASE_CLIENT
+
+    if _SUPABASE_CLIENT is not None:
+        return _SUPABASE_CLIENT
+
     url = required_env("SUPABASE_URL")
     key = required_env("SUPABASE_SERVICE_ROLE_KEY")
 
-    return create_client(url, key)
+    _SUPABASE_CLIENT = create_client(url, key)
+    return _SUPABASE_CLIENT
 
 
 def _first_row(response) -> dict[str, Any]:
