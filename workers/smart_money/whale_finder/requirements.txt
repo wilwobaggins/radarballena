@@ -1,0 +1,5 @@
+httpx==0.27.2
+pandas
+python-dotenv==1.0.1
+openai>=1.0.0
+pydantic
