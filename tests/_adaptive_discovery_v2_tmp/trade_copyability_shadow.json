@@ -1,0 +1,82 @@
+{
+  "clusters": [
+    {
+      "wallet": "0x1111111111111111111111111111111111111111",
+      "marketTitle": "Politics election outcome",
+      "category": "politics",
+      "copyabilityStatus": "high_copyability",
+      "copyabilityLabel": "ALTA_CONVICCION",
+      "totalSizeUsd": 500,
+      "hedge": {
+        "hedgeProbability": 10
+      }
+    },
+    {
+      "wallet": "0x2222222222222222222222222222222222222222",
+      "marketTitle": "Macro GDP print",
+      "category": "macro",
+      "copyabilityStatus": "watch_copyability",
+      "copyabilityLabel": "ACUMULACION",
+      "totalSizeUsd": 300,
+      "hedge": {
+        "hedgeProbability": 60
+      }
+    },
+    {
+      "wallet": "0x3333333333333333333333333333333333333333",
+      "marketTitle": "Crypto cycle trade",
+      "category": "crypto",
+      "copyabilityStatus": "watch_copyability",
+      "copyabilityLabel": "ACUMULACION",
+      "totalSizeUsd": 400,
+      "hedge": {
+        "hedgeProbability": 15
+      }
+    },
+    {
+      "wallet": "0x4444444444444444444444444444444444444444",
+      "marketTitle": "Bitcoin Up or Down - June 29, 4:50PM-4:55PM ET",
+      "category": "sports",
+      "copyabilityStatus": "low_copyability",
+      "copyabilityLabel": "ACTIVIDAD_RUTINARIA",
+      "totalSizeUsd": 20,
+      "hedge": {
+        "hedgeProbability": 0
+      }
+    }
+  ],
+  "walletResults": [
+    {
+      "wallet": "0x1111111111111111111111111111111111111111",
+      "clusters": 8,
+      "highCopyabilityCount": 4,
+      "watchCopyabilityCount": 2,
+      "notCopyableCount": 0,
+      "hedgeRate": 0.1
+    },
+    {
+      "wallet": "0x2222222222222222222222222222222222222222",
+      "clusters": 8,
+      "highCopyabilityCount": 1,
+      "watchCopyabilityCount": 1,
+      "notCopyableCount": 3,
+      "hedgeRate": 0.6
+    },
+    {
+      "wallet": "0x3333333333333333333333333333333333333333",
+      "clusters": 8,
+      "highCopyabilityCount": 2,
+      "watchCopyabilityCount": 2,
+      "notCopyableCount": 0,
+      "hedgeRate": 0.15
+    },
+    {
+      "wallet": "0x4444444444444444444444444444444444444444",
+      "clusters": 8,
+      "highCopyabilityCount": 0,
+      "watchCopyabilityCount": 1,
+      "notCopyableCount": 7,
+      "hedgeRate": 0.2
+    }
+  ]
+}

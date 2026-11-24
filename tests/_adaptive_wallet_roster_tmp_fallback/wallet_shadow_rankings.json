@@ -1,0 +1,4707 @@
+[
+  {
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "displayName": "Ken",
+    "roles": [
+      "active",
+      "benchmark"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 64,
+    "robustSkillScore": 77,
+    "shadowRobustMetaScore": 69,
+    "longitudinalComparisonScore": 62.1,
+    "comparisonConfidence": "sufficient",
+    "runCount": 9,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "geopolitics",
+    "knownCategoryCoverageScore": 54,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 1
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000001",
+    "displayName": "Candidate 1",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 2
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000002",
+    "displayName": "Candidate 2",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 3
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000003",
+    "displayName": "Candidate 3",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 4
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000004",
+    "displayName": "Candidate 4",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 5
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000005",
+    "displayName": "Candidate 5",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 6
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000006",
+    "displayName": "Candidate 6",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 7
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000007",
+    "displayName": "Candidate 7",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 8
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000008",
+    "displayName": "Candidate 8",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 9
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000009",
+    "displayName": "Candidate 9",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 10
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000000a",
+    "displayName": "Candidate 10",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 11
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000000b",
+    "displayName": "Candidate 11",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 12
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000000c",
+    "displayName": "Candidate 12",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 13
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000000d",
+    "displayName": "Candidate 13",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 14
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000000e",
+    "displayName": "Candidate 14",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 15
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000000f",
+    "displayName": "Candidate 15",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 16
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000010",
+    "displayName": "Candidate 16",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 17
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000011",
+    "displayName": "Candidate 17",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 18
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000012",
+    "displayName": "Candidate 18",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 19
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000013",
+    "displayName": "Candidate 19",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 20
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000014",
+    "displayName": "Candidate 20",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 21
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000015",
+    "displayName": "Candidate 21",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 22
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000016",
+    "displayName": "Candidate 22",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 23
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000017",
+    "displayName": "Candidate 23",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 24
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000018",
+    "displayName": "Candidate 24",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 25
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000019",
+    "displayName": "Candidate 25",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 26
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000001a",
+    "displayName": "Candidate 26",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 27
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000001b",
+    "displayName": "Candidate 27",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 28
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000001c",
+    "displayName": "Candidate 28",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 29
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000001d",
+    "displayName": "Candidate 29",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 30
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000001e",
+    "displayName": "Candidate 30",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 31
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000001f",
+    "displayName": "Candidate 31",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 32
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000020",
+    "displayName": "Candidate 32",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 33
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000021",
+    "displayName": "Candidate 33",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 34
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000022",
+    "displayName": "Candidate 34",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 35
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000023",
+    "displayName": "Candidate 35",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 36
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000024",
+    "displayName": "Candidate 36",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 37
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000025",
+    "displayName": "Candidate 37",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 38
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000026",
+    "displayName": "Candidate 38",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 39
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000027",
+    "displayName": "Candidate 39",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 40
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000028",
+    "displayName": "Candidate 40",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 41
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000029",
+    "displayName": "Candidate 41",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 42
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000002a",
+    "displayName": "Candidate 42",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 43
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000002b",
+    "displayName": "Candidate 43",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 44
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000002c",
+    "displayName": "Candidate 44",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 45
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000002d",
+    "displayName": "Candidate 45",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 46
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000002e",
+    "displayName": "Candidate 46",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 47
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000002f",
+    "displayName": "Candidate 47",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 48
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000030",
+    "displayName": "Candidate 48",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 49
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000031",
+    "displayName": "Candidate 49",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 50
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000032",
+    "displayName": "Candidate 50",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 51
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000033",
+    "displayName": "Candidate 51",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 52
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000034",
+    "displayName": "Candidate 52",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 53
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000035",
+    "displayName": "Candidate 53",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 54
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000036",
+    "displayName": "Candidate 54",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 55
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000037",
+    "displayName": "Candidate 55",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 56
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000038",
+    "displayName": "Candidate 56",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 57
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000039",
+    "displayName": "Candidate 57",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 58
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000003a",
+    "displayName": "Candidate 58",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 59
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000003b",
+    "displayName": "Candidate 59",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 60
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000003c",
+    "displayName": "Candidate 60",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 61
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000003d",
+    "displayName": "Candidate 61",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 62
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000003e",
+    "displayName": "Candidate 62",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 63
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000003f",
+    "displayName": "Candidate 63",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 64
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000040",
+    "displayName": "Candidate 64",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 65
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000041",
+    "displayName": "Candidate 65",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 66
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000042",
+    "displayName": "Candidate 66",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 67
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000043",
+    "displayName": "Candidate 67",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 68
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000044",
+    "displayName": "Candidate 68",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 69
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000045",
+    "displayName": "Candidate 69",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 70
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000046",
+    "displayName": "Candidate 70",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 71
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000047",
+    "displayName": "Candidate 71",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 72
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000048",
+    "displayName": "Candidate 72",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 73
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000049",
+    "displayName": "Candidate 73",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 74
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000004a",
+    "displayName": "Candidate 74",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 75
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000004b",
+    "displayName": "Candidate 75",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 76
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000004c",
+    "displayName": "Candidate 76",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 77
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000004d",
+    "displayName": "Candidate 77",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 78
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000004e",
+    "displayName": "Candidate 78",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 79
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000004f",
+    "displayName": "Candidate 79",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 80
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000050",
+    "displayName": "Candidate 80",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 81
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000051",
+    "displayName": "Candidate 81",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 82
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000052",
+    "displayName": "Candidate 82",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 83
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000053",
+    "displayName": "Candidate 83",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 84
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000054",
+    "displayName": "Candidate 84",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 85
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000055",
+    "displayName": "Candidate 85",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 86
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000056",
+    "displayName": "Candidate 86",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 87
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000057",
+    "displayName": "Candidate 87",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 88
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000058",
+    "displayName": "Candidate 88",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 89
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000059",
+    "displayName": "Candidate 89",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 90
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000005a",
+    "displayName": "Candidate 90",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 91
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000005b",
+    "displayName": "Candidate 91",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 92
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000005c",
+    "displayName": "Candidate 92",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 93
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000005d",
+    "displayName": "Candidate 93",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 94
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000005e",
+    "displayName": "Candidate 94",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 95
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000005f",
+    "displayName": "Candidate 95",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 96
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000060",
+    "displayName": "Candidate 96",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 97
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000061",
+    "displayName": "Candidate 97",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 98
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000062",
+    "displayName": "Candidate 98",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 99
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000063",
+    "displayName": "Candidate 99",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 100
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000064",
+    "displayName": "Candidate 100",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 101
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000065",
+    "displayName": "Candidate 101",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 102
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000066",
+    "displayName": "Candidate 102",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 103
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000067",
+    "displayName": "Candidate 103",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 104
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000068",
+    "displayName": "Candidate 104",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 105
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000069",
+    "displayName": "Candidate 105",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 106
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000006a",
+    "displayName": "Candidate 106",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 107
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000006b",
+    "displayName": "Candidate 107",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 108
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000006c",
+    "displayName": "Candidate 108",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 109
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000006d",
+    "displayName": "Candidate 109",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 110
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000006e",
+    "displayName": "Candidate 110",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 111
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000006f",
+    "displayName": "Candidate 111",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 112
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000070",
+    "displayName": "Candidate 112",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 113
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000071",
+    "displayName": "Candidate 113",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 114
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000072",
+    "displayName": "Candidate 114",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 115
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000073",
+    "displayName": "Candidate 115",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 116
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000074",
+    "displayName": "Candidate 116",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 117
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000075",
+    "displayName": "Candidate 117",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 118
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000076",
+    "displayName": "Candidate 118",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 119
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000077",
+    "displayName": "Candidate 119",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 120
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000078",
+    "displayName": "Candidate 120",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 121
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000079",
+    "displayName": "Candidate 121",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 122
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000007a",
+    "displayName": "Candidate 122",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 123
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000007b",
+    "displayName": "Candidate 123",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 124
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000007c",
+    "displayName": "Candidate 124",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 125
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000007d",
+    "displayName": "Candidate 125",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 126
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000007e",
+    "displayName": "Candidate 126",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 127
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000007f",
+    "displayName": "Candidate 127",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 128
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000080",
+    "displayName": "Candidate 128",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 129
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000081",
+    "displayName": "Candidate 129",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 130
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000082",
+    "displayName": "Candidate 130",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 131
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000083",
+    "displayName": "Candidate 131",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 132
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000084",
+    "displayName": "Candidate 132",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 133
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000085",
+    "displayName": "Candidate 133",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 134
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000086",
+    "displayName": "Candidate 134",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 135
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000087",
+    "displayName": "Candidate 135",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 136
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000088",
+    "displayName": "Candidate 136",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 137
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000089",
+    "displayName": "Candidate 137",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 138
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000008a",
+    "displayName": "Candidate 138",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 139
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000008b",
+    "displayName": "Candidate 139",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 140
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000008c",
+    "displayName": "Candidate 140",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 141
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000008d",
+    "displayName": "Candidate 141",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 142
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000008e",
+    "displayName": "Candidate 142",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 143
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000008f",
+    "displayName": "Candidate 143",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 144
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000090",
+    "displayName": "Candidate 144",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 145
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000091",
+    "displayName": "Candidate 145",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 146
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000092",
+    "displayName": "Candidate 146",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 147
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000093",
+    "displayName": "Candidate 147",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 148
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000094",
+    "displayName": "Candidate 148",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 149
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000095",
+    "displayName": "Candidate 149",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 150
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000096",
+    "displayName": "Candidate 150",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 151
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000097",
+    "displayName": "Candidate 151",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 152
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000098",
+    "displayName": "Candidate 152",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 153
+  },
+  {
+    "wallet": "0x0000000000000000000000000000000000000099",
+    "displayName": "Candidate 153",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 154
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000009a",
+    "displayName": "Candidate 154",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 155
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000009b",
+    "displayName": "Candidate 155",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 156
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000009c",
+    "displayName": "Candidate 156",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 157
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000009d",
+    "displayName": "Candidate 157",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 158
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000009e",
+    "displayName": "Candidate 158",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 159
+  },
+  {
+    "wallet": "0x000000000000000000000000000000000000009f",
+    "displayName": "Candidate 159",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 160
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a0",
+    "displayName": "Candidate 160",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 161
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a1",
+    "displayName": "Candidate 161",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 162
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a2",
+    "displayName": "Candidate 162",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 163
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a3",
+    "displayName": "Candidate 163",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 164
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a4",
+    "displayName": "Candidate 164",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 165
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a5",
+    "displayName": "Candidate 165",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 166
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a6",
+    "displayName": "Candidate 166",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 167
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a7",
+    "displayName": "Candidate 167",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 168
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a8",
+    "displayName": "Candidate 168",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 169
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000a9",
+    "displayName": "Candidate 169",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 170
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000aa",
+    "displayName": "Candidate 170",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 171
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000ab",
+    "displayName": "Candidate 171",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 172
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000ac",
+    "displayName": "Candidate 172",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 173
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000ad",
+    "displayName": "Candidate 173",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 174
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000ae",
+    "displayName": "Candidate 174",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 175
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000af",
+    "displayName": "Candidate 175",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 176
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b0",
+    "displayName": "Candidate 176",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 177
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b1",
+    "displayName": "Candidate 177",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 178
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b2",
+    "displayName": "Candidate 178",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 179
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b3",
+    "displayName": "Candidate 179",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 180
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b4",
+    "displayName": "Candidate 180",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 181
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b5",
+    "displayName": "Candidate 181",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 182
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b6",
+    "displayName": "Candidate 182",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 183
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b7",
+    "displayName": "Candidate 183",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 184
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b8",
+    "displayName": "Candidate 184",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 185
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000b9",
+    "displayName": "Candidate 185",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 186
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000ba",
+    "displayName": "Candidate 186",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 187
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000bb",
+    "displayName": "Candidate 187",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 188
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000bc",
+    "displayName": "Candidate 188",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 189
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000bd",
+    "displayName": "Candidate 189",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 190
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000be",
+    "displayName": "Candidate 190",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 191
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000bf",
+    "displayName": "Candidate 191",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 192
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000c0",
+    "displayName": "Candidate 192",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 193
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000c1",
+    "displayName": "Candidate 193",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 194
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000c2",
+    "displayName": "Candidate 194",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 195
+  },
+  {
+    "wallet": "0x00000000000000000000000000000000000000c3",
+    "displayName": "Candidate 195",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 8,
+    "robustSkillScore": 12,
+    "shadowRobustMetaScore": 10,
+    "longitudinalComparisonScore": 6,
+    "comparisonConfidence": "insufficient",
+    "runCount": 0,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "mixed",
+    "knownCategoryCoverageScore": 0,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 196
+  }
+]

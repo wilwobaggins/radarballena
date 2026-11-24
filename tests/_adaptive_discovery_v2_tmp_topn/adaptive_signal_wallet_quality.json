@@ -1,0 +1,28 @@
+{
+  "runId": "quality",
+  "generatedAt": "2026-06-29T12:00:00+00:00",
+  "benchmarkWallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+  "walletCount": 4,
+  "wallets": [
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "keepInRosterRecommendation": "KEEP_BENCHMARK",
+      "actionableSignalScore": 90
+    },
+    {
+      "wallet": "0x1111111111111111111111111111111111111111",
+      "keepInRosterRecommendation": "KEEP_CANDIDATE",
+      "actionableSignalScore": 84
+    },
+    {
+      "wallet": "0x2222222222222222222222222222222222222222",
+      "keepInRosterRecommendation": "REPLACE_CANDIDATE",
+      "actionableSignalScore": 18
+    },
+    {
+      "wallet": "0x3333333333333333333333333333333333333333",
+      "keepInRosterRecommendation": "KEEP_CANDIDATE",
+      "actionableSignalScore": 61
+    }
+  ]
+}

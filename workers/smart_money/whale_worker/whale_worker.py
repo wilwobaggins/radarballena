@@ -5,6 +5,7 @@ import urllib.parse
 import urllib.request
 import urllib.error
 import os
+import tempfile
 
 WATCHED_WHALES = {
     "nba_volume": {
@@ -97,15 +98,49 @@ def load_seen_hashes():
 
 
 def save_seen_hashes(seen):
-    """Save seen hashes to persistent file, limiting to MAX_SEEN_HASHES."""
+    """Atomically save seen hashes, leaving the prior checkpoint intact on error."""
+    temp_path = None
     try:
-        os.makedirs(os.path.dirname(SEEN_FILE) or ".", exist_ok=True)
+        target_path = os.path.abspath(SEEN_FILE)
+        target_dir = os.path.dirname(target_path)
+        os.makedirs(target_dir, exist_ok=True)
         # Keep only the most recent hashes to prevent unbounded growth
         hashes_list = list(seen)[-MAX_SEEN_HASHES:]
-        with open(SEEN_FILE, 'w') as f:
+
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=target_dir,
+            prefix=f".{os.path.basename(target_path)}.",
+            suffix=".tmp",
+            delete=False,
+        ) as f:
+            temp_path = f.name
             json.dump(hashes_list, f)
-    except Exception as e:
-        print(f"[WARN] Failed to save seen hashes: {e}")
+            f.flush()
+            os.fsync(f.fileno())
+
+        # Same-directory replacement is atomic on the target filesystem.
+        os.replace(temp_path, target_path)
+        temp_path = None
+        return True
+    except Exception as exc:
+        print(f"[WARN] Failed to save seen hashes: {type(exc).__name__}")
+        return False
+    finally:
+        if temp_path is not None:
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+
+
+def persist_seen_hashes(seen):
+    """Persist the checkpoint only for real runs, never for dry-run simulations."""
+    if DRY_RUN:
+        print("[DRY_RUN] Checkpoint unchanged", flush=True)
+        return False
+    return save_seen_hashes(seen)
 
 
 def fetch_activity(wallet):
@@ -360,7 +395,7 @@ def post_alert(alert):
     if DRY_RUN:
         print("[DRY_RUN] Would POST alert to backend", flush=True)
         print(json.dumps(alert, indent=2, ensure_ascii=False), flush=True)
-        return True
+        return None
 
     if not INTERNAL_API_KEY:
         print("[ERROR] INTERNAL_API_KEY is missing", flush=True)
@@ -502,11 +537,13 @@ def main():
 
                     sent_ok = post_alert(alert)
 
-                    if sent_ok:
+                    if sent_ok is True:
                         seen.add(alert_hash)
                         printed += 1
-                    else:
+                    elif sent_ok is False:
                         print("[WARN] Alert not marked as seen because POST failed", flush=True)
+                    else:
+                        print("[DRY_RUN] Alert not marked as seen", flush=True)
 
                 print(
                     f"[{whale_id}] fetched={total} trades={total-non_trades} "
@@ -527,7 +564,7 @@ def main():
         )
 
         # Save seen hashes periodically
-        save_seen_hashes(seen)
+        persist_seen_hashes(seen)
         first_run = False
 
         elapsed = round(time.time() - cycle_start, 2)

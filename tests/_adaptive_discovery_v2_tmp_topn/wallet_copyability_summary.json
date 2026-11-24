@@ -1,0 +1,22 @@
+{
+  "0x1111111111111111111111111111111111111111": {
+    "clustersCount": 8,
+    "actionableClusterCount": 4,
+    "hedgeRate": 0.1
+  },
+  "0x2222222222222222222222222222222222222222": {
+    "clustersCount": 8,
+    "actionableClusterCount": 1,
+    "hedgeRate": 0.6
+  },
+  "0x3333333333333333333333333333333333333333": {
+    "clustersCount": 8,
+    "actionableClusterCount": 3,
+    "hedgeRate": 0.15
+  },
+  "0x4444444444444444444444444444444444444444": {
+    "clustersCount": 8,
+    "actionableClusterCount": 1,
+    "hedgeRate": 0.2
+  }
+}

@@ -1,0 +1,171 @@
+[
+  {
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "displayName": "Ken",
+    "roles": [
+      "active",
+      "benchmark"
+    ],
+    "profiles": [
+      "mixed"
+    ],
+    "classification": "WHALE_BUT_NOISY",
+    "behaviorQualityScore": 64,
+    "robustSkillScore": 77,
+    "shadowRobustMetaScore": 69,
+    "longitudinalComparisonScore": 62.1,
+    "comparisonConfidence": "sufficient",
+    "runCount": 9,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "geopolitics",
+    "knownCategoryCoverageScore": 54,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_watch",
+    "rank": 1
+  },
+  {
+    "wallet": "0x1111111111111111111111111111111111111111",
+    "displayName": "Macro Wallet",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "macro"
+    ],
+    "classification": "SPECIALIST_WALLET",
+    "behaviorQualityScore": 79,
+    "robustSkillScore": 88,
+    "shadowRobustMetaScore": 83,
+    "longitudinalComparisonScore": 74,
+    "comparisonConfidence": "sufficient",
+    "runCount": 8,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "macro",
+    "knownCategoryCoverageScore": 79,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_strong",
+    "rank": 2
+  },
+  {
+    "wallet": "0x2222222222222222222222222222222222222222",
+    "displayName": "Politics Wallet",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "politics"
+    ],
+    "classification": "SPECIALIST_WALLET",
+    "behaviorQualityScore": 78,
+    "robustSkillScore": 86,
+    "shadowRobustMetaScore": 81,
+    "longitudinalComparisonScore": 73,
+    "comparisonConfidence": "sufficient",
+    "runCount": 8,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "politics",
+    "knownCategoryCoverageScore": 78,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_strong",
+    "rank": 3
+  },
+  {
+    "wallet": "0x3333333333333333333333333333333333333333",
+    "displayName": "Geopolitics Wallet",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "geopolitics"
+    ],
+    "classification": "SPECIALIST_WALLET",
+    "behaviorQualityScore": 77,
+    "robustSkillScore": 84,
+    "shadowRobustMetaScore": 79,
+    "longitudinalComparisonScore": 72,
+    "comparisonConfidence": "sufficient",
+    "runCount": 8,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "geopolitics",
+    "knownCategoryCoverageScore": 77,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_strong",
+    "rank": 4
+  },
+  {
+    "wallet": "0x4444444444444444444444444444444444444444",
+    "displayName": "Crypto Wallet",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "crypto"
+    ],
+    "classification": "SPECIALIST_WALLET",
+    "behaviorQualityScore": 76,
+    "robustSkillScore": 82,
+    "shadowRobustMetaScore": 77,
+    "longitudinalComparisonScore": 71,
+    "comparisonConfidence": "sufficient",
+    "runCount": 8,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "crypto",
+    "knownCategoryCoverageScore": 76,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_strong",
+    "rank": 5
+  },
+  {
+    "wallet": "0x5555555555555555555555555555555555555555",
+    "displayName": "Technology Wallet",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "technology"
+    ],
+    "classification": "SPECIALIST_WALLET",
+    "behaviorQualityScore": 75,
+    "robustSkillScore": 80,
+    "shadowRobustMetaScore": 75,
+    "longitudinalComparisonScore": 70,
+    "comparisonConfidence": "sufficient",
+    "runCount": 8,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "technology",
+    "knownCategoryCoverageScore": 75,
+    "pnlConcentrationLevel": "low",
+    "recommendation": "shadow_strong",
+    "rank": 6
+  },
+  {
+    "wallet": "0x6666666666666666666666666666666666666666",
+    "displayName": "Rejected Wallet",
+    "roles": [
+      "candidate"
+    ],
+    "profiles": [
+      "rejected"
+    ],
+    "classification": "SPECIALIST_WALLET",
+    "behaviorQualityScore": 74,
+    "robustSkillScore": 78,
+    "shadowRobustMetaScore": 73,
+    "longitudinalComparisonScore": 69,
+    "comparisonConfidence": "sufficient",
+    "runCount": 8,
+    "stabilityScore": 0.0,
+    "scoreTrend": "stable",
+    "dominantKnownCategory": "rejected",
+    "knownCategoryCoverageScore": 74,
+    "pnlConcentrationLevel": "extreme",
+    "recommendation": "shadow_strong",
+    "rank": 7
+  }
+]

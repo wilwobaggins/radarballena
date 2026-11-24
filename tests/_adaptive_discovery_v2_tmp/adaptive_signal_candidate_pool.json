@@ -1,0 +1,218 @@
+{
+  "generatedAt": "2026-11-18T18:37:47.873530+00:00",
+  "sourceStatus": "ok",
+  "candidateCount": 3,
+  "strongCandidateCount": 1,
+  "watchlistCandidateCount": 1,
+  "weakCandidateCount": 0,
+  "rejectedCandidateCount": 2,
+  "candidates": [
+    {
+      "wallet": "0x3333333333333333333333333333333333333333",
+      "candidateQualityScore": 100,
+      "candidateRecommendation": "STRONG_CANDIDATE",
+      "discoverySources": [
+        "adaptive_signal_wallet_quality",
+        "trade_copyability_shadow",
+        "wallet_category_rankings",
+        "wallet_copyability_summary",
+        "wallet_shadow_rankings"
+      ],
+      "sourceCount": 5,
+      "seenInPreviousRoster": false,
+      "previousQualityRecommendation": "KEEP_CANDIDATE",
+      "previousActionableSignalScore": 61,
+      "previousRoutineClusterRate": null,
+      "previousMicroMarketClusterRate": null,
+      "previousHedgeRate": 0.15,
+      "previousBestCategory": "crypto",
+      "robustSkillScore": 0,
+      "categorySkillScore": 0,
+      "walletCategorySkillScore": 0,
+      "categorySkillStatus": "sufficient",
+      "recentRawTrades": 11,
+      "recentNormalizedTrades": 11,
+      "uniqueMarketsCount": 11,
+      "totalRecentUsdc": 400,
+      "clusterViabilityScore": 270.93,
+      "strategicMarketExposureScore": 8,
+      "microMarketExposureScore": 0,
+      "routineRiskScore": 0,
+      "copyabilityPotentialScore": 30.8,
+      "candidateReasons": [
+        "multi_market_activity",
+        "strategic_market_exposure",
+        "copyability_signal_present"
+      ],
+      "candidateRisks": [
+        "copyability_summary_present",
+        "previous_quality_recommendation",
+        "insufficient_live_trades",
+        "insufficient_normalized_trades"
+      ],
+      "preflightStatus": "completed",
+      "preflightReason": "clusters_generated",
+      "preflightSource": "copyability_api_fetch"
+    },
+    {
+      "wallet": "0x2222222222222222222222222222222222222222",
+      "candidateQualityScore": 73.62,
+      "candidateRecommendation": "CANDIDATE",
+      "discoverySources": [
+        "adaptive_signal_wallet_quality",
+        "trade_copyability_shadow",
+        "wallet_category_rankings",
+        "wallet_copyability_summary",
+        "wallet_shadow_rankings"
+      ],
+      "sourceCount": 5,
+      "seenInPreviousRoster": false,
+      "previousQualityRecommendation": "REPLACE_CANDIDATE",
+      "previousActionableSignalScore": 18,
+      "previousRoutineClusterRate": null,
+      "previousMicroMarketClusterRate": null,
+      "previousHedgeRate": 0.6,
+      "previousBestCategory": "macro",
+      "robustSkillScore": 0,
+      "categorySkillScore": 0,
+      "walletCategorySkillScore": 0,
+      "categorySkillStatus": "sufficient",
+      "recentRawTrades": 8,
+      "recentNormalizedTrades": 7,
+      "uniqueMarketsCount": 7,
+      "totalRecentUsdc": 300,
+      "clusterViabilityScore": 182,
+      "strategicMarketExposureScore": 8,
+      "microMarketExposureScore": 0,
+      "routineRiskScore": 2.4,
+      "copyabilityPotentialScore": 21.2,
+      "candidateReasons": [
+        "multi_market_activity",
+        "strategic_market_exposure",
+        "copyability_signal_present"
+      ],
+      "candidateRisks": [
+        "copyability_summary_present",
+        "previous_quality_recommendation",
+        "previous_replace_candidate",
+        "high_hedge_rate",
+        "insufficient_live_trades",
+        "insufficient_normalized_trades"
+      ],
+      "preflightStatus": "completed",
+      "preflightReason": "clusters_generated",
+      "preflightSource": "copyability_api_fetch"
+    },
+    {
+      "wallet": "0x1111111111111111111111111111111111111111",
+      "candidateQualityScore": 52.74,
+      "candidateRecommendation": "WATCHLIST_CANDIDATE",
+      "discoverySources": [
+        "adaptive_signal_wallet_quality",
+        "trade_copyability_shadow",
+        "wallet_category_rankings",
+        "wallet_copyability_summary",
+        "wallet_shadow_rankings"
+      ],
+      "sourceCount": 5,
+      "seenInPreviousRoster": false,
+      "previousQualityRecommendation": "KEEP_CANDIDATE",
+      "previousActionableSignalScore": 84,
+      "previousRoutineClusterRate": null,
+      "previousMicroMarketClusterRate": null,
+      "previousHedgeRate": 0.1,
+      "previousBestCategory": "politics",
+      "robustSkillScore": 0,
+      "categorySkillScore": 0,
+      "walletCategorySkillScore": 0,
+      "categorySkillStatus": "sufficient",
+      "recentRawTrades": 8,
+      "recentNormalizedTrades": 1,
+      "uniqueMarketsCount": 1,
+      "totalRecentUsdc": 500,
+      "clusterViabilityScore": 0,
+      "strategicMarketExposureScore": 8,
+      "microMarketExposureScore": 0,
+      "routineRiskScore": 0,
+      "copyabilityPotentialScore": 18.4,
+      "candidateReasons": [
+        "strategic_market_exposure",
+        "copyability_signal_present"
+      ],
+      "candidateRisks": [
+        "copyability_summary_present",
+        "previous_quality_recommendation",
+        "insufficient_live_trades",
+        "insufficient_normalized_trades",
+        "low_unique_markets",
+        "low_cluster_viability"
+      ],
+      "preflightStatus": "unknown",
+      "preflightReason": null,
+      "preflightSource": null
+    }
+  ],
+  "rejectedCandidates": [
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "candidateQualityScore": 6,
+      "candidateRecommendation": "REJECT",
+      "discoverySources": [
+        "adaptive_signal_wallet_quality",
+        "adaptive_signal_wallet_roster",
+        "engine_wallet_scores",
+        "wallet_shadow_rankings"
+      ],
+      "sourceCount": 4,
+      "candidateReasons": [
+        "strategic_market_exposure"
+      ],
+      "candidateRisks": [
+        "previous_quality_recommendation",
+        "insufficient_live_trades",
+        "insufficient_normalized_trades",
+        "low_unique_markets",
+        "low_cluster_viability",
+        "missing_category_status"
+      ]
+    },
+    {
+      "wallet": "0x4444444444444444444444444444444444444444",
+      "candidateQualityScore": 0,
+      "candidateRecommendation": "REJECT",
+      "discoverySources": [
+        "trade_copyability_shadow",
+        "wallet_category_rankings",
+        "wallet_copyability_summary",
+        "wallet_shadow_rankings"
+      ],
+      "sourceCount": 4,
+      "candidateReasons": [],
+      "candidateRisks": [
+        "micro_market",
+        "copyability_summary_present",
+        "no_prior_actionable_signal",
+        "insufficient_live_trades",
+        "insufficient_normalized_trades",
+        "low_unique_markets",
+        "low_cluster_viability"
+      ]
+    }
+  ],
+  "reasonSummary": {
+    "risk:insufficient_live_trades": 5,
+    "risk:insufficient_normalized_trades": 5,
+    "risk:copyability_summary_present": 4,
+    "risk:previous_quality_recommendation": 4,
+    "strategic_market_exposure": 4,
+    "copyability_signal_present": 3,
+    "risk:low_cluster_viability": 3,
+    "risk:low_unique_markets": 3,
+    "multi_market_activity": 2,
+    "risk:high_hedge_rate": 1,
+    "risk:micro_market": 1,
+    "risk:missing_category_status": 1,
+    "risk:no_prior_actionable_signal": 1,
+    "risk:previous_replace_candidate": 1
+  }
+}

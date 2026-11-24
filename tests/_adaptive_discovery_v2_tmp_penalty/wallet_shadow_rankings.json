@@ -1,0 +1,47 @@
+[
+  {
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "displayName": "Ken",
+    "robustSkillScore": 80,
+    "categorySkillScore": 70,
+    "dominantKnownCategory": "geopolitics",
+    "recommendation": "shadow_watch",
+    "rank": 1
+  },
+  {
+    "wallet": "0x1111111111111111111111111111111111111111",
+    "displayName": "Strong",
+    "robustSkillScore": 88,
+    "categorySkillScore": 84,
+    "dominantKnownCategory": "politics",
+    "recommendation": "shadow_strong",
+    "rank": 2
+  },
+  {
+    "wallet": "0x2222222222222222222222222222222222222222",
+    "displayName": "Replace",
+    "robustSkillScore": 72,
+    "categorySkillScore": 64,
+    "dominantKnownCategory": "macro",
+    "recommendation": "shadow_watch",
+    "rank": 3
+  },
+  {
+    "wallet": "0x3333333333333333333333333333333333333333",
+    "displayName": "Crypto",
+    "robustSkillScore": 66,
+    "categorySkillScore": 62,
+    "dominantKnownCategory": "crypto",
+    "recommendation": "shadow_watch",
+    "rank": 4
+  },
+  {
+    "wallet": "0x4444444444444444444444444444444444444444",
+    "displayName": "Micro",
+    "robustSkillScore": 65,
+    "categorySkillScore": 61,
+    "dominantKnownCategory": "sports",
+    "recommendation": "shadow_watch",
+    "rank": 5
+  }
+]
